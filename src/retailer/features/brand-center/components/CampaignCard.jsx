@@ -1,0 +1,178 @@
+import React from 'react';
+import { Clock, Pin, Instagram, Facebook, Mail, FileText, Download, Smartphone, Linkedin, Twitter, Globe, MessageSquare, Share2, Check, Flame } from 'lucide-react';
+
+const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpiringStatus = false }) => {
+  // Calculate asset counts
+  const linkedTemplates = templates.filter(t => campaign.templates?.includes(t.id));
+  const linkedAssets = files.filter(f => campaign.assets?.includes(f.id));
+
+  const socialTemplates = linkedTemplates.filter(t => t.type === 'social');
+  const socialCount = socialTemplates.length;
+  const emailCount = linkedTemplates.filter(t => t.type === 'email').length;
+  const smsCount = linkedTemplates.filter(t => t.type === 'sms').length;
+  const fileCount = linkedAssets.filter(f => f.type !== 'folder').length;
+
+  // Extract unique platforms
+  const platforms = [...new Set(socialTemplates.flatMap(t => t.platforms || []))];
+
+  // Helper for status
+  const getExpirationStatus = () => {
+      if (campaign.endDate === 'Permanent') return { type: 'permanent', label: 'No Expiration', color: 'text-green-600' };
+      
+      const end = new Date(campaign.endDate);
+      const now = new Date('2025-11-26'); // Simulated Now
+      const diffTime = end - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays <= 0) return { type: 'expired', label: 'Expired', color: 'text-gray-400' };
+      if (diffDays <= 1) return { type: 'urgent', label: 'Ends Today', color: 'text-red-600', icon: <Flame size={12} className="fill-red-600 text-red-600"/> };
+      if (diffDays <= 7) return { type: 'warning', label: `${diffDays} Days Left`, color: 'text-amber-600' };
+      
+      return { type: 'normal', label: `Ends ${campaign.endDate}`, color: 'text-gray-500' };
+  };
+
+  const expiration = getExpirationStatus();
+  const isUsed = campaign.retailerUsage && Object.values(campaign.retailerUsage).some(v => v === true);
+  const isNew = campaign.views < 50; 
+
+  const getPlatformIcon = (p) => {
+      switch(p) {
+          case 'instagram': return <Instagram size={14} className="text-pink-600"/>;
+          case 'facebook': return <div className="w-3.5 h-3.5 bg-blue-600 rounded-full flex items-center justify-center text-[9px] text-white font-bold">f</div>;
+          case 'x': 
+          case 'twitter': return <div className="w-3.5 h-3.5 bg-black rounded-full flex items-center justify-center text-[9px] text-white font-bold">X</div>;
+          case 'google': return <div className="w-3.5 h-3.5 bg-red-500 rounded-full flex items-center justify-center text-[9px] text-white font-bold">G</div>;
+          default: return <Smartphone size={14} className="text-gray-400"/>;
+      }
+  };
+
+  return (
+    <div className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full border border-gray-100 hover:border-gray-200">
+      {/* Visual Area (Fixed Aspect Ratio 16:9) */}
+      <div className="relative aspect-video w-full overflow-hidden bg-gray-100 rounded-t-xl flex-shrink-0">
+        {/* Cover Image */}
+        <div className={`absolute inset-0 ${campaign.cover} transition-transform duration-700 group-hover:scale-105`}></div>
+
+        {/* Status Badge (Top Left) - Priority: Used > New/Expiring */}
+        {/* Status Badge (Top Left) - Priority: Used > New/Expiring */}
+        <div className="absolute top-3 left-3 z-30">
+           {isUsed ? (
+              <div className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm uppercase tracking-wider flex items-center gap-1 border border-green-200">
+                 <Check size={10} strokeWidth={3} /> Used
+              </div>
+           ) : (
+              /* If not used, show New or Expiring if applicable (logic can be refined) */
+              null 
+           )}
+        </div>
+
+        {/* Right Side Badges (New / Expiring) - Only if NOT Used (Mutual Exclusion requested) */}
+        {!isUsed && (
+            <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-2">
+               {isNew && expiration.type !== 'urgent' && expiration.type !== 'expired' && (
+                  <div className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider">
+                     New
+                  </div>
+               )}
+               {expiration.type === 'urgent' && (
+                  <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider flex items-center gap-1 animate-pulse border border-red-700">
+                     <Flame size={10} className="fill-white"/> Ends Today
+                  </div>
+               )}
+               {expiration.type === 'expired' && (
+                  <div className="bg-gray-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-gray-900">
+                     Expired
+                  </div>
+               )}
+            </div>
+        )}
+      </div>
+
+      {/* Info Area */}
+      <div className="flex-1 p-4 flex flex-col bg-white relative z-20 rounded-b-xl">
+         {/* Row 1: Brand Logo + Name */}
+         <div className="flex items-center gap-2 mb-2">
+            <div className={`w-5 h-5 rounded-full ${brand?.logo || 'bg-gray-200'} flex items-center justify-center text-white text-[8px] font-bold`}>
+               {brand?.name?.substring(0, 1)}
+            </div>
+            <span className="text-xs font-medium text-gray-500">{brand?.name}</span>
+         </div>
+         
+         {/* Row 2: Title + Pin */}
+         <div className="flex items-start justify-between gap-2 mb-1">
+            <h3 
+               className="font-serif text-base font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors"
+               title={campaign.title}
+            >
+               {campaign.title}
+            </h3>
+            {campaign.isPinned && (
+               <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>
+            )}
+         </div>
+
+         {/* Row 3: Expiration Date */}
+         <div className={`text-xs font-medium mb-4 flex items-center gap-1 ${expiration.color}`}>
+            {expiration.icon}
+            {expiration.label}
+         </div>
+
+         {/* Row 4: Asset Icons (Platform logos, Envelope, Bubble, Download) */}
+         <div className="mt-auto pt-3 border-t border-gray-50 flex items-center gap-1.5">
+             {/* Social Platforms */}
+             {platforms.length > 0 && (
+                <div className="flex items-center -space-x-1.5 group/social relative cursor-help">
+                   {platforms.map(p => (
+                      <div key={p} className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shadow-sm z-10 relative border border-white">
+                         {getPlatformIcon(p)}
+                      </div>
+                   ))}
+                   {/* Tooltip */}
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover/social:opacity-100 transition pointer-events-none whitespace-nowrap z-30">
+                      {socialCount} Posts
+                   </div>
+                </div>
+             )}
+
+             {/* Email */}
+             {emailCount > 0 && (
+                <div className="group/email relative cursor-help">
+                   <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                      <Mail size={12}/>
+                   </div>
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover/email:opacity-100 transition pointer-events-none whitespace-nowrap z-30">
+                      {emailCount} Emails
+                   </div>
+                </div>
+             )}
+
+             {/* SMS */}
+             {smsCount > 0 && (
+                <div className="group/sms relative cursor-help">
+                   <div className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                      <MessageSquare size={12}/>
+                   </div>
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover/sms:opacity-100 transition pointer-events-none whitespace-nowrap z-30">
+                      {smsCount} SMS
+                   </div>
+                </div>
+             )}
+
+             {/* Downloads */}
+             {fileCount > 0 && (
+                <div className="group/files relative cursor-help">
+                   <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                      <Download size={12}/>
+                   </div>
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover/files:opacity-100 transition pointer-events-none whitespace-nowrap z-30">
+                      {fileCount} Files
+                   </div>
+                </div>
+             )}
+         </div>
+      </div>
+    </div>
+  );
+};
+
+export default CampaignCard;
