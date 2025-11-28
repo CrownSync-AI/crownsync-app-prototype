@@ -1,10 +1,6 @@
 # CrownSync App Prototype
 
-A prototype for **CrownSync** - A modern brand asset management platform that connects luxury brands with retailers.
-
-## 🎯 Overview
-
-CrownSync streamlines the distribution and management of brand assets (campaigns, templates, files) between luxury brands and their retail partners. This prototype demonstrates the core UX/UI concepts and workflows.
+**Note**: This is a prototype for demonstration purposes. Mock data is used throughout the application.
 
 ## 🚀 Tech Stack
 
@@ -48,16 +44,8 @@ crownsync-app/
 └── ...
 ```
 
-## 📝 License
-
-MIT
-
 ## 🔗 Links
 
 - [React Documentation](https://react.dev/)
 - [Vite Documentation](https://vite.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
-
----
-
-**Note**: This is a prototype for demonstration purposes. Mock data is used throughout the application.
