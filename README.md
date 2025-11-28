@@ -48,23 +48,6 @@ crownsync-app/
 └── ...
 ```
 
-## 🎨 Features
-
-### Brand Side
-
-- Campaign management (create, share, track)
-- Asset library with folder organization
-- Template creation (social, email, SMS)
-- Retailer management
-- E-catalog publishing
-
-### Retailer Side
-
-- Brand center with campaigns overview
-- Asset browsing and filtering
-- Campaign usage tracking
-- Partner brand discovery
-
 ## 📝 License
 
 MIT
