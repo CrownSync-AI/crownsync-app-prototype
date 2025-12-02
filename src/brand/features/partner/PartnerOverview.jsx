@@ -10,7 +10,7 @@ const formatBytes = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-const AssetsOverview = ({ files, campaigns, notify, isEmpty }) => {
+const PartnerOverview = ({ files, campaigns, notify, isEmpty }) => {
   if (isEmpty) return <EmptyState title="No Assets Yet" description="Upload your first files or create a campaign to get started." action="Upload Assets" onAction={() => notify('Upload Clicked', 'success')} />;
 
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
@@ -126,4 +126,4 @@ const AssetsOverview = ({ files, campaigns, notify, isEmpty }) => {
   );
 };
 
-export default AssetsOverview;
+export default PartnerOverview;

@@ -58,17 +58,22 @@ const AllCatalogs = ({ catalogs, brands }) => {
   );
 };
 
+import RetailerBrandDetail from './RetailerBrandDetail';
+
+// ... (imports)
+
 const BrandCenter = ({ campaigns, catalogs, templates, files }) => {
   const [view, setView] = useState('overview'); // Default to overview
-  const [selectedBrandId, setSelectedBrandId] = useState('all');
+  const [selectedBrandId] = useState('all');
+  const [selectedBrand, setSelectedBrand] = useState(null);
 
   const handleNavigate = (targetView) => {
     setView(targetView);
   };
 
   const handleSelectBrand = (brand) => {
-    setSelectedBrandId(brand.id);
-    setView('campaigns');
+    setSelectedBrand(brand);
+    setView('brand-detail');
   };
 
   return (
@@ -83,7 +88,7 @@ const BrandCenter = ({ campaigns, catalogs, templates, files }) => {
           </button>
           <button 
             onClick={() => setView('brands')}
-            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'brands' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
+            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'brands' || view === 'brand-detail' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
           >
             Partner Brands
           </button>
@@ -120,6 +125,14 @@ const BrandCenter = ({ campaigns, catalogs, templates, files }) => {
                 onSelectBrand={handleSelectBrand} 
               />
             </div>
+          )}
+          {view === 'brand-detail' && selectedBrand && (
+             <div className="h-full overflow-auto">
+                <RetailerBrandDetail 
+                   brand={selectedBrand}
+                   onBack={() => setView('brands')}
+                />
+             </div>
           )}
           {view === 'campaigns' && (
              <AllCampaigns 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Clock, Pin, Instagram, Facebook, Mail, FileText, Download, Smartphone, Linkedin, Twitter, Globe, MessageSquare, Share2, Check, Flame } from 'lucide-react';
+import { Clock, Pin, Instagram, Facebook, Mail, FileText, Download, Smartphone, Linkedin, Twitter, Globe, MessageSquare, Share2, Check, Flame, ArrowRight, Lock } from 'lucide-react';
 
-const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpiringStatus = false }) => {
+const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
   // Calculate asset counts
   const linkedTemplates = templates.filter(t => campaign.templates?.includes(t.id));
   const linkedAssets = files.filter(f => campaign.assets?.includes(f.id));
@@ -17,14 +17,14 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
 
   // Helper for status
   const getExpirationStatus = () => {
-      if (campaign.endDate === 'Permanent') return { type: 'permanent', label: 'No Expiration', color: 'text-green-600' };
+      if (campaign.endDate === 'Permanent') return { type: 'permanent', label: 'No Expiration', color: 'text-green-600', icon: <div className="text-lg leading-none">∞</div> };
       
       const end = new Date(campaign.endDate);
       const now = new Date('2025-11-26'); // Simulated Now
       const diffTime = end - now;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
-      if (diffDays <= 0) return { type: 'expired', label: 'Expired', color: 'text-gray-400' };
+      if (diffDays <= 0) return { type: 'expired', label: `Expired ${campaign.endDate}`, color: 'text-gray-400' };
       if (diffDays <= 1) return { type: 'urgent', label: 'Ends Today', color: 'text-red-600', icon: <Flame size={12} className="fill-red-600 text-red-600"/> };
       if (diffDays <= 7) return { type: 'warning', label: `${diffDays} Days Left`, color: 'text-amber-600' };
       
@@ -33,57 +33,78 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
 
   const expiration = getExpirationStatus();
   const isUsed = campaign.retailerUsage && Object.values(campaign.retailerUsage).some(v => v === true);
-  const isNew = campaign.views < 50; 
+  
+  // New & Blue Dot Logic
+  const now = new Date('2025-11-26');
+  const start = new Date(campaign.startDate);
+  const lastUpdated = campaign.lastUpdated ? new Date(campaign.lastUpdated) : null;
+  
+  const isNew = (now - start) / (1000 * 60 * 60 * 24) <= 3;
+  const isUpdated = !isNew && lastUpdated && (now - lastUpdated) / (1000 * 60 * 60) <= 48; 
 
   const getPlatformIcon = (p) => {
       switch(p) {
           case 'instagram': return <Instagram size={14} className="text-pink-600"/>;
           case 'facebook': return <div className="w-3.5 h-3.5 bg-blue-600 rounded-full flex items-center justify-center text-[9px] text-white font-bold">f</div>;
           case 'x': 
-          case 'twitter': return <div className="w-3.5 h-3.5 bg-black rounded-full flex items-center justify-center text-[9px] text-white font-bold">X</div>;
-          case 'google': return <div className="w-3.5 h-3.5 bg-red-500 rounded-full flex items-center justify-center text-[9px] text-white font-bold">G</div>;
+          case 'twitter': return <div className="w-3.5 h-3.5 bg-black rounded-sm flex items-center justify-center text-white font-black text-[10px]">𝕏</div>;
+          case 'google': 
+          case 'gmb': return <div className="w-3.5 h-3.5 rounded-sm flex items-center justify-center text-white font-bold text-[9px]" style={{backgroundColor: '#4285F4'}}>G</div>;
           default: return <Smartphone size={14} className="text-gray-400"/>;
       }
   };
 
+  const isExpired = expiration.type === 'expired';
+
   return (
-    <div className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full border border-gray-100 hover:border-gray-200">
+    <div className={`group relative bg-white rounded-xl shadow-sm transition-all duration-300 flex flex-col h-full border border-gray-100 ${isExpired ? 'cursor-default' : 'hover:shadow-xl hover:border-gray-200 cursor-pointer'}`}>
       {/* Visual Area (Fixed Aspect Ratio 16:9) */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100 rounded-t-xl flex-shrink-0">
         {/* Cover Image */}
-        <div className={`absolute inset-0 ${campaign.cover} transition-transform duration-700 group-hover:scale-105`}></div>
+        <div className={`absolute inset-0 ${campaign.cover} transition-transform duration-700 ${!isExpired && 'group-hover:scale-105'}`}></div>
+        
+        {/* Expired Overlay */}
+        {isExpired && <div className="absolute inset-0 bg-white/30 backdrop-grayscale"></div>}
 
-        {/* Status Badge (Top Left) - Priority: Used > New/Expiring */}
-        {/* Status Badge (Top Left) - Priority: Used > New/Expiring */}
-        <div className="absolute top-3 left-3 z-30">
-           {isUsed ? (
-              <div className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm uppercase tracking-wider flex items-center gap-1 border border-green-200">
-                 <Check size={10} strokeWidth={3} /> Used
+        {/* Status Badge (Top Left) - Priority: New/Expiring/Expired */}
+        <div className="absolute top-3 left-3 z-30 flex flex-col items-start gap-2">
+           {isNew && expiration.type !== 'urgent' && !isExpired && (
+              <div className="relative overflow-hidden bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-yellow-300">
+                 <span className="relative z-10">New</span>
+                 <div className="absolute inset-0 bg-white/40 skew-x-12 animate-[shimmer_2s_infinite] -translate-x-full"></div>
               </div>
-           ) : (
-              /* If not used, show New or Expiring if applicable (logic can be refined) */
-              null 
+           )}
+            {isUpdated && expiration.type !== 'urgent' && !isExpired && (
+               <div className="relative group/updated cursor-help">
+                   <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-blue-400">
+                      <span className="relative z-10">Updated</span>
+                      <div className="absolute inset-0 bg-white/20 skew-x-12 animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                   </div>
+                   {/* Tooltip */}
+                   <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover/updated:opacity-100 transition pointer-events-none whitespace-nowrap z-50 shadow-lg font-sans font-normal min-w-[200px]">
+                       <div className="font-bold mb-0.5">Updated</div>
+                       <div className="text-gray-300 text-[10px] whitespace-normal leading-tight">This campaign has been updated within the last 48 hours.</div>
+                   </div>
+               </div>
+            )}
+           {expiration.type === 'urgent' && (
+              <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider flex items-center gap-1 animate-pulse border border-red-700">
+                 <Flame size={10} className="fill-white"/> Ends Today
+              </div>
+           )}
+           {isExpired && (
+              <div className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-black flex items-center gap-1">
+                 <Lock size={10} /> EXPIRED
+              </div>
            )}
         </div>
 
-        {/* Right Side Badges (New / Expiring) - Only if NOT Used (Mutual Exclusion requested) */}
-        {!isUsed && (
-            <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-2">
-               {isNew && expiration.type !== 'urgent' && expiration.type !== 'expired' && (
-                  <div className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider">
-                     New
-                  </div>
-               )}
-               {expiration.type === 'urgent' && (
-                  <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider flex items-center gap-1 animate-pulse border border-red-700">
-                     <Flame size={10} className="fill-white"/> Ends Today
-                  </div>
-               )}
-               {expiration.type === 'expired' && (
-                  <div className="bg-gray-800 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-gray-900">
-                     Expired
-                  </div>
-               )}
+        {/* Right Side Badges (Used) */}
+        {isUsed && (
+            <div className="absolute top-3 right-3 z-30">
+               <div className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm uppercase tracking-wider flex items-center gap-1 border border-green-200">
+                  <Check size={10} strokeWidth={3} /> Used
+               </div>
             </div>
         )}
       </div>
@@ -100,22 +121,23 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
          
          {/* Row 2: Title + Pin */}
          <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 
-               className="font-serif text-base font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors"
-               title={campaign.title}
-            >
-               {campaign.title}
-            </h3>
+            <div className="mb-3 min-h-[40px] flex-1">
+             <h3 className={`font-serif font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-red-600 transition-colors'}`}>
+                {campaign.title}
+             </h3>
+            </div>
             {campaign.isPinned && (
-               <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>
+               <Pin size={14} className="fill-black flex-shrink-0 mt-1.5"/>
             )}
          </div>
 
          {/* Row 3: Expiration Date */}
-         <div className={`text-xs font-medium mb-4 flex items-center gap-1 ${expiration.color}`}>
-            {expiration.icon}
-            {expiration.label}
-         </div>
+          <div className="flex items-center justify-between mb-4">
+             <div className={`text-xs font-medium flex items-center gap-1 ${expiration.color}`}>
+                {expiration.icon}
+                {expiration.label}
+             </div>
+          </div>
 
          {/* Row 4: Asset Icons (Platform logos, Envelope, Bubble, Download) */}
          <div className="mt-auto pt-3 border-t border-gray-50 flex items-center gap-1.5">
@@ -169,6 +191,11 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
                    </div>
                 </div>
              )}
+
+             {/* Arrow Icon (Bottom Right) */}
+             <div className="ml-auto text-gray-300 group-hover:text-indigo-600 transition">
+                <ArrowRight size={16} />
+             </div>
          </div>
       </div>
     </div>

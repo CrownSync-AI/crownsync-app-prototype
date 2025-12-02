@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Search, Pin, Clock, Download, Eye, BarChart3, ArrowLeft, Settings, Share2, AlertCircle, X, FolderOpen, Image as ImageIcon, FileText, ChevronRight, Grid, List as ListIcon, Trash2, ChevronDown, Layers, Instagram, Mail, Smartphone, Paperclip, CheckCircle2, Video } from 'lucide-react';
 import ActionMenu from '../../components/ActionMenu';
 import EmptyState from '../../components/EmptyState';
+import BrandCampaignList from './BrandCampaignList';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -645,8 +646,50 @@ const CampaignModal = ({ isOpen, onClose, onSave, initialData }) => {
 };
 
 const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, allTemplates, retailers, isEmpty }) => {
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [search, setSearch] = useState('');
+  // Initialize with richer mock data if empty or basic
+  React.useEffect(() => {
+      if (campaigns.length > 0 && !campaigns[0].adoptionRate) {
+          const statuses = ['Active', 'Active', 'Scheduled', 'Draft', 'Ended', 'Active', 'Scheduled', 'Draft', 'Ended', 'Active', 'Draft', 'Ended', 'Archived', 'Archived'];
+          const enhancedCampaigns = statuses.map((status, i) => {
+              const isDraftOrScheduled = status === 'Draft' || status === 'Scheduled';
+              const isPermanent = i === 5; 
+              
+              // Use original assets/templates if available, otherwise empty
+              const original = campaigns[i % campaigns.length];
+
+              return {
+                  ...original,
+                  id: `camp-${i}`,
+                  title: `Campaign ${i + 1}: ${['Summer Sale', 'Holiday Special', 'New Arrival', 'VIP Event', 'Clearance'][i % 5]}`,
+                  status: status,
+                  updatePending: i === 0, // Only first one is pending update
+                  adoptionRate: isDraftOrScheduled ? null : Math.floor(Math.random() * 80) + 20,
+                  usageCount: isDraftOrScheduled ? null : Math.floor(Math.random() * 500),
+                  audience: status === 'Draft' && i % 2 === 0 ? 'Unspecified' : (i % 3 === 0 ? 'All Retailers' : i % 3 === 1 ? '3 Groups' : '25 Retailers'),
+                  startDate: '2025-11-01',
+                  endDate: isPermanent ? 'Permanent' : (status === 'Ended' ? '2025-10-15' : status === 'Scheduled' ? '2026-02-01' : '2025-12-31'),
+                  // Preserve original assets and templates
+                  assets: original.assets || [],
+                  templates: original.templates || []
+              };
+          });
+          setCampaigns(enhancedCampaigns);
+      }
+  }, []);
+
+  const handleDuplicate = (campaign) => {
+    const newCampaign = {
+      ...campaign,
+      id: Date.now(),
+      title: `${campaign.title} (Copy)`,
+      status: 'Draft',
+      isPinned: false, // Don't copy pinned state
+      adoptionRate: null, // Reset metrics
+      usageCount: null
+    };
+    // Prepend to top, after pinned items if any (but logic in list handles sorting)
+    setCampaigns([newCampaign, ...campaigns]);
+  };
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [campaignToShare, setCampaignToShare] = useState(null);
@@ -698,6 +741,8 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
           };
           setCampaigns([newCamp, ...campaigns]);
           notify('New Draft Campaign Created', 'success');
+          // Redirect to detail
+          setSelectedCampaign(newCamp);
       }
       setEditModalOpen(false);
       setCampaignToEdit(null);
@@ -713,13 +758,7 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
       setEditModalOpen(true);
   };
 
-  const filteredCampaigns = campaigns
-    .filter(c => {
-      if (filterStatus === 'All') return true;
-      return c.status === filterStatus;
-    })
-    .filter(c => c.title.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => (b.isPinned === a.isPinned ? 0 : b.isPinned ? 1 : -1));
+
 
   const handlePin = (id, e) => {
       if (e) e.stopPropagation();
@@ -748,6 +787,11 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
     }
   };
 
+  const handlePublish = (id) => {
+      setCampaigns(campaigns.map(c => c.id === id ? { ...c, status: 'Active', updatePending: false } : c));
+      notify('Campaign Published', 'success');
+  };
+
   // --- Render Detail View ---
   
 
@@ -768,9 +812,9 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
               isOpen={shareModalOpen} 
               onClose={() => setShareModalOpen(false)} 
               onSave={saveShare}
-              title={campaignToShare.title}
+              title={campaignToShare?.title}
               retailers={retailers}
-              initialSharedWith={campaignToShare.sharedWith || []}
+              initialSharedWith={campaignToShare?.sharedWith}
           />
         )}
         <CampaignDetail 
@@ -782,10 +826,7 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
           notify={notify}
           retailers={retailers}
           onShare={() => handleShare(selectedCampaign)}
-          onEdit={() => {
-              setCampaignToEdit(selectedCampaign);
-              setEditModalOpen(true);
-          }}
+          onEdit={() => openEdit(selectedCampaign)}
           onUpdateStatus={(status) => {
               const updated = campaigns.map(c => c.id === selectedCampaign.id ? { ...c, status } : c);
               setCampaigns(updated);
@@ -793,7 +834,7 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
               notify(status === 'Shared' ? 'Campaign Published' : 'Maintenance Mode Enabled', 'success');
           }}
           onAddAsset={handleAddAssetToCampaign}
-          onPin={(e) => handlePin(selectedCampaign.id, e)}
+          onPin={() => handlePin(selectedCampaign.id)}
         />
       </>
     );
@@ -801,9 +842,12 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
 
   if (isEmpty) return <EmptyState title="No Campaigns" description="Create your first campaign to start sharing assets with retailers." action="Create Campaign" onAction={openCreate} />;
 
+  // Duplicate handler moved to bottom
+
+
   // --- Render List View ---
   return (
-    <div className="p-6 h-full flex flex-col">
+    <div className="h-full flex flex-col bg-gray-50 overflow-auto">
       {editModalOpen && (
           <CampaignModal 
              key={campaignToEdit ? campaignToEdit.id : 'new'}
@@ -823,104 +867,29 @@ const CampaignManager = ({ campaigns, setCampaigns, notify, allFiles, setFiles, 
             initialSharedWith={campaignToShare.sharedWith || []}
         />
       )}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-serif text-gray-900">Campaigns</h2>
-        <button 
-          onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition shadow-sm"
-        >
-          <Plus size={16} /> New Campaign
-        </button>
-      </div>
-
-      {/* Campaign Filter Bar */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
-         <div className="flex gap-2">
-            {['All', 'Shared', 'Draft', 'Expired'].map(status => (
-               <button 
-                 key={status}
-                 onClick={() => setFilterStatus(status)}
-                 className={cn(
-                   "px-4 py-1.5 rounded-full text-sm font-medium transition",
-                   filterStatus === status ? "bg-black text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                 )}
-               >
-                 {status}
-               </button>
-            ))}
-         </div>
-         <div className="relative">
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
-            <input 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-black w-64 text-sm"
-              placeholder="Search campaigns..."
-            />
-         </div>
-      </div>
-
-      <div className="space-y-4 overflow-auto pb-10">
-        {filteredCampaigns.length === 0 ? (
-           <div className="text-center py-12 text-gray-400">No campaigns found.</div>
-        ) : (
-          filteredCampaigns.map(campaign => (
-            <div 
-              key={campaign.id} 
-              onClick={() => setSelectedCampaign(campaign)}
-              className="group bg-white border border-gray-200 rounded-lg p-5 flex items-center justify-between hover:shadow-md transition hover:border-gray-300 cursor-pointer"
-            >
-              <div className="flex items-center gap-5">
-                <div className={`w-20 h-20 rounded-md ${campaign.cover} flex items-center justify-center text-gray-500 text-xs shadow-inner`}>
-                  Cover
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg text-gray-900 flex items-center gap-2">
-                    {campaign.title}
-                    <button onClick={(e) => handlePin(campaign.id, e)} className={`p-1 rounded-full hover:bg-gray-100 ${campaign.isPinned ? 'text-black' : 'text-gray-300 hover:text-gray-500'}`}>
-                        <Pin size={16} className={campaign.isPinned ? "fill-black" : ""} />
-                    </button>
-                  </h3>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
-                      campaign.status === 'Shared' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                      campaign.status === 'Maintenance' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
-                      campaign.status === 'Draft' ? 'bg-gray-100 text-gray-600 border-gray-200' :
-                      'bg-red-50 text-red-700 border-red-100'
-                    }`}>{campaign.status}</span>
-                    <span className="flex items-center gap-1"><Clock size={14}/> {campaign.endDate}</span>
-                    <span className="flex items-center gap-1"><Download size={14}/> {campaign.downloads} DLs</span>
-                    <span className="flex items-center gap-1"><Eye size={14}/> {campaign.views} Views</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Interactive Actions */}
-              <div className="flex items-center gap-3">
-                 <button 
-                    onClick={(e) => { e.stopPropagation(); notify(`Viewing analytics for ${campaign.title}`, 'success') }} 
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition" 
-                    title="Analytics"
-                 >
-                    <BarChart3 size={20}/>
-                 </button>
-                 <ActionMenu 
-                   label="Campaign"
-                   onEdit={() => openEdit(campaign)}
-                   onShare={() => handleShare(campaign)}
-                   onDuplicate={() => {
-                      const copy = {...campaign, id: `c${Date.now()}`, title: `${campaign.title} (Copy)`, status: 'Draft'};
-                      setCampaigns([copy, ...campaigns]);
-                      notify('Campaign Duplicated', 'success');
-                   }}
-                   onDelete={() => handleDelete(campaign.id)}
-                   onAnalytics={() => notify('Analytics opened', 'success')}
-                 />
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      
+      <BrandCampaignList 
+         campaigns={campaigns}
+         files={allFiles}
+         templates={allTemplates}
+         onCreate={openCreate}
+         onSelect={setSelectedCampaign}
+         onEdit={openEdit}
+         onDelete={handleDelete}
+         onDuplicate={handleDuplicate}
+         onPin={(id) => handlePin(id)}
+         onArchive={(id) => {
+             const updated = campaigns.map(c => c.id === id ? { ...c, status: 'Archived' } : c);
+             setCampaigns(updated);
+             notify('Campaign Archived', 'success');
+         }}
+         onEnd={(id) => {
+             const updated = campaigns.map(c => c.id === id ? { ...c, status: 'Ended', endDate: new Date().toISOString().split('T')[0] } : c);
+             setCampaigns(updated);
+             notify('Campaign Ended', 'success');
+         }}
+         onPublish={handlePublish}
+      />
     </div>
   );
 };

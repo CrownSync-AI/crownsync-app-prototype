@@ -239,7 +239,6 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
   const storageUsed = 90.4; // GB
   const storageTotal = 100; // GB
   const storagePercent = (storageUsed / storageTotal) * 100;
-  const isStorageWarning = storagePercent > 80;
 
   if (isEmpty) return <EmptyState title="Asset Library Empty" description="Your asset library is the central hub for all your brand assets." action="Upload Files" onAction={() => notify('Upload Clicked', 'success')} />;
 
@@ -408,38 +407,27 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
     <div className="h-full flex flex-col bg-white">
       {/* [A] Page Header */}
       <div className="px-8 py-6 flex items-center justify-between bg-white border-b border-gray-100">
-         <div className="flex items-center gap-6">
-            <h1 className="text-2xl font-serif font-medium text-gray-900">Asset Library</h1>
-            
-            {/* Compact Storage Status */}
-            <div className="hidden md:flex items-center gap-3 text-xs bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                   <div className={`h-full rounded-full ${isStorageWarning ? 'bg-[#B8A77E]' : 'bg-[#333333]'}`} style={{ width: `${storagePercent}%` }}></div>
-                </div>
-                <span className="text-gray-500 font-medium">{storageUsed}GB / {storageTotal}GB</span>
-                {isStorageWarning && <button className="text-[#0044CC] hover:underline font-medium">Upgrade</button>}
-            </div>
-         </div>
-
-         <div className="flex gap-3 relative">
-            {/* Sync Dropdown */}
-             <div className="relative">
-                <button 
-                   className={`flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition shadow-sm text-sm font-medium ${isSyncOpen ? 'bg-gray-50 ring-2 ring-black/5' : ''}`}
-                   onClick={() => setIsSyncOpen(!isSyncOpen)}
-                   title="Sync from external sources"
-                >
-                   <RefreshCw size={16} /> <span className="hidden sm:inline">Sync</span> <ChevronDown size={14}/>
-                </button>
-                {isSyncOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-20 animate-in fade-in slide-in-from-top-2">
-                   <button onClick={() => { notify('Syncing Dropbox...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><Box size={14} className="text-[#0061FF]"/> Dropbox</button>
-                   <button onClick={() => { notify('Syncing OneDrive...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold">O</div> OneDrive</button>
-                   <button onClick={() => { notify('Syncing Google Drive...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><div className="w-3.5 h-3.5 bg-green-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold">G</div> Google Drive</button>
-                </div>
-                )}
+         <h1 className="text-2xl font-serif font-medium text-gray-900">Asset Library</h1>
+         
+         {/* Compact Storage Status */}
+         <div className="hidden md:flex items-center bg-white rounded-xl border border-gray-200 shadow-sm py-2 px-5 gap-6">
+             {/* Storage Pool */}
+             <div className="flex flex-col gap-1.5 min-w-[200px]">
+                 <div className="flex items-center justify-between">
+                     <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Storage</span>
+                     <span className="text-gray-900 font-medium text-xs tabular-nums">{storageUsed}GB / {storageTotal}GB</span>
+                 </div>
+                 <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-[#B8A77E]" style={{ width: `${storagePercent}%` }}></div>
+                 </div>
              </div>
-          </div>
+
+             <div className="w-px h-8 bg-gray-100"></div>
+
+             <button className="text-indigo-600 hover:text-indigo-700 text-xs font-bold uppercase tracking-wider hover:underline transition px-1">
+                 Upgrade
+             </button>
+         </div>
        </div>
 
       {/* [C] Main Body with Sidebar */}
@@ -537,8 +525,26 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
                         )}
                     </div>
 
-                    {/* Folder Actions: New Folder & Upload */}
+                    {/* Folder Actions: Sync, New Folder & Upload */}
                     <div className="flex items-center gap-3">
+                        {/* Sync Dropdown */}
+                        <div className="relative">
+                            <button 
+                               className={`flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition shadow-sm text-sm font-medium ${isSyncOpen ? 'bg-gray-50 ring-2 ring-black/5' : ''}`}
+                               onClick={() => setIsSyncOpen(!isSyncOpen)}
+                               title="Sync from external sources"
+                            >
+                               <RefreshCw size={16} /> <span className="hidden sm:inline">Sync</span> <ChevronDown size={14}/>
+                            </button>
+                            {isSyncOpen && (
+                            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-20 animate-in fade-in slide-in-from-top-2">
+                               <button onClick={() => { notify('Syncing Dropbox...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><Box size={14} className="text-[#0061FF]"/> Dropbox</button>
+                               <button onClick={() => { notify('Syncing OneDrive...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold">O</div> OneDrive</button>
+                               <button onClick={() => { notify('Syncing Google Drive...', 'success'); setIsSyncOpen(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><div className="w-3.5 h-3.5 bg-green-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold">G</div> Google Drive</button>
+                            </div>
+                            )}
+                        </div>
+
                         <button 
                            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition shadow-sm text-sm font-medium"
                            onClick={() => setNewFolderDialogOpen(true)}

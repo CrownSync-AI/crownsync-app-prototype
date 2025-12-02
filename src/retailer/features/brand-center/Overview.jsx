@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, Sparkles, Bell, Activity, ChevronRight, AlertTriangle } from 'lucide-react';
 import CampaignCard from './components/CampaignCard';
 
-const Overview = ({ campaigns, brands, templates, files, onNavigate }) => {
+const Overview = ({ campaigns, brands, templates, files }) => {
   // --- Logic for Sections ---
   
   // Expiring Soon: EndDate < Now + 3 Days (72h)
@@ -41,12 +41,6 @@ const Overview = ({ campaigns, brands, templates, files, onNavigate }) => {
 
   return (
     <div className="p-8 space-y-10 pb-20">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-serif font-bold text-gray-900">Welcome back, Sarah</h1>
-        <p className="text-gray-500 mt-1">Here's what needs your attention today.</p>
-      </div>
-
       {/* 1. High Priority: Expiring Soon */}
       {expiringCampaigns.length > 0 && (
         <section>
@@ -55,9 +49,6 @@ const Overview = ({ campaigns, brands, templates, files, onNavigate }) => {
               <AlertTriangle size={18} className="fill-amber-100" />
               Expiring Soon
             </h2>
-            <button onClick={() => onNavigate('campaigns')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-              View All <ChevronRight size={14} />
-            </button>
           </div>
           <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 no-scrollbar snap-x items-stretch">
              {expiringCampaigns.map(campaign => (
@@ -82,9 +73,6 @@ const Overview = ({ campaigns, brands, templates, files, onNavigate }) => {
               <Sparkles size={18} className="text-blue-600 fill-blue-100" />
               New Arrivals
             </h2>
-            <button onClick={() => onNavigate('campaigns')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-              View All <ChevronRight size={14} />
-            </button>
           </div>
           <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 no-scrollbar snap-x items-stretch">
              {newArrivals.map(campaign => (

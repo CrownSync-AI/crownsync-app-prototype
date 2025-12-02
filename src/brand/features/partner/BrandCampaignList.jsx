@@ -1,0 +1,496 @@
+import React, { useState } from 'react';
+import { Plus, Search, Grid, List as ListIcon, ChevronDown, Check, MoreHorizontal, Edit, Copy, Trash2, BarChart3, Clock, Download, Eye, Users, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Pin, Flame, Archive, XCircle, Pencil, ArrowRight, MessageSquare, Facebook, Twitter, MapPin, Calendar, Infinity as InfinityIcon, Upload } from 'lucide-react';
+import PerformanceOverview from './PerformanceOverview';
+import EmptyState from '../../components/EmptyState';
+import Tooltip from '../../components/Tooltip';
+
+const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, onEdit, onDelete, onDuplicate, onPin, onArchive, onEnd, onPublish }) => {
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  // Filter Logic
+  const filteredCampaigns = campaigns.filter(c => {
+      if (filterStatus !== 'All' && c.status !== filterStatus) return false;
+      if (filterStatus === 'All' && c.status === 'Archived') return false; // Don't show Archived in All
+      if (searchQuery && !c.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+  }).sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      if (sortBy === 'newest') return b.id.toString().localeCompare(a.id.toString()); // Ensure string comparison for IDs
+      if (sortBy === 'ending') {
+          if (a.endDate === 'Permanent') return 1;
+          if (b.endDate === 'Permanent') return -1;
+          return new Date(a.endDate) - new Date(b.endDate);
+      }
+      if (sortBy === 'active') return (b.usageCount || 0) - (a.usageCount || 0);
+      return 0;
+  });
+
+  const statusTabs = [
+      { id: 'All', label: 'All' },
+      { id: 'Active', label: 'Active' },
+      { id: 'Draft', label: 'Draft' },
+      { id: 'Scheduled', label: 'Scheduled' },
+      { id: 'Ended', label: 'Ended' },
+      { id: 'Archived', label: 'Archived' }
+  ];
+
+  const sortOptions = [
+      { id: 'newest', label: 'Newest Created' },
+      { id: 'ending', label: 'Ending Soon' },
+      { id: 'active', label: 'Most Active' }
+  ];
+
+  // Helper for expiration status
+  const getExpirationStatus = (campaign) => {
+      if (campaign.endDate === 'Permanent') return { type: 'permanent', label: 'No Expiration', color: 'text-green-600', icon: <InfinityIcon size={14} className="text-green-600"/> };
+      if (campaign.status === 'Draft' || campaign.status === 'Scheduled') return { type: 'normal', label: `${campaign.startDate || 'TBD'} → ${campaign.endDate}`, color: 'text-gray-500', icon: <Calendar size={12} className="text-gray-400"/> };
+      if (campaign.status === 'Ended') return { type: 'expired', label: `Ended ${campaign.endDate}`, color: 'text-gray-500', icon: <Clock size={12} className="text-gray-400"/> };
+      
+      const end = new Date(campaign.endDate);
+      const now = new Date('2025-11-26'); // Simulated Now
+      const diffTime = end - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays <= 0) return { type: 'expired', label: `Ended ${campaign.endDate}`, color: 'text-gray-500', icon: <Clock size={12} className="text-gray-400"/> };
+      if (diffDays <= 1) return { type: 'urgent', label: 'Ends Today', color: 'text-red-600', icon: <Flame size={12} className="fill-red-600 text-red-600"/> };
+      if (diffDays <= 7) return { type: 'warning', label: `${diffDays} Days Left`, color: 'text-amber-600', icon: <Clock size={12} className="text-amber-600"/> };
+      
+      return { type: 'normal', label: `Ends ${campaign.endDate}`, color: 'text-gray-500', icon: <Clock size={12} className="text-gray-400"/> };
+  };
+
+  // Helper for status badge
+  const renderStatusBadge = (campaign) => {
+      const styles = {
+          'Draft': 'bg-gray-100 text-gray-600',
+          'Scheduled': 'bg-blue-50 text-blue-700',
+          'Active': 'bg-emerald-50 text-emerald-700',
+          'Ended': 'bg-gray-800 text-white',
+          'Archived': 'bg-gray-50 text-gray-400 border border-gray-200'
+      };
+      
+      return (
+          <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap ${styles[campaign.status] || styles['Draft']}`}>
+              {campaign.status === 'Active' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>}
+              {campaign.status === 'Scheduled' && <Calendar size={10} />}
+              {campaign.status}
+          </span>
+      );
+  };
+
+  // Helper for asset icons
+  const renderAssetIcons = (campaign) => {
+      const assetIds = campaign.assets || [];
+      const templateIds = campaign.templates || [];
+      
+      // 1. Derive Social Platforms from Templates
+      const socialPlatforms = new Set();
+      let hasEmail = false;
+      let hasSms = false;
+
+      templateIds.forEach(tid => {
+          const t = templates?.find(temp => temp.id === tid);
+          if (t) {
+              if (t.type === 'social' && t.platforms) {
+                  t.platforms.forEach(p => socialPlatforms.add(p));
+              }
+              if (t.type === 'email') hasEmail = true;
+              if (t.type === 'sms') hasSms = true;
+          }
+      });
+
+      // 2. Check for Files
+      const hasFile = assetIds.some(id => files?.some(f => f.id === id)); // Check if any asset ID exists in files
+
+      const getPlatformIcon = (p) => {
+          switch(p) {
+              case 'instagram': return <Instagram size={14} className="text-pink-600"/>;
+              case 'facebook': return <div className="w-3.5 h-3.5 bg-blue-600 rounded-full flex items-center justify-center text-[9px] text-white font-bold">f</div>;
+              case 'x': 
+              case 'twitter': return <div className="w-3.5 h-3.5 bg-black rounded-sm flex items-center justify-center text-white font-black text-[10px]">𝕏</div>;
+              case 'google':
+              case 'gmb': return <div className="w-3.5 h-3.5 rounded-sm flex items-center justify-center text-white font-bold text-[9px]" style={{backgroundColor: '#4285F4'}}>G</div>;
+              default: return null;
+          }
+      };
+
+      const uniqueSocials = Array.from(socialPlatforms);
+
+      return (
+          <div className="flex items-center gap-1.5 text-gray-400">
+              {/* Social Group */}
+              {uniqueSocials.length > 0 && (
+                 <div className="flex items-center -space-x-1.5">
+                    {uniqueSocials.map(p => (
+                       <div key={p} className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shadow-sm z-10 relative border border-white">
+                          {getPlatformIcon(p)}
+                       </div>
+                    ))}
+                 </div>
+              )}
+
+              {/* Email */}
+              {hasEmail && <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600" title="Email"><Mail size={12}/></div>}
+              
+              {/* SMS */}
+              {hasSms && <div className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-600" title="SMS"><Smartphone size={12}/></div>}
+
+              {/* File */}
+              {hasFile && <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600" title="Downloadable"><Download size={12}/></div>}
+          </div>
+      );
+  };
+
+  // Helper for Duration Formatting
+  const formatDuration = (startStr, endStr) => {
+      if (endStr === 'Permanent') {
+          const start = new Date(startStr);
+          const startMonth = start.toLocaleString('en-US', { month: 'short' });
+          const startDay = start.getDate();
+          const startYear = start.getFullYear();
+          return `Since ${startMonth} ${startDay}, '${startYear.toString().slice(2)}`;
+      }
+
+      const start = new Date(startStr);
+      const end = new Date(endStr);
+      
+      const startMonth = start.toLocaleString('en-US', { month: 'short' });
+      const startDay = start.getDate();
+      const startYear = start.getFullYear();
+      
+      const endMonth = end.toLocaleString('en-US', { month: 'short' });
+      const endDay = end.getDate();
+      const endYear = end.getFullYear();
+
+      // Same Year
+      if (startYear === endYear) {
+          // Same Month
+          if (startMonth === endMonth) {
+              return `${startMonth} ${startDay} - ${endDay}`;
+          }
+          // Diff Month
+          return `${startMonth} ${startDay} → ${endMonth} ${endDay}`;
+      }
+
+      // Cross Year
+      return `${startMonth} ${startDay}, '${startYear.toString().slice(2)} → ${endMonth} ${endDay}, '${endYear.toString().slice(2)}`;
+  };
+
+  // Helper for Action Menu
+  const renderActionMenu = (campaign, closeMenu) => {
+      const isDraft = campaign.status === 'Draft';
+      const isScheduled = campaign.status === 'Scheduled';
+      const isActive = campaign.status === 'Active';
+      const isEnded = campaign.status === 'Ended';
+      const isArchived = campaign.status === 'Archived';
+      
+      const canEdit = !isEnded && !isArchived;
+      const canPin = !isEnded && !isArchived;
+      const canPublish = isDraft;
+      const canEnd = isActive;
+      const canArchive = isEnded;
+      const canDuplicate = !isDraft; // Draft cannot duplicate
+      const canViewAnalytics = !isDraft && !isScheduled; // Draft/Scheduled cannot view analytics
+
+      return (
+          <>
+              <div className="fixed inset-0 z-30" onClick={(e) => {e.stopPropagation(); closeMenu()}}></div>
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-40 animate-in fade-in zoom-in-95 text-left">
+                  {canPublish && <button onClick={(e) => {e.stopPropagation(); onPublish && onPublish(campaign.id); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-indigo-600"><Upload size={14}/> Publish</button>}
+                  {canPin && <button onClick={(e) => {e.stopPropagation(); onPin(campaign.id); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"><Pin size={14}/> {campaign.isPinned ? 'Unpin' : 'Pin to Top'}</button>}
+                  {canEdit && <button onClick={(e) => {e.stopPropagation(); onEdit(campaign); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"><Edit size={14}/> Edit Campaign</button>}
+                  {canViewAnalytics && <button onClick={(e) => {e.stopPropagation(); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"><BarChart3 size={14}/> View Analytics</button>}
+                  {canDuplicate && <button onClick={(e) => {e.stopPropagation(); onDuplicate(campaign); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"><Copy size={14}/> Duplicate</button>}
+                  {canEnd && <button onClick={(e) => {e.stopPropagation(); onEnd(campaign.id); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-amber-600"><XCircle size={14}/> End Now</button>}
+                  {canArchive && <button onClick={(e) => {e.stopPropagation(); onArchive(campaign.id); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 text-gray-600"><Archive size={14}/> Archive</button>}
+                  <div className="h-px bg-gray-100 my-1"></div>
+                  <button onClick={(e) => {e.stopPropagation(); onDelete(campaign.id); closeMenu()}} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 flex items-center gap-2 text-red-600"><Trash2 size={14}/> Delete</button>
+              </div>
+          </>
+      );
+  };
+
+  // Empty State
+  if (campaigns.length === 0 && !searchQuery) {
+      return <EmptyState title="Launch your first Campaign" description="Create a collection of assets for your retailers." action="Create Campaign" onAction={onCreate} />;
+  }
+
+  return (
+    <div className="h-full overflow-auto">
+      {/* [A] Page Header */}
+      <div className="flex items-center justify-between mb-6 px-6 pt-6">
+         <h2 className="text-2xl font-serif text-gray-900">Campaigns</h2>
+         <button 
+            onClick={onCreate}
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition shadow-sm"
+         >
+            <Plus size={16} /> New Campaign
+         </button>
+      </div>
+
+      {/* [B] Performance Overview */}
+      <div className="px-6">
+          <PerformanceOverview campaigns={campaigns} />
+      </div>
+
+      {/* [C] Filter & Control Bar (Sticky) */}
+      <div className="sticky top-0 z-40 bg-gray-50 pt-2 pb-4 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 px-6 shadow-sm">
+         {/* Left: Status Tabs */}
+         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {statusTabs.map(tab => {
+                const count = campaigns.filter(c => tab.id === 'All' ? c.status !== 'Archived' : c.status === tab.id).length;
+                const isActive = filterStatus === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        onClick={() => setFilterStatus(tab.id)}
+                        className={`px-4 py-1.5 rounded-full text-sm font-medium transition whitespace-nowrap ${
+                            isActive ? 'bg-black text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-transparent'
+                        }`}
+                    >
+                        {tab.label} <span className={`text-xs ml-1 ${isActive ? 'text-white/70' : 'text-gray-400'}`}>({count})</span>
+                    </button>
+                );
+            })}
+         </div>
+
+         {/* Right: Tools */}
+         <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative">
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+               <input 
+                 type="text"
+                 placeholder="Search campaigns..."
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 className="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black w-48 transition shadow-sm"
+               />
+            </div>
+
+            {/* Sort */}
+            <div className="relative">
+               <button 
+                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                  className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition min-w-[160px] justify-between shadow-sm"
+               >
+                  <span>{sortOptions.find(o => o.id === sortBy)?.label}</span>
+                  <ChevronDown size={14} className="text-gray-500"/>
+               </button>
+               {isSortDropdownOpen && (
+                  <>
+                      <div className="fixed inset-0 z-30" onClick={() => setIsSortDropdownOpen(false)}></div>
+                      <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-40 animate-in fade-in zoom-in-95">
+                          {sortOptions.map(opt => (
+                              <button
+                                  key={opt.id}
+                                  onClick={() => { setSortBy(opt.id); setIsSortDropdownOpen(false); }}
+                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between group"
+                              >
+                                  {opt.label}
+                                  {sortBy === opt.id && <Check size={14} className="text-black"/>}
+                              </button>
+                          ))}
+                      </div>
+                  </>
+               )}
+            </div>
+
+            {/* View Switcher */}
+            <div className="flex bg-gray-200 p-1 rounded-lg">
+               <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}><Grid size={16}/></button>
+               <button onClick={() => setViewMode('list')} className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}><ListIcon size={16}/></button>
+            </div>
+         </div>
+      </div>
+
+      {/* [D] Content Area */}
+      <div className="px-6 pb-20">
+      {viewMode === 'grid' ? (
+          /* [D1] Grid View */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredCampaigns.map(campaign => {
+                  const expiration = getExpirationStatus(campaign);
+                  return (
+                  <div 
+                      key={campaign.id} 
+                      className="group relative bg-white border border-gray-200 rounded-xl hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full"
+                      onClick={() => onSelect(campaign)}
+                  >
+                      {/* Cover Image Area */}
+                      <div className={`aspect-video ${campaign.cover} relative bg-gray-100 rounded-t-xl overflow-hidden`}>
+                          {/* Status Badge */}
+                          <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+                              {renderStatusBadge(campaign)}
+                              {campaign.updatePending && campaign.status === 'Active' && (
+                                  <div className="bg-amber-100 text-amber-700 p-1 rounded shadow-sm border border-amber-200 group/edit" title="Update Pending">
+                                      <Pencil size={12} />
+                                      <div className="absolute left-full ml-2 top-0 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 whitespace-nowrap pointer-events-none transition">Update Pending</div>
+                                  </div>
+                              )}
+                          </div>
+                      </div>
+
+                      {/* Hover Actions Menu - MOVED OUTSIDE OVERFLOW-HIDDEN CONTAINER */}
+                      <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="relative">
+                              <button 
+                                  onClick={(e) => {e.stopPropagation(); setOpenMenuId(openMenuId === campaign.id ? null : campaign.id)}}
+                                  className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 text-gray-700"
+                              >
+                                  <MoreHorizontal size={16}/>
+                              </button>
+                              {openMenuId === campaign.id && renderActionMenu(campaign, () => setOpenMenuId(null))}
+                          </div>
+                      </div>
+
+                      {/* Info Area */}
+                      <div className="p-5 flex-1 flex flex-col">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                              <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-indigo-600 transition">{campaign.title}</h3>
+                              {campaign.isPinned && <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>}
+                          </div>
+                          
+                          <div className="mb-4">
+                              {campaign.endDate === 'Permanent' ? (
+                                  <div className="flex items-center gap-1 text-green-600 font-medium text-xs">
+                                      <InfinityIcon size={12} />
+                                      <span>No Expiration</span>
+                                  </div>
+                              ) : (
+                                  <Tooltip content={`${campaign.startDate || 'TBD'} → ${campaign.endDate}`}>
+                                      <div className={`text-xs font-medium ${expiration.color} flex items-center gap-1.5`}>
+                                          {expiration.icon}
+                                          {formatDuration(campaign.startDate, campaign.endDate)}
+                                      </div>
+                                  </Tooltip>
+                              )}
+                          </div>
+
+                          {/* Metrics Row */}
+                          <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
+                              <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                                  <span className="text-gray-400 text-xs font-normal">Adoption</span>
+                                  {campaign.adoptionRate !== null ? `${campaign.adoptionRate}%` : '--'}
+                              </div>
+                              <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                                  <span className="text-gray-400 text-xs font-normal">Uses</span>
+                                  {campaign.usageCount !== null ? campaign.usageCount : '--'}
+                              </div>
+                          </div>
+
+                          {/* Asset Icons */}
+                          <div className="mt-auto flex items-center gap-1.5">
+                              {renderAssetIcons(campaign)}
+                              <div className="ml-auto text-gray-300 group-hover:text-indigo-600 transition"><ArrowRight size={16}/></div>
+                          </div>
+                      </div>
+                  </div>
+              )})}
+          </div>
+      ) : (
+          /* [D2] List View */
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+              <table className="w-full text-left table-fixed">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      <tr>
+                          <th className="px-6 py-4 w-[25%]">Campaign Name</th>
+                          <th className="px-6 py-4 w-[12%]">Status</th>
+                          <th className="px-6 py-4 w-[15%]">Duration</th>
+                          <th className="px-6 py-4 w-[12%]">Audience</th>
+                          <th className="px-6 py-4 w-[12%]">Content</th>
+                          <th className="px-6 py-4 w-[10%]">Adoption</th>
+                          <th className="px-6 py-4 w-[8%]">Uses</th>
+                          <th className="px-6 py-4 w-[6%] text-right"></th>
+                      </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                      {filteredCampaigns.map(campaign => {
+                          const expiration = getExpirationStatus(campaign);
+                          return (
+                          <tr 
+                              key={campaign.id} 
+                              className="group hover:bg-gray-50 transition cursor-pointer"
+                              onClick={() => onSelect(campaign)}
+                          >
+                              <td className="px-6 py-4">
+                                  <div className="flex items-start gap-4">
+                                      <div className={`w-16 h-9 rounded ${campaign.cover} flex-shrink-0 shadow-sm mt-1`}></div>
+                                      <div>
+                                          <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition flex items-center gap-2">
+                                              {campaign.title}
+                                              {campaign.isPinned && <Pin size={12} className="fill-black"/>}
+                                          </div>
+                                          <div className="text-xs text-gray-500 line-clamp-2 mt-0.5 max-w-[200px]">{campaign.description || 'No description provided for this campaign.'}</div>
+                                      </div>
+                                  </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                  {renderStatusBadge(campaign)}
+                              </td>
+                              <td className="px-6 py-4">
+                                  {campaign.endDate === 'Permanent' ? (
+                                      <div className="flex flex-col">
+                                          <div className="flex items-center gap-1 text-green-600 font-medium text-sm">
+                                              <InfinityIcon size={12} />
+                                              <span>No Expiration</span>
+                                          </div>
+                                          <span className="text-gray-400 text-[10px] uppercase">{formatDuration(campaign.startDate, campaign.endDate)}</span>
+                                      </div>
+                                  ) : (
+                                      <Tooltip content={`${campaign.startDate || 'TBD'} → ${campaign.endDate}`}>
+                                          <div className={`text-sm font-medium ${expiration.color} flex items-center gap-1 whitespace-nowrap`}>
+                                              {expiration.icon}
+                                              {formatDuration(campaign.startDate, campaign.endDate)}
+                                          </div>
+                                      </Tooltip>
+                                  )}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600">
+                                  {campaign.audience === 'Unspecified' ? (
+                                      <span className="text-gray-400 italic">Unspecified</span>
+                                  ) : (
+                                      campaign.audience
+                                  )}
+                              </td>
+                              <td className="px-6 py-4">
+                                  {renderAssetIcons(campaign)}
+                              </td>
+                              <td className="px-6 py-4">
+                                  {campaign.adoptionRate !== null ? (
+                                      <>
+                                          <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${campaign.adoptionRate}%` }}></div>
+                                          </div>
+                                          <div className="text-xs text-gray-400 mt-1">{campaign.adoptionRate}%</div>
+                                      </>
+                                  ) : <span className="text-gray-400 text-sm">--</span>}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600">
+                                  {campaign.usageCount !== null ? campaign.usageCount : '--'}
+                              </td>
+                              <td className="px-6 py-4 text-right relative" onClick={e => e.stopPropagation()}>
+                                  <button 
+                                      onClick={(e) => {e.stopPropagation(); setOpenMenuId(openMenuId === campaign.id ? null : campaign.id)}}
+                                      className="p-2 hover:bg-gray-200 rounded text-gray-400 hover:text-black transition"
+                                  >
+                                      <MoreHorizontal size={16}/>
+                                  </button>
+                                  {openMenuId === campaign.id && renderActionMenu(campaign, () => setOpenMenuId(null))}
+                              </td>
+                          </tr>
+                      )})}
+                  </tbody>
+              </table>
+          </div>
+      )}
+      </div>
+    </div>
+  );
+};
+
+export default BrandCampaignList;

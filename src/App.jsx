@@ -83,7 +83,8 @@ const INITIAL_CAMPAIGNS = [
        sms: true,
        download: true,
        lastAction: '2025-11-25'
-    }
+    },
+    lastUpdated: '2025-11-25T10:00:00' // Blue Dot (Pinned)
   },
   { 
     id: 'c2', 
@@ -105,7 +106,8 @@ const INITIAL_CAMPAIGNS = [
        sms: false,
        download: false,
        lastAction: '2025-11-20'
-    }
+    },
+    lastUpdated: '2025-11-26T09:30:00' // Blue Dot
   },
   { 
     id: 'c3', 
@@ -120,7 +122,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f1'],
     templates: [],
     brandId: 'b1', // Chanel
-    description: 'Internal draft. Not yet shared.'
+    description: 'Internal draft. Not yet shared.',
+    lastUpdated: '2025-11-25T14:00:00' // Blue Dot
   },
   { 
     id: 'c4', 
@@ -135,14 +138,15 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f2'],
     templates: ['t4'],
     brandId: 'b2', // Gucci
-    description: 'Limited time offer assets.',
+    description: "Limited time offer assets. This is a very long description to test the two-line truncation functionality. It should wrap to a second line and then show an ellipsis if it exceeds the available space. We need to ensure that the layout handles this correctly without breaking alignment.",
     retailerUsage: {
        social: false,
        email: true,
        sms: false,
        download: true,
        lastAction: '2025-11-22'
-    }
+    },
+    lastUpdated: '2025-11-22T10:00:00'
   },
   { 
     id: 'c5', 
@@ -157,7 +161,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f11'],
     templates: [],
     brandId: 'b2', // Gucci
-    description: 'Annual sustainability report and assets.'
+    description: 'Annual sustainability report and assets.',
+    lastUpdated: '2025-01-05'
   },
   { 
     id: 'c6', 
@@ -172,7 +177,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f3', 'f5'],
     templates: ['t1'],
     brandId: 'b3', // Louis Vuitton
-    description: 'Assets for the summer influencer campaign.'
+    description: 'Assets for the summer influencer campaign.',
+    lastUpdated: '2025-06-05'
   },
   { 
     id: 'c7', 
@@ -187,7 +193,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f6'],
     templates: ['t2', 't6'],
     brandId: 'b3', // Louis Vuitton
-    description: 'Digital exclusive deals.'
+    description: 'Digital exclusive deals.',
+    lastUpdated: '2025-11-25' // Within 48h of Nov 26
   },
   { 
     id: 'c8', 
@@ -202,7 +209,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f7'],
     templates: ['t1', 't5'],
     brandId: 'b4', // Dior
-    description: 'Teaser content for the new year.'
+    description: 'Teaser content for the new year.',
+    lastUpdated: '2025-11-20'
   },
   { 
     id: 'c9', 
@@ -224,7 +232,8 @@ const INITIAL_CAMPAIGNS = [
        sms: false,
        download: false,
        lastAction: '2025-11-26'
-    }
+    },
+    lastUpdated: '2025-11-26'
   },
   { 
     id: 'c10', 
@@ -239,7 +248,8 @@ const INITIAL_CAMPAIGNS = [
     assets: ['f1'],
     templates: ['t1'],
     brandId: 'b4', // Dior
-    description: 'Ending soon.'
+    description: 'Ending soon.',
+    lastUpdated: '2025-11-20'
   },
   {
     id: 'c11',
@@ -254,7 +264,8 @@ const INITIAL_CAMPAIGNS = [
     assets: [],
     templates: [],
     brandId: 'b5', // Hermes
-    description: 'Timeless classics.'
+    description: 'Timeless classics.',
+    lastUpdated: '2025-10-05'
   },
   {
     id: 'c12',
@@ -269,7 +280,168 @@ const INITIAL_CAMPAIGNS = [
     assets: [],
     templates: [],
     brandId: 'b6', // Prada
-    description: 'Sustainable fashion initiative.'
+    description: 'Sustainable fashion initiative.',
+    lastUpdated: '2025-11-15'
+  },
+  {
+    id: 'c13',
+    title: 'Summer Essentials',
+    status: 'Shared',
+    views: 450,
+    downloads: 120,
+    startDate: '2025-06-15',
+    endDate: '2025-09-15',
+    cover: 'bg-gradient-to-r from-yellow-200 to-orange-300',
+    isPinned: false,
+    assets: ['f1', 'f2'],
+    templates: ['t1'],
+    brandId: 'b1', // Rolex
+    description: 'Summer collection highlights.',
+    lastUpdated: '2025-06-20'
+  },
+  {
+    id: 'c14',
+    title: 'Winter Wonderland',
+    status: 'Shared',
+    views: 900,
+    downloads: 300,
+    startDate: '2025-12-01',
+    endDate: '2026-02-28',
+    cover: 'bg-gradient-to-r from-blue-200 to-cyan-300',
+    isPinned: false,
+    assets: ['f3', 'f4'],
+    templates: ['t2', 't3'],
+    brandId: 'b2', // Gucci
+    description: 'Winter seasonal campaign.',
+    lastUpdated: '2025-12-05'
+  },
+  {
+    id: 'c15',
+    title: 'Spring Awakening',
+    status: 'Shared',
+    views: 600,
+    downloads: 180,
+    startDate: '2026-03-01',
+    endDate: '2026-05-31',
+    cover: 'bg-gradient-to-r from-green-200 to-emerald-300',
+    isPinned: false,
+    assets: ['f5'],
+    templates: ['t4'],
+    brandId: 'b3', // Louis Vuitton
+    description: 'Spring collection launch.',
+    lastUpdated: '2026-03-05'
+  },
+  {
+    id: 'c16',
+    title: 'Black Friday Special',
+    status: 'Shared',
+    views: 1500,
+    downloads: 600,
+    startDate: '2025-11-20',
+    endDate: '2025-11-30',
+    cover: 'bg-gradient-to-r from-gray-800 to-black',
+    isPinned: false,
+    assets: ['f6', 'f7'],
+    templates: ['t5'],
+    brandId: 'b4', // Dior
+    description: 'Exclusive Black Friday deals.',
+    lastUpdated: '2025-11-25' // Updated recently
+  },
+  {
+    id: 'c17',
+    title: 'Holiday Gift Guide',
+    status: 'Shared',
+    views: 1200,
+    downloads: 400,
+    startDate: '2025-12-01',
+    endDate: '2025-12-25',
+    cover: 'bg-gradient-to-r from-red-500 to-green-500',
+    isPinned: false,
+    assets: ['f8'],
+    templates: ['t6'],
+    brandId: 'b5', // Hermes
+    description: 'Curated gift selection.',
+    lastUpdated: '2025-12-05'
+  },
+  {
+    id: 'c18',
+    title: 'New Year Resolution',
+    status: 'Shared',
+    views: 700,
+    downloads: 250,
+    startDate: '2026-01-01',
+    endDate: '2026-01-31',
+    cover: 'bg-gradient-to-r from-purple-400 to-pink-400',
+    isPinned: false,
+    assets: ['f9'],
+    templates: ['t7'],
+    brandId: 'b6', // Prada
+    description: 'Start the year with style.',
+    lastUpdated: '2026-01-05'
+  },
+  {
+    id: 'c19',
+    title: 'Resort Collection',
+    status: 'Shared',
+    views: 550,
+    downloads: 160,
+    startDate: '2025-05-01',
+    endDate: '2025-07-31',
+    cover: 'bg-gradient-to-r from-teal-200 to-blue-300',
+    isPinned: false,
+    assets: ['f10'],
+    templates: ['t1'],
+    brandId: 'b1', // Rolex
+    description: 'Luxury resort wear.',
+    lastUpdated: '2025-05-05'
+  },
+  {
+    id: 'c20',
+    title: 'Back to School',
+    status: 'Shared',
+    views: 850,
+    downloads: 280,
+    startDate: '2025-08-01',
+    endDate: '2025-09-30',
+    cover: 'bg-gradient-to-r from-indigo-300 to-purple-400',
+    isPinned: false,
+    assets: ['f11'],
+    templates: ['t2'],
+    brandId: 'b2', // Gucci
+    description: 'Stylish back to school gear.',
+    lastUpdated: '2025-08-05'
+  },
+  {
+    id: 'c21',
+    title: 'Fall Fashion',
+    status: 'Shared',
+    views: 950,
+    downloads: 320,
+    startDate: '2025-09-01',
+    endDate: '2025-11-30',
+    cover: 'bg-gradient-to-r from-orange-400 to-red-500',
+    isPinned: false,
+    assets: ['f12'],
+    templates: ['t3'],
+    brandId: 'b3', // Louis Vuitton
+    description: 'Autumn trends.',
+    lastUpdated: '2025-09-05'
+  },
+  {
+    id: 'c22',
+    title: 'Cyber Monday',
+    status: 'Shared',
+    views: 1800,
+    downloads: 700,
+    startDate: '2025-12-01',
+    endDate: '2025-12-02',
+    cover: 'bg-gradient-to-r from-blue-600 to-indigo-700',
+    isPinned: false,
+    assets: ['f13'],
+    templates: ['t4'],
+    brandId: 'b4', // Dior
+    description: 'Online exclusive offers.',
+    lastUpdated: '2025-12-01'
   }
 ];
 
