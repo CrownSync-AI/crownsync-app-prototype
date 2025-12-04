@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Mail, MapPin, Building2, Users, Clock, CheckCircle2, AlertCircle, Facebook, Instagram, Linkedin, Globe, Edit, Ban, Store, Map, ChevronDown, ChevronUp, XCircle, Plus } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, ExternalLink, MoreHorizontal, CheckCircle2, Ban, Store, Users, BarChart3, Clock, AlertCircle, Edit2, Building2, Map, ChevronDown, ChevronUp, XCircle, Globe, Facebook, Instagram, Plus } from 'lucide-react';
+import TierBadge from './TierBadge';
 
-const RetailerDetail = ({ retailer, onBack }) => {
+const RetailerDetail = ({ retailer, onBack, onEditProfile }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isAdjustingQuota, setIsAdjustingQuota] = useState(false);
   const [newQuota, setNewQuota] = useState(retailer?.quota?.email?.limit || 10000);
   const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [isTierDropdownOpen, setIsTierDropdownOpen] = useState(false);
+  const [currentTier, setCurrentTier] = useState(retailer?.tier || 'Default Tier');
 
   if (!retailer) return null;
 
@@ -27,23 +30,28 @@ const RetailerDetail = ({ retailer, onBack }) => {
                         {retailer.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-gray-900">{retailer.name}</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl font-bold text-gray-900">{retailer.name}</h1>
+                            <TierBadge tier={retailer.tier || 'Default Tier'} size="md" />
+                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                retailer.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' : 
+                                retailer.status === 'Suspended' ? 'bg-red-50 text-red-700 border-red-100' :
+                                'bg-amber-50 text-amber-700 border-amber-100'
+                            }`}>
+                                {retailer.status}
+                            </span>
+                        </div>
                         <div className="flex items-center gap-2">
-                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
-                                 retailer.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' :
-                                 retailer.status === 'Suspended' ? 'bg-red-50 text-red-700 border-red-100' :
-                                 retailer.status === 'Pending' ? 'bg-gray-50 text-gray-600 border-gray-100' :
-                                 'bg-amber-50 text-amber-700 border-amber-100'
-                             }`}>
-                                 {retailer.status}
-                             </span>
                              <span className="text-xs text-gray-400">ID: {retailer.id.toUpperCase()}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition shadow-sm">
+                <button 
+                    onClick={onEditProfile}
+                    className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition shadow-sm"
+                >
                     Edit Profile
                 </button>
                 {retailer.status === 'Inactive' ? (
@@ -64,8 +72,8 @@ const RetailerDetail = ({ retailer, onBack }) => {
                 {/* Tabs */}
                 <div className="border-b border-gray-200 mb-8">
                     <div className="flex items-center gap-8">
-                        {['Profile', 'Stores', 'Group', 'Quota', 'Activity Log'].map((tab) => {
-                            const id = tab.toLowerCase().replace(' ', '-');
+                        {['Profile', 'Stores', 'Segmentation', 'Quota', 'Activity & Performance', 'Communication'].map((tab) => {
+                            const id = tab.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
                             return (
                                 <button
                                     key={id}
@@ -93,25 +101,47 @@ const RetailerDetail = ({ retailer, onBack }) => {
                                 <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
                                     <Building2 size={16} className="text-gray-400"/> Basic Information
                                 </h3>
-                                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm grid grid-cols-2 gap-8">
-                                    <div>
-                                        <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Primary Contact</label>
-                                        <div className="text-base font-semibold text-gray-900">{retailer.contact.name}</div>
-                                        <div className="text-sm text-gray-500 mt-0.5">{retailer.contact.email}</div>
+                                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm space-y-6">
+                                    <div className="grid grid-cols-2 gap-8">
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Primary Contact</label>
+                                            <div className="text-base font-semibold text-gray-900">{retailer.contact.name}</div>
+                                            <div className="text-sm text-gray-500 mt-0.5">{retailer.contact.email}</div>
+                                            {retailer.contact.phone && <div className="text-sm text-gray-500">{retailer.contact.phone}</div>}
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Location</label>
+                                            <div className="text-base font-semibold text-gray-900">{retailer.location.country}</div>
+                                            <div className="text-sm text-gray-500 mt-0.5">{retailer.location.zone || 'No Zone'}</div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Joined Date</label>
+                                            <div className="text-base font-semibold text-gray-900">{retailer.joinedDate || 'N/A'}</div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Website</label>
+                                            <a href={`https://${retailer.website}`} target="_blank" rel="noopener noreferrer" className="text-base font-semibold text-blue-600 hover:underline cursor-pointer">
+                                                {retailer.website || 'N/A'}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Address</label>
+                                            <div className="text-base font-semibold text-gray-900">{retailer.address || 'N/A'}</div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Timezone</label>
+                                            <div className="text-base font-semibold text-gray-900">{retailer.timezone || 'N/A'}</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Location</label>
-                                        <div className="text-base font-semibold text-gray-900">{retailer.location.country}</div>
-                                        <div className="text-sm text-gray-500 mt-0.5">{retailer.location.zone || 'No Zone'}</div>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Joined Date</label>
-                                        <div className="text-base font-semibold text-gray-900">Oct 15, 2024</div>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500 block mb-1 uppercase tracking-wide">Website</label>
-                                        <div className="text-base font-semibold text-blue-600 hover:underline cursor-pointer">www.{retailer.name.toLowerCase().replace(/\s/g, '')}.com</div>
-                                    </div>
+                                    
+                                    {retailer.internalNotes && (
+                                        <div className="pt-6 border-t border-gray-100">
+                                            <label className="text-xs text-gray-500 block mb-2 uppercase tracking-wide">Internal Notes</label>
+                                            <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 text-sm text-amber-900">
+                                                {retailer.internalNotes}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </section>
 
@@ -194,39 +224,101 @@ const RetailerDetail = ({ retailer, onBack }) => {
                         </div>
                     )}
 
-                    {activeTab === 'group' && (
-                        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                    {activeTab === 'segmentation' && (
+                        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+                            {/* Header */}
                             <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 flex gap-4">
                                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
                                     <Users size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-base font-bold text-blue-900">Group Management</h4>
-                                    <p className="text-sm text-blue-700 mt-1 max-w-2xl">Assign this retailer to groups to control their access to campaigns and resources. Changes apply immediately.</p>
+                                    <h4 className="text-base font-bold text-blue-900">Segmentation Management</h4>
+                                    <p className="text-sm text-blue-700 mt-1 max-w-2xl">Manage this retailer's tier and group assignments to control their access and benefits.</p>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Current Groups</h3>
-                                <div className="flex flex-wrap gap-3">
-                                    {retailer.groups.map(g => (
-                                        <span key={g} className="pl-4 pr-2 py-2 bg-gray-50 text-gray-700 rounded-full text-sm font-medium flex items-center gap-2 border border-gray-200 hover:bg-gray-100 transition group">
-                                            {g}
-                                            <button className="p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-red-500 transition"><XCircle size={14}/></button>
-                                        </span>
-                                    ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Retailer Tier Section */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
+                                    <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Retailer Tier</h3>
+                                    <div className="space-y-4">
+                                        <p className="text-sm text-gray-500">Current Tier Assignment</p>
+                                        <div className="relative">
+                                            <button 
+                                                onClick={() => setIsTierDropdownOpen(!isTierDropdownOpen)}
+                                                className="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-lg flex items-center justify-between hover:border-gray-300 transition"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`w-2 h-2 rounded-full ${
+                                                        (currentTier === 'Platinum' ? 'bg-purple-500' : 
+                                                        currentTier === 'Gold' ? 'bg-amber-500' : 
+                                                        currentTier === 'Silver' ? 'bg-gray-400' : 'bg-slate-200')
+                                                    }`}></span>
+                                                    <span className="text-sm font-medium">{currentTier}</span>
+                                                </div>
+                                                <ChevronDown size={16} className={`transition-transform duration-200 ${isTierDropdownOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+
+                                            {isTierDropdownOpen && (
+                                                <>
+                                                    <div 
+                                                        className="fixed inset-0 z-10" 
+                                                        onClick={() => setIsTierDropdownOpen(false)}
+                                                    ></div>
+                                                    <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 p-1 z-20 animate-in fade-in zoom-in-95">
+                                                        {['Platinum', 'Gold', 'Silver', 'Default Tier'].map((tier) => (
+                                                            <button
+                                                                key={tier}
+                                                                onClick={() => {
+                                                                    setCurrentTier(tier);
+                                                                    setIsTierDropdownOpen(false);
+                                                                }}
+                                                                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-3 transition ${
+                                                                    currentTier === tier ? 'bg-gray-50 font-medium text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                                }`}
+                                                            >
+                                                                <span className={`w-2 h-2 rounded-full ${
+                                                                    (tier === 'Platinum' ? 'bg-purple-500' : 
+                                                                    tier === 'Gold' ? 'bg-amber-500' : 
+                                                                    tier === 'Silver' ? 'bg-gray-400' : 'bg-slate-200')
+                                                                }`}></span>
+                                                                {tier}
+                                                                {currentTier === tier && <CheckCircle2 size={14} className="ml-auto text-black" />}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        <div className="text-xs text-gray-400">
+                                            Changing the tier will update the retailer's benefits and access levels immediately.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Group Management Section */}
+                                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
+                                    <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Custom Groups</h3>
+                                    <div className="flex flex-wrap gap-3 mb-4">
+                                        {retailer.groups.map(g => (
+                                            <span key={g} className="pl-4 pr-2 py-2 bg-gray-50 text-gray-700 rounded-full text-sm font-medium flex items-center gap-2 border border-gray-200 hover:bg-gray-100 transition group">
+                                                {g}
+                                                <button className="p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-red-500 transition"><XCircle size={14}/></button>
+                                            </span>
+                                        ))}
+                                    </div>
                                     
                                     {/* Add Group Dropdown */}
                                     <div className="relative">
                                         <button 
                                             onClick={() => setIsAddingGroup(!isAddingGroup)}
-                                            className={`px-4 py-2 border border-dashed border-gray-300 text-gray-500 rounded-full text-sm font-medium hover:border-gray-400 hover:text-gray-900 hover:bg-gray-50 transition flex items-center gap-2 ${isAddingGroup ? 'bg-gray-50 border-gray-400 text-gray-900' : ''}`}
+                                            className={`w-full px-4 py-2 border border-dashed border-gray-300 text-gray-500 rounded-lg text-sm font-medium hover:border-gray-400 hover:text-gray-900 hover:bg-gray-50 transition flex items-center justify-center gap-2 ${isAddingGroup ? 'bg-gray-50 border-gray-400 text-gray-900' : ''}`}
                                         >
-                                            <Users size={16} /> Add to Group
+                                            <Plus size={16} /> Add to Group
                                         </button>
                                         
                                         {isAddingGroup && (
-                                            <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-20 animate-in fade-in zoom-in-95">
+                                            <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-20 animate-in fade-in zoom-in-95">
                                                 <div className="mb-2 px-2 pt-1">
                                                     <input 
                                                         autoFocus
@@ -256,6 +348,16 @@ const RetailerDetail = ({ retailer, onBack }) => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {(activeTab === 'activity-performance' || activeTab === 'communication') && (
+                        <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-500">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+                                <Clock size={32} />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Coming Soon</h3>
+                            <p className="text-gray-500 mt-2">This feature is currently under development.</p>
                         </div>
                     )}
 
@@ -440,25 +542,7 @@ const RetailerDetail = ({ retailer, onBack }) => {
                         </div>
                     )}
 
-                    {activeTab === 'activity-log' && (
-                        <div className="relative pl-8 border-l border-gray-200 space-y-10 py-4 animate-in slide-in-from-bottom-4 duration-500">
-                            <div className="relative">
-                                <div className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-blue-500 border-4 border-white ring-1 ring-gray-200 shadow-sm"></div>
-                                <div className="text-base font-bold text-gray-900">Downloaded Resource: Holiday_Guide_2025.pdf</div>
-                                <div className="text-sm text-gray-500 mt-1">Today, 10:30 AM • by {retailer.contact.name}</div>
-                            </div>
-                            <div className="relative">
-                                <div className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-green-500 border-4 border-white ring-1 ring-gray-200 shadow-sm"></div>
-                                <div className="text-base font-bold text-gray-900">Published Campaign: Winter Collection</div>
-                                <div className="text-sm text-gray-500 mt-1">Yesterday, 2:15 PM • by Marketing Team</div>
-                            </div>
-                            <div className="relative">
-                                <div className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-gray-300 border-4 border-white ring-1 ring-gray-200 shadow-sm"></div>
-                                <div className="text-base font-bold text-gray-900">System: Email Quota Warning (80%)</div>
-                                <div className="text-sm text-gray-500 mt-1">Nov 28, 2025 • System Automated</div>
-                            </div>
-                        </div>
-                    )}
+
                 </div>
             </div>
         </div>

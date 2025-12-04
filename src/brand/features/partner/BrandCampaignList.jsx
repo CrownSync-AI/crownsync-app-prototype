@@ -12,6 +12,8 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
 
+  const [visibleCount, setVisibleCount] = useState(12);
+
   // Filter Logic
   const filteredCampaigns = campaigns.filter(c => {
       if (filterStatus !== 'All' && c.status !== filterStatus) return false;
@@ -29,6 +31,13 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
       if (sortBy === 'active') return (b.usageCount || 0) - (a.usageCount || 0);
       return 0;
   });
+
+  const displayedCampaigns = filteredCampaigns.slice(0, visibleCount);
+
+  // Reset pagination when filter changes
+  React.useEffect(() => {
+    setVisibleCount(12);
+  }, [filterStatus, searchQuery, sortBy]);
 
   const statusTabs = [
       { id: 'All', label: 'All' },
@@ -313,7 +322,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
       {viewMode === 'grid' ? (
           /* [D1] Grid View */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredCampaigns.map(campaign => {
+              {displayedCampaigns.map(campaign => {
                   const expiration = getExpirationStatus(campaign);
                   return (
                   <div 
@@ -322,7 +331,20 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                       onClick={() => onSelect(campaign)}
                   >
                       {/* Cover Image Area */}
-                      <div className={`aspect-video ${campaign.cover} relative bg-gray-100 rounded-t-xl overflow-hidden`}>
+                      <div className={`aspect-video relative bg-gray-100 rounded-t-xl overflow-hidden`}>
+                          {campaign.coverImage ? (
+                              <img 
+                                src={campaign.coverImage} 
+                                alt={campaign.title} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'block';
+                                }}
+                              />
+                          ) : null}
+                          <div className={`w-full h-full ${campaign.cover} absolute inset-0 ${campaign.coverImage ? 'hidden' : ''}`}></div>
+
                           {/* Status Badge */}
                           <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
                               {renderStatusBadge(campaign)}
@@ -409,7 +431,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                       </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                      {filteredCampaigns.map(campaign => {
+                      {displayedCampaigns.map(campaign => {
                           const expiration = getExpirationStatus(campaign);
                           return (
                           <tr 
@@ -419,7 +441,20 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                           >
                               <td className="px-6 py-4">
                                   <div className="flex items-start gap-4">
-                                      <div className={`w-16 h-9 rounded ${campaign.cover} flex-shrink-0 shadow-sm mt-1`}></div>
+                                      <div className="w-16 h-9 rounded bg-gray-100 flex-shrink-0 shadow-sm mt-1 overflow-hidden relative">
+                                          {campaign.coverImage ? (
+                                              <img 
+                                                src={campaign.coverImage} 
+                                                alt={campaign.title} 
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'block';
+                                                }}
+                                              />
+                                          ) : null}
+                                          <div className={`w-full h-full ${campaign.cover} absolute inset-0 ${campaign.coverImage ? 'hidden' : ''}`}></div>
+                                      </div>
                                       <div>
                                           <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition flex items-center gap-2">
                                               {campaign.title}
@@ -488,6 +523,22 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
               </table>
           </div>
       )}
+
+      {/* Load More Section */}
+      <div className="mt-8 text-center">
+          {visibleCount < filteredCampaigns.length ? (
+              <button 
+                  onClick={() => setVisibleCount(prev => prev + 12)}
+                  className="px-6 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:border-gray-300 transition shadow-sm"
+              >
+                  Load More
+              </button>
+          ) : (
+              filteredCampaigns.length > 0 && (
+                  <p className="text-gray-400 text-sm">No more campaigns to load</p>
+              )
+          )}
+      </div>
       </div>
     </div>
   );

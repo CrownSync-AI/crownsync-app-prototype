@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Filter, Mail, Store, Info, MoreHorizontal, ChevronDown, Check, X, Bell, RefreshCw } from 'lucide-react';
+import { Search, Filter, Mail, Store, Info, MoreHorizontal, ChevronDown, Check, X, Bell, RefreshCw, Plus, Shield } from 'lucide-react';
 import Tooltip from '../../../components/Tooltip';
+import TierBadge from './TierBadge';
 
 // Custom Dropdown Component
 const FilterDropdown = ({ label, options, value, onChange, disabled = false, multi = false }) => {
@@ -90,7 +91,7 @@ const ActionMenu = ({ onEdit, onDeactivate, onReactivate, status }) => {
                     >
                         Edit
                     </button>
-                    {status === 'Inactive' ? (
+                    {status === 'Inactive' || status === 'Suspended' ? (
                          <button 
                             onClick={() => { onReactivate(); setIsOpen(false); }}
                             className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
@@ -111,11 +112,12 @@ const ActionMenu = ({ onEdit, onDeactivate, onReactivate, status }) => {
     );
 };
 
-const RetailerList = ({ retailers, onSelectRetailer }) => {
+const RetailerList = ({ retailers, onSelectRetailer, onEditRetailer, onInviteRetailers }) => {
   const [filters, setFilters] = useState({
     country: 'All',
     zone: 'All',
     groups: [],
+    tier: 'All',
     status: 'All',
     pendingOnly: false
   });
@@ -128,6 +130,7 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
     'All': ['All']
   };
   const GROUPS = ['VIP', 'Department Store', 'Luxury', 'International', 'Boutique', 'Iconic', 'New Openings'];
+  const TIERS = ['All', 'Platinum', 'Gold', 'Silver', 'Default Tier'];
   const STATUSES = ['All', 'Active', 'Inactive', 'Suspended'];
 
   const handleCountryChange = (val) => {
@@ -146,12 +149,13 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
         country: 'All',
         zone: 'All',
         groups: [],
+        tier: 'All',
         status: 'All',
         pendingOnly: false
     });
   };
 
-  const hasActiveFilters = filters.country !== 'All' || filters.zone !== 'All' || filters.groups.length > 0 || filters.status !== 'All' || filters.pendingOnly;
+  const hasActiveFilters = filters.country !== 'All' || filters.zone !== 'All' || filters.groups.length > 0 || filters.tier !== 'All' || filters.status !== 'All' || filters.pendingOnly;
 
   // Filter Logic
   const filteredRetailers = retailers.filter(r => {
@@ -159,6 +163,7 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
       if (filters.country !== 'All' && r.location.country !== filters.country) return false;
       if (filters.zone !== 'All' && r.location.zone !== filters.zone) return false;
       if (filters.status !== 'All' && r.status !== filters.status) return false;
+      if (filters.tier !== 'All' && r.tier !== filters.tier) return false;
       if (filters.groups.length > 0 && !filters.groups.some(g => r.groups.includes(g))) return false;
       return true;
   });
@@ -214,6 +219,12 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                     multi={true}
                 />
                 <FilterDropdown 
+                    label="Tier" 
+                    options={TIERS} 
+                    value={filters.tier} 
+                    onChange={(val) => setFilters({...filters, tier: val})} 
+                />
+                <FilterDropdown 
                     label="Status" 
                     options={STATUSES} 
                     value={filters.status} 
@@ -221,8 +232,11 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                 />
             </div>
 
-             <button className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition flex items-center gap-2 shadow-sm ml-4">
-                <Mail size={16} /> Invite Retailer
+             <button 
+                onClick={onInviteRetailers}
+                className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition flex items-center gap-2 shadow-sm ml-4"
+             >
+                <Plus size={16} /> Invite Retailers
              </button>
         </div>
         
@@ -255,6 +269,12 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                         <button onClick={() => toggleGroup(g)} className="hover:text-black"><X size={12}/></button>
                     </span>
                 ))}
+                {filters.tier !== 'All' && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium border border-gray-200">
+                        Tier: {filters.tier}
+                        <button onClick={() => setFilters({...filters, tier: 'All'})} className="hover:text-black"><X size={12}/></button>
+                    </span>
+                )}
                 {filters.status !== 'All' && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium border border-gray-200">
                         Status: {filters.status}
@@ -279,7 +299,8 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                 <tr className="border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     <th className="px-6 py-3 font-medium">Retailer Name</th>
                     <th className="px-6 py-3 font-medium">Primary Contact</th>
-                    <th className="px-6 py-3 font-medium w-32">Location</th>
+                    <th className="px-6 py-3 font-medium">Tier</th>
+                    <th className="px-6 py-3 font-medium">Location</th>
                     <th className="px-6 py-3 font-medium w-40">Group</th>
                     <th className="px-6 py-3 font-medium w-24 text-center">Stores</th>
                     <th className="px-6 py-3 font-medium w-40">
@@ -322,12 +343,17 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                         </div>
                     </td>
 
-                    {/* Contact */}
+                    {/* Primary Contact */}
                     <td className="px-6 py-4">
                         <div className="min-w-0">
                             <div className="text-sm text-gray-900 truncate max-w-[160px]">{retailer.contact.name}</div>
                             <div className="text-xs text-gray-500 truncate max-w-[160px]">{retailer.contact.email}</div>
                         </div>
+                    </td>
+
+                    {/* Tier */}
+                    <td className="px-6 py-4">
+                        <TierBadge tier={retailer.tier || 'Default Tier'} />
                     </td>
 
                     {/* Location */}
@@ -382,6 +408,7 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                             retailer.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' :
                             retailer.status === 'Suspended' ? 'bg-red-50 text-red-700 border-red-100' :
+                            retailer.status === 'Inactive' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                             'bg-gray-50 text-gray-600 border-gray-100'
                         }`}>
                             {retailer.status}
@@ -392,7 +419,7 @@ const RetailerList = ({ retailers, onSelectRetailer }) => {
                     <td className="px-6 py-4">
                         <ActionMenu 
                             status={retailer.status}
-                            onEdit={() => {}}
+                            onEdit={() => onEditRetailer(retailer)}
                             onDeactivate={() => {}}
                             onReactivate={() => {}}
                         />
