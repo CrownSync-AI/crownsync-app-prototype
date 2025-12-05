@@ -486,10 +486,26 @@ const INITIAL_CATALOGS = [
 ];
 
 const INITIAL_RETAILERS = [
-  { id: 'r1', name: 'Luxury Boutique Paris', email: 'contact@lbparis.com', status: 'Active' },
-  { id: 'r2', name: 'Fifth Avenue Fashion', email: 'buyer@fifthave.com', status: 'Active' },
-  { id: 'r3', name: 'Tokyo Trends', email: 'info@tokyotrends.jp', status: 'Pending' },
-  { id: 'r4', name: 'Milano Style', email: 'ciao@milanostyle.it', status: 'Active' },
+  { id: 'r1', name: 'Luxury Boutique Paris', email: 'contact@lbparis.com', status: 'Active', tier: 'Platinum', zone: 'Europe' },
+  { id: 'r2', name: 'Fifth Avenue Fashion', email: 'buyer@fifthave.com', status: 'Active', tier: 'Platinum', zone: 'North America' },
+  { id: 'r3', name: 'Tokyo Trends', email: 'info@tokyotrends.jp', status: 'Pending', tier: 'Gold', zone: 'Asia' },
+  { id: 'r4', name: 'Milano Style', email: 'ciao@milanostyle.it', status: 'Active', tier: 'Gold', zone: 'Europe' },
+  { id: 'r5', name: 'Nordic Design House', email: 'hello@nordicdesign.se', status: 'Active', tier: 'Silver', zone: 'Europe' },
+  { id: 'r6', name: 'Seoul Streetwear', email: 'contact@seoulstreet.kr', status: 'Active', tier: 'Silver', zone: 'Asia' },
+  { id: 'r7', name: 'Bond Street Collective', email: 'info@bondstreet.co.uk', status: 'Active', tier: 'Platinum', zone: 'Europe' },
+  { id: 'r8', name: 'Dubai Luxury Edit', email: 'vip@dubailuxury.ae', status: 'Active', tier: 'Gold', zone: 'Middle East' },
+  { id: 'r9', name: 'Sydney Harbour Fashion', email: 'buy@shfashion.com.au', status: 'Pending', tier: 'Silver', zone: 'Oceania' },
+  { id: 'r10', name: 'Toronto Trends', email: 'hello@torontotrends.ca', status: 'Active', tier: 'Standard', zone: 'North America' },
+  { id: 'r11', name: 'Berlin Modern', email: 'info@berlinmod.de', status: 'Active', tier: 'Gold', zone: 'Europe' },
+  { id: 'r12', name: 'Shanghai Chic', email: 'contact@shchic.cn', status: 'Active', tier: 'Platinum', zone: 'Asia' },
+  { id: 'r13', name: 'LA Lifestyle', email: 'buyer@lalifestyle.com', status: 'Active', tier: 'Silver', zone: 'North America' },
+  { id: 'r14', name: 'Miami Beach Boutique', email: 'sun@miamibb.com', status: 'Inactive', tier: 'Standard', zone: 'North America' },
+  { id: 'r15', name: 'São Paulo Select', email: 'info@spselect.br', status: 'Active', tier: 'Gold', zone: 'South America' },
+  { id: 'r16', name: 'Mumbai Market', email: 'contact@mumbaimkt.in', status: 'Pending', tier: 'Standard', zone: 'Asia' },
+  { id: 'r17', name: 'Cape Town Couture', email: 'hello@ctcouture.za', status: 'Active', tier: 'Silver', zone: 'Africa' },
+  { id: 'r18', name: 'Singapore Silk', email: 'buy@sgsilk.sg', status: 'Active', tier: 'Gold', zone: 'Asia' },
+  { id: 'r19', name: 'Mexico City Moda', email: 'hola@mcmoda.mx', status: 'Active', tier: 'Silver', zone: 'North America' },
+  { id: 'r20', name: 'Chicago Classics', email: 'info@chicagoclassics.com', status: 'Active', tier: 'Platinum', zone: 'North America' },
 ];
 
 const App = () => {
