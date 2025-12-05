@@ -67,7 +67,7 @@ const Toast = ({ id, message, type = 'info', duration = 3000, onClose }) => {
               onClick={handleClose}
             >
               <span className="sr-only">Close</span>
-              <X class="h-5 w-5" aria-hidden="true" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </div>
