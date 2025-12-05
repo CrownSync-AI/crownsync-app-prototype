@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Toast from './brand/components/Toast';
 import BrandSidebar from './brand/BrandSidebar';
 import PartnerOverview from './brand/features/partner/PartnerOverview';
 import CampaignManager from './brand/features/partner/CampaignManager';
@@ -7,6 +6,8 @@ import ResourcesManager from './brand/features/partner/ResourcesManager';
 import AssetLibrary from './brand/features/assets/AssetLibrary';
 import TemplateLibrary from './brand/features/assets/TemplateLibrary';
 import RetailersManager from './brand/features/partner/retailers/RetailersManager';
+
+import { useToast } from './brand/context/ToastContext';
 
 const BrandApp = ({ 
   files, setFiles, 
@@ -17,11 +18,10 @@ const BrandApp = ({
   showEmptyState 
 }) => {
   const [activePage, setActivePage] = useState('dashboard');
-  const [notification, setNotification] = useState(null);
+  const { addToast } = useToast();
 
   const notify = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
+    addToast(message, type);
   };
 
   const renderContent = () => {
@@ -117,8 +117,6 @@ const BrandApp = ({
 
   return (
     <div className="flex h-screen w-full bg-gray-50 font-sans text-gray-900 relative">
-      {notification && <Toast message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
-
       <BrandSidebar activePage={activePage} setActivePage={setActivePage} />
 
       <main className="flex-1 overflow-hidden flex flex-col bg-gray-50">

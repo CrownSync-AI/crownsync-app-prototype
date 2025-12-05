@@ -3,9 +3,7 @@ import BrandCampaignList from './BrandCampaignList';
 import CampaignDetail from './campaigns/CampaignDetail';
 import CreateCampaignModal from './campaigns/components/CreateCampaignModal';
 
-let uniqueIdCounter = 1000;
-
-const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentCampaigns, notify, allFiles, setFiles, allTemplates, retailers }) => {
+const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentCampaigns, notify, allFiles, allTemplates, retailers }) => {
   // Local state if not provided by parent
   const [localCampaigns, setLocalCampaigns] = useState([]);
   const campaigns = initialCampaigns || localCampaigns;
@@ -98,7 +96,7 @@ const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentC
       });
       setCampaigns(enhancedCampaigns);
     }
-  }, []);
+  }, [campaigns, setCampaigns]);
 
   // Mock Objects for List View Icons
   const mockTemplates = [
@@ -133,8 +131,7 @@ const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentC
         usageCount: null,
         views: 0,
         downloads: 0,
-        views: 0,
-        downloads: 0,
+
         isPinned: false,
         createdAt: new Date().toISOString().split('T')[0],
         createdBy: {
@@ -150,7 +147,7 @@ const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentC
   const handleUpdateCampaign = (updatedCampaign) => {
     setCampaigns(campaigns.map(c => c.id === updatedCampaign.id ? updatedCampaign : c));
     setSelectedCampaign(updatedCampaign);
-    notify('Campaign updated', 'success');
+    // notify('Campaign updated', 'success'); // Removed to avoid double toast with specific actions
   };
 
   // ... (previous code)
