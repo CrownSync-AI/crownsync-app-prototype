@@ -5,7 +5,7 @@ import { useToast } from '../../../../context/ToastContext';
 import { 
   RefreshCw, TrendingUp, AlertCircle, CheckCircle2, Clock, Search, Filter, 
   ChevronRight, X, Award, MessageSquare, MoreHorizontal, ChevronDown, Check,
-  Download, Share2, Mail, Smartphone, FileText, Video, ChevronLeft, User
+  Download, Share2, Mail, Smartphone, FileText, Video, ChevronLeft, User, Bell
 } from 'lucide-react';
 
 // --- Shared Components ---
@@ -295,7 +295,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       
       {/* --- 1. Header --- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -303,8 +303,8 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
            <h2 className="text-lg font-bold text-gray-900">Adoption Overview</h2>
         </div>
         <div className="flex items-center gap-3">
-          <div className="group relative flex items-center gap-2 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full shadow-sm cursor-help">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          <div className="group relative flex items-center gap-2 text-[10px] text-gray-400 bg-white border border-gray-200 px-2 py-1 rounded-full shadow-sm cursor-help">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             <span>Updated {lastUpdated}</span>
             <div className="absolute right-0 top-full mt-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               Auto-refreshes every 1 hour
@@ -325,21 +325,18 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Adoption Rate */}
         <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <div className="text-sm text-gray-500 font-medium mb-1">Adoption Rate</div>
+          <div className="text-xs text-gray-500 font-medium mb-1 tracking-wide uppercase">Adoption Rate</div>
           <div className="flex items-end gap-2">
             <div className="text-3xl font-bold text-gray-900">{adoptionRate}%</div>
             {adoptionRate > 0 && <div className="mb-1 text-xs font-medium text-emerald-600 flex items-center">
               <TrendingUp size={12} className="mr-0.5" /> +5%
             </div>}
           </div>
-          <div className="mt-3 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-             <div className="h-full bg-black rounded-full" style={{ width: `${adoptionRate}%` }}></div>
-          </div>
         </div>
 
         {/* Active Retailers */}
         <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <div className="text-sm text-gray-500 font-medium mb-1">Active Retailers</div>
+          <div className="text-xs text-gray-500 font-medium mb-1 tracking-wide uppercase">Active Retailers</div>
           <div className="flex items-end gap-2">
             <div className="text-3xl font-bold text-gray-900">{participatedCount}</div>
             <div className="mb-1 text-xs text-gray-400">/ {totalInvited} invited</div>
@@ -351,7 +348,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <AlertCircle size={48} className="text-amber-500" />
           </div>
-          <div className="text-sm text-gray-500 font-medium mb-1">Zero-Action</div>
+          <div className="text-xs text-gray-500 font-medium mb-1 tracking-wide uppercase">Zero-Action</div>
           <div className="flex items-end gap-2">
             <div className="text-3xl font-bold text-amber-600">{zeroActionCount}</div>
             <div className="mb-1 text-xs text-amber-600 font-medium">{zeroActionCount > 0 ? 'Needs Attention' : 'All Good'}</div>
@@ -360,7 +357,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
 
         {/* Est. Reach */}
         <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <div className="text-sm text-gray-500 font-medium mb-1">Est. Reach</div>
+          <div className="text-xs text-gray-500 font-medium mb-1 tracking-wide uppercase">Est. Reach</div>
           <div className="flex items-end gap-2">
             <div className="text-3xl font-bold text-gray-900">{(totalEstReach / 1000).toFixed(1)}k</div>
           </div>
@@ -380,8 +377,9 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
             {needsAttentionList.length > 0 && (
               <button 
                 onClick={handleNudgeAll}
-                className="text-xs font-bold text-amber-700 hover:text-amber-800 hover:underline"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition shadow-sm"
               >
+                <Bell size={12} className="fill-amber-700" />
                 Nudge All ({needsAttentionList.length})
               </button>
             )}
@@ -416,9 +414,10 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                             setNudgeMessage(`Hi ${r.contact?.name || 'Partner'}, \n\nJust a friendly reminder that our ${campaign.title} campaign is live. We'd love for you to participate!\n\nBest,\nThe CrownSync Team`);
                             setShowNudgeModal(true);
                         }}
-                        className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded hover:bg-amber-200 transition"
+                        className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-full transition opacity-0 group-hover:opacity-100"
+                        title="Send Reminder"
                       >
-                        Remind
+                        <Bell size={16} />
                       </button>
                     </div>
                   </div>
