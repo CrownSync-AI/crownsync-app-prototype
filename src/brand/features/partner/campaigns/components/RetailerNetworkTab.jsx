@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import Drawer from '../../../../components/Drawer';
 import { 
   RefreshCw, TrendingUp, AlertCircle, CheckCircle2, Clock, Search, Filter, 
   ChevronRight, X, Award, MessageSquare, MoreHorizontal, ChevronDown, Check,
@@ -604,28 +605,47 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
       </div>
 
       {/* --- 5. Retailer Activity Drawer --- */}
-      {selectedRetailer && createPortal(
-        <div className="fixed inset-0 z-[9999] flex justify-end">
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedRetailer(null)}></div>
-          {/* H-full ensures full screen height [Request 3] */}
-          <div className="relative bg-white w-full max-w-md h-full shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-            
-            {/* Drawer Header */}
-            <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-gray-50/50">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full ${selectedRetailer.logo || 'bg-gray-200'} flex items-center justify-center text-lg font-bold text-white shadow-sm`}>
-                  {selectedRetailer.name?.substring(0, 2).toUpperCase() || 'NA'}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{selectedRetailer.name}</h3>
-                  <div className="text-sm text-gray-500">{selectedRetailer.contact?.name} • {selectedRetailer.contact?.email}</div>
-                </div>
+      <Drawer
+        isOpen={!!selectedRetailer}
+        onClose={() => setSelectedRetailer(null)}
+        title={
+          selectedRetailer ? (
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-full ${selectedRetailer.logo || 'bg-gray-200'} flex items-center justify-center text-lg font-bold text-white shadow-sm`}>
+                {selectedRetailer.name?.substring(0, 2).toUpperCase() || 'NA'}
               </div>
-              <button onClick={() => setSelectedRetailer(null)} className="p-2 hover:bg-gray-200 rounded-full transition">
-                <X size={20} className="text-gray-500" />
-              </button>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{selectedRetailer.name}</h3>
+                <div className="text-sm text-gray-500">{selectedRetailer.contact?.name} • {selectedRetailer.contact?.email}</div>
+              </div>
             </div>
-
+          ) : null
+        }
+        footer={
+           <div className="flex gap-3 w-full">
+               <button 
+                 onClick={() => {
+                    setNudgeMessage(`Hi ${selectedRetailer?.contact?.name || 'there'}, just a friendly reminder...`);
+                    setShowNudgeModal(true);
+                 }}
+                 className="flex-1 py-2.5 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2"
+               >
+                 <Mail size={16} /> Send Reminder
+               </button>
+               <button 
+                 onClick={() => {
+                     alert('Navigate to retailer detail');
+                 }}
+                 className="flex-1 py-2.5 bg-white border border-gray-200 text-gray-900 font-bold rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
+               >
+                 <User size={16} /> View Details
+               </button>
+           </div>
+        }
+      >
+        {selectedRetailer && (
+          <div className="space-y-0"> { /* Wrapper to maintain internal structure if needed */ }
+            
             {/* Quick Stats */}
             <div className="grid grid-cols-2 border-b border-gray-100">
               <div className="p-4 text-center border-r border-gray-100">
@@ -654,8 +674,9 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
               </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* Content */}
+            <div className="p-6">
+
               {drawerTab === 'usage' ? (
                 <div className="space-y-6">
                   {/* Social */}
@@ -754,37 +775,13 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                 </div>
               )}
             </div>
-
-            {/* Drawer Footer (Actions) - Fixed [Request 3] */}
-            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
-               <button 
-                 onClick={() => {
-                    setNudgeMessage(`Hi ${selectedRetailer.contact?.name || 'there'}, just a friendly reminder...`);
-                    setShowNudgeModal(true);
-                 }}
-                 className="flex-1 py-2.5 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2"
-               >
-                 <Mail size={16} /> Send Reminder
-               </button>
-               <button 
-                 onClick={() => {
-                     // Placeholder for navigating to detail
-                     alert('Navigate to retailer detail');
-                 }}
-                 className="flex-1 py-2.5 bg-white border border-gray-200 text-gray-900 font-bold rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
-               >
-                 <User size={16} /> View Details
-               </button>
-            </div>
-
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </Drawer>
 
       {/* --- Nudge Modal --- */}
-      {showNudgeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {showNudgeModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={() => setShowNudgeModal(false)}></div>
           <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-start mb-4">
@@ -830,7 +827,8 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Drawer from '../../../../components/Drawer';
 import { XCircle, Mail, MapPin, Building2, Users, Clock, CheckCircle2, AlertCircle, Facebook, Instagram, Linkedin, Globe, Edit, Ban, Store, Map } from 'lucide-react';
 
 const RetailerDrawer = ({ retailer, onClose }) => {
@@ -6,42 +7,55 @@ const RetailerDrawer = ({ retailer, onClose }) => {
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [newQuota, setNewQuota] = useState(retailer?.quota?.email?.limit || 10000);
 
-  if (!retailer) return null;
+  // Cache retailer for exit animation
+  const [cachedRetailer, setCachedRetailer] = useState(retailer);
+  
+  if (retailer && retailer !== cachedRetailer) {
+    setCachedRetailer(retailer);
+  }
+
+  const displayRetailer = retailer || cachedRetailer;
+  
+  if (!displayRetailer) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose}></div>
-        <div className="relative w-[600px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-start justify-between bg-gray-50/50">
-                <div className="flex items-center gap-4">
-                    <div className={`w-16 h-16 rounded-full ${retailer.logo} flex items-center justify-center text-white font-bold text-xl shadow-sm`}>
-                        {retailer.name.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">{retailer.name}</h2>
-                        <div className="flex items-center gap-2 mt-1">
-                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
-                                 retailer.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' :
-                                 retailer.status === 'Suspended' ? 'bg-red-50 text-red-700 border-red-100' :
-                                 retailer.status === 'Pending' ? 'bg-gray-50 text-gray-600 border-gray-100' :
-                                 'bg-amber-50 text-amber-700 border-amber-100'
-                             }`}>
-                                 {retailer.status}
-                             </span>
-                             <span className="text-xs text-gray-400">ID: {retailer.id.toUpperCase()}</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-white bg-white/50 border border-gray-200 rounded-lg text-gray-500 hover:text-black transition" title="Edit Profile">
-                        <Edit size={18} />
-                    </button>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition">
-                        <XCircle size={24} className="text-gray-400" />
-                    </button>
+    <Drawer
+      isOpen={!!retailer}
+      onClose={onClose}
+      width="w-[600px] max-w-full"
+      title={
+        <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-full ${displayRetailer.logo} flex items-center justify-center text-white font-bold text-lg shadow-sm`}>
+                {displayRetailer.name.substring(0, 2).toUpperCase()}
+            </div>
+            <div>
+                <h2 className="text-lg font-bold text-gray-900">{displayRetailer.name}</h2>
+                <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                            displayRetailer.status === 'Active' ? 'bg-green-50 text-green-700 border-green-100' :
+                            displayRetailer.status === 'Suspended' ? 'bg-red-50 text-red-700 border-red-100' :
+                            displayRetailer.status === 'Pending' ? 'bg-gray-50 text-gray-600 border-gray-100' :
+                            'bg-amber-50 text-amber-700 border-amber-100'
+                        }`}>
+                            {displayRetailer.status}
+                        </span>
+                        <span className="text-[10px] text-gray-400">ID: {displayRetailer.id.toUpperCase()}</span>
                 </div>
             </div>
+            {/* Edit Button moved to title area if desired, or keep separate? 
+                Drawer title prop is flexible.
+            */}
+        </div>
+      }
+      footer={
+         <div className="flex justify-end items-center w-full">
+            <button className="text-red-600 text-sm font-medium hover:text-red-700 flex items-center gap-2 px-4 py-2 hover:bg-red-50 rounded-lg transition">
+                <Ban size={16} /> Deactivate Retailer
+            </button>
+         </div>
+      }
+    >
+        <div className="flex flex-col h-full"> {/* Inner wrapper for flex layout if needed for tabs */}
 
             {/* Tabs */}
             <div className="px-6 border-b border-gray-200">
@@ -357,13 +371,6 @@ const RetailerDrawer = ({ retailer, onClose }) => {
                 )}
             </div>
 
-            {/* Footer Actions */}
-            <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-end items-center">
-                <button className="text-red-600 text-sm font-medium hover:text-red-700 flex items-center gap-2 px-4 py-2 hover:bg-red-50 rounded-lg transition">
-                    <Ban size={16} /> Deactivate Retailer
-                </button>
-            </div>
-
             {/* Quota Adjustment Modal */}
             {showQuotaModal && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-[1px]">
@@ -402,7 +409,7 @@ const RetailerDrawer = ({ retailer, onClose }) => {
                 </div>
             )}
         </div>
-    </div>
+    </Drawer>
   );
 };
 
