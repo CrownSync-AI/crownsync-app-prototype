@@ -508,6 +508,8 @@ const INITIAL_RETAILERS = [
   { id: 'r20', name: 'Chicago Classics', email: 'info@chicagoclassics.com', status: 'Active', tier: 'Platinum', zone: 'North America' },
 ];
 
+import { ToastProvider } from './brand/context/ToastContext';
+
 const App = () => {
   // State lifting for persistence across views
   const [files, setFiles] = useState(INITIAL_FILES);
@@ -520,39 +522,41 @@ const App = () => {
   const [showEmptyState, setShowEmptyState] = useState(false);
 
   return (
-    <BrowserRouter>
-      <FloatingDevTools 
-        showEmptyState={showEmptyState} 
-        setShowEmptyState={setShowEmptyState} 
-      />
-      <Routes>
-        <Route path="/" element={
-          <BrandApp 
-            files={files} 
-            setFiles={setFiles}
-            campaigns={campaigns} 
-            setCampaigns={setCampaigns}
-            templates={templates} 
-            setTemplates={setTemplates}
-            catalogs={catalogs} 
-            setCatalogs={setCatalogs}
-            retailers={retailers}
-            showEmptyState={showEmptyState}
-          />
-        } />
-        <Route path="/retailer" element={
-          <RetailerApp 
-            campaigns={campaigns} 
-            catalogs={catalogs}
-            templates={templates}
-            files={files}
-            retailerId="r1" 
-            showEmptyState={showEmptyState}
-          />
-        } />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <FloatingDevTools 
+          showEmptyState={showEmptyState} 
+          setShowEmptyState={setShowEmptyState} 
+        />
+        <Routes>
+          <Route path="/" element={
+            <BrandApp 
+              files={files} 
+              setFiles={setFiles}
+              campaigns={campaigns} 
+              setCampaigns={setCampaigns}
+              templates={templates} 
+              setTemplates={setTemplates}
+              catalogs={catalogs} 
+              setCatalogs={setCatalogs}
+              retailers={retailers}
+              showEmptyState={showEmptyState}
+            />
+          } />
+          <Route path="/retailer" element={
+            <RetailerApp 
+              campaigns={campaigns} 
+              catalogs={catalogs}
+              templates={templates}
+              files={files}
+              retailerId="r1" 
+              showEmptyState={showEmptyState}
+            />
+          } />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ToastProvider>
   );
 };
 

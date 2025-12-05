@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Drawer from '../../../../components/Drawer';
+import { useToast } from '../../../../context/ToastContext';
 import { 
   RefreshCw, TrendingUp, AlertCircle, CheckCircle2, Clock, Search, Filter, 
   ChevronRight, X, Award, MessageSquare, MoreHorizontal, ChevronDown, Check,
@@ -263,20 +264,20 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
-      setIsRefreshing(false);
+  setIsRefreshing(false);
       setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     }, 1000);
   };
 
+  const { addToast } = useToast();
+
   const handleClearFilters = () => {
-    setFilterStatus('All');
-    setFilterTier('All');
-    setFilterZone('All');
+    setFilterStatus('All Status');
+    setFilterTier('All Tiers');
+    setFilterZone('All Zones');
     setSearchTerm('');
     setCurrentPage(1);
   };
-
-
 
   const handleNudgeAll = () => {
     setNudgeMessage(`Hi there! Just a friendly reminder that our new ${campaign.title} campaign is live. We noticed you haven't had a chance to check it out yet.`);
@@ -284,8 +285,13 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   };
 
   const confirmSendNudge = () => {
+    // Mock API call
+    const targetName = selectedRetailer ? selectedRetailer.name : `${needsAttentionList.length} retailers`;
+    console.log(`Sending nudge to ${targetName}: "${nudgeMessage}"`);
+    
     setShowNudgeModal(false);
-    alert(`Reminders queued for ${needsAttentionList.length} retailers.`);
+    setNudgeMessage('');
+    addToast('Reminder sent successfully!', 'success');
   };
 
   return (
