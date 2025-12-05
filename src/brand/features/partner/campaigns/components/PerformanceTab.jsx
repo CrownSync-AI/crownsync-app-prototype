@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { 
   Instagram, Facebook, Twitter, MessageCircle, Video, Mail, Smartphone, 
   Download, Users, TrendingUp, Eye, MousePointer, FileText, Image as ImageIcon, 
-  BarChart3, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Info 
+  BarChart3, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Info, MapPin 
 } from 'lucide-react';
 
 const PerformanceTab = ({ campaign }) => {
@@ -13,11 +13,12 @@ const PerformanceTab = ({ campaign }) => {
 
   const socialRef = useRef(null);
   const emailRef = useRef(null);
+  const smsRef = useRef(null);
   const assetsRef = useRef(null);
 
   // --- Mock Data Generation ---
   
-  // Social Content: Heterogeneous posts (some have IG+FB, some have TikTok, etc.)
+  // Social Content: Heterogeneous posts
   const socialContent = [
     {
       id: 'post-1',
@@ -36,25 +37,25 @@ const PerformanceTab = ({ campaign }) => {
       id: 'post-2',
       title: 'Behind the Scenes Video',
       thumbnail: 'https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?w=100&h=100&fit=crop',
-      platforms: ['tiktok', 'instagram'],
+      platforms: ['twitter', 'instagram'],
       totalShares: 280,
       estReach: 125000,
       avgEngagement: 7.2,
       details: [
-        { platform: 'tiktok', shares: 190, views: 85000, likes: 12400 },
+        { platform: 'twitter', shares: 190, views: 85000, likes: 12400 },
         { platform: 'instagram', shares: 90, views: 32000, likes: 4500 }
       ]
     },
     {
       id: 'post-3',
-      title: 'Limited Time Offer',
+      title: 'Store Event Promo',
       thumbnail: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop',
-      platforms: ['wechat'],
+      platforms: ['google_business'],
       totalShares: 45,
       estReach: 12000,
       avgEngagement: 3.5,
       details: [
-        { platform: 'wechat', shares: 45, reads: 8500, wow: 320 }
+        { platform: 'google_business', shares: 45, views: 8500, clicks: 320 }
       ]
     }
   ];
@@ -66,12 +67,11 @@ const PerformanceTab = ({ campaign }) => {
     { id: 'email-3', subject: 'New Arrivals are Here', sent: 580, openRate: 25, clickRate: 4, usageCount: 22 }
   ];
 
-  // SMS Content
-  const smsData = {
-    sent: 1200,
-    deliveryRate: 98.5,
-    clickRate: 18.2
-  };
+  // SMS Content (List format)
+  const smsContent = [
+    { id: 'sms-1', message: 'Your exclusive access code is here! Shop now.', sent: 1200, deliveryRate: 98.5, clickRate: 18.2, usageCount: 45 },
+    { id: 'sms-2', message: 'Flash Sale starts in 1 hour. Don\'t miss out.', sent: 850, deliveryRate: 99.1, clickRate: 22.5, usageCount: 32 }
+  ];
 
   // Asset Content
   const assetContent = [
@@ -84,10 +84,10 @@ const PerformanceTab = ({ campaign }) => {
 
   // Counts for filters
   const counts = {
-    all: socialContent.length + emailContent.length + 1 + assetContent.length, // +1 for SMS
+    all: socialContent.length + emailContent.length + smsContent.length + assetContent.length,
     social: socialContent.length,
     email: emailContent.length,
-    sms: 1,
+    sms: smsContent.length,
     downloads: assetContent.length
   };
 
@@ -113,10 +113,8 @@ const PerformanceTab = ({ campaign }) => {
   };
 
   const scrollToSection = (ref) => {
-    const offset = 180; // Adjust for sticky header height
     if (ref.current) {
-      const top = ref.current.getBoundingClientRect().top + window.pageYOffset - offset;
-      window.scrollTo({ top, behavior: 'smooth' });
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -125,9 +123,14 @@ const PerformanceTab = ({ campaign }) => {
     switch(filter) {
       case 'social': scrollToSection(socialRef); break;
       case 'email': scrollToSection(emailRef); break;
-      case 'sms': scrollToSection(emailRef); break; // Grouped with Email
+      case 'sms': scrollToSection(smsRef); break;
       case 'downloads': scrollToSection(assetsRef); break;
-      default: window.scrollTo({ top: 0, behavior: 'smooth' });
+      default: {
+        // Scroll to top of the container
+        const container = socialRef.current?.closest('.overflow-y-auto');
+        if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+      }
     }
   };
 
@@ -136,9 +139,8 @@ const PerformanceTab = ({ campaign }) => {
     switch(platform) {
       case 'instagram': return <Instagram size={size} className="text-pink-600" />;
       case 'facebook': return <Facebook size={size} className="text-blue-600" />;
-      case 'twitter': return <Twitter size={size} className="text-sky-500" />;
-      case 'tiktok': return <Video size={size} className="text-black" />;
-      case 'wechat': return <MessageCircle size={size} className="text-emerald-600" />;
+      case 'twitter': return <Twitter size={size} className="text-black" />; // X (Twitter)
+      case 'google_business': return <MapPin size={size} className="text-blue-500" />;
       default: return null;
     }
   };
@@ -161,7 +163,7 @@ const PerformanceTab = ({ campaign }) => {
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
           <BarChart3 size={32} className="text-gray-300" />
         </div>
-        <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">No Performance Data Yet</h3>
+        <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">No Content Insights Yet</h3>
         <p className="text-gray-500 max-w-md mx-auto mb-8">
           Analytics and retailer activity will appear here once you publish this campaign and retailers start interacting with it.
         </p>
@@ -177,33 +179,17 @@ const PerformanceTab = ({ campaign }) => {
   }
 
   return (
-    <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
       
-      {/* --- Sticky Header: Data Status & Filters --- */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm -mx-6 px-6 py-4">
-        <div className="flex flex-col gap-4 max-w-5xl mx-auto">
+      {/* --- Sticky Header: Filters & Actions --- */}
+      <div className="sticky top-0 z-30 bg-gray-50/95 backdrop-blur-md border-b border-gray-200 shadow-sm py-3 mb-6">
+        <div className="flex items-center justify-between px-6 gap-4">
           
-          {/* Data Refresh Indicator */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              <span>Last updated: {lastUpdated} • Auto-refreshes every 1 hour</span>
-            </div>
-            <button 
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition disabled:opacity-50"
-            >
-              <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh Now'}
-            </button>
-          </div>
-
-          {/* Smart Content Filter */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          {/* Left: Smart Content Filter */}
+          <div className="flex items-center gap-2 no-scrollbar pl-1 py-1">
             {[
               { id: 'all', label: 'All Content', count: counts.all },
-              { id: 'social', label: 'Social', count: counts.social },
+              { id: 'social', label: 'Social Post', count: counts.social },
               { id: 'email', label: 'Email', count: counts.email },
               { id: 'sms', label: 'SMS', count: counts.sms },
               { id: 'downloads', label: 'Downloads', count: counts.downloads },
@@ -211,32 +197,58 @@ const PerformanceTab = ({ campaign }) => {
               <button
                 key={filter.id}
                 onClick={() => handleFilterClick(filter.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap border ${
                   activeFilter === filter.id
-                    ? 'bg-black text-white shadow-md transform scale-105'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-black text-white border-black shadow-md transform'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200'
                 }`}
               >
                 {filter.label}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                  activeFilter === filter.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600'
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  activeFilter === filter.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
                 }`}>
                   {filter.count}
                 </span>
               </button>
             ))}
           </div>
+
+          {/* Right: Status & Refresh */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Last Updated - Compact with Hover */}
+            <div className="group relative flex items-center gap-2 text-[10px] text-gray-400 bg-white border border-gray-200 px-2 py-1 rounded-full shadow-sm cursor-help">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              <span>Updated {lastUpdated.split(',')[1]}</span>
+              
+              {/* Tooltip */}
+              <div className="absolute right-0 top-full mt-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                Last updated: {lastUpdated}
+                <br />
+                Auto-refreshes every 1 hour
+              </div>
+            </div>
+
+            <button 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition disabled:opacity-50"
+              title="Refresh Data"
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            </button>
+          </div>
+
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto space-y-10">
+      <div className="w-full space-y-10 px-6">
         
-        {/* --- Section 1: Social Media Performance --- */}
+        {/* --- Section 1: Social Post --- */}
         <div ref={socialRef} className="scroll-mt-40">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Instagram size={24} className="text-pink-500" />
-              Social Media Performance
+              Social Post
             </h2>
             <div className="flex gap-4">
                <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
@@ -306,14 +318,14 @@ const PerformanceTab = ({ campaign }) => {
                           <div key={idx} className="flex items-center gap-6 text-sm">
                             <div className="flex items-center gap-2 w-24 font-medium text-gray-700">
                               {getPlatformIcon(detail.platform)}
-                              <span className="capitalize">{detail.platform}</span>
+                              <span className="capitalize">{detail.platform.replace('_', ' ')}</span>
                             </div>
                             <div className="flex gap-6 text-gray-600">
                               <span><span className="font-medium text-gray-900">{detail.shares}</span> Shares</span>
                               {detail.likes && <span><span className="font-medium text-gray-900">{detail.likes.toLocaleString()}</span> Likes</span>}
                               {detail.comments && <span><span className="font-medium text-gray-900">{detail.comments}</span> Comments</span>}
                               {detail.views && <span><span className="font-medium text-gray-900">{detail.views.toLocaleString()}</span> Views</span>}
-                              {detail.reads && <span><span className="font-medium text-gray-900">{detail.reads.toLocaleString()}</span> Reads</span>}
+                              {detail.clicks && <span><span className="font-medium text-gray-900">{detail.clicks.toLocaleString()}</span> Clicks</span>}
                             </div>
                           </div>
                         ))}
@@ -326,94 +338,139 @@ const PerformanceTab = ({ campaign }) => {
           </div>
         </div>
 
-        {/* --- Section 2: Direct Outreach --- */}
+        {/* --- Section 2: Email --- */}
         <div ref={emailRef} className="scroll-mt-40">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Mail size={24} className="text-blue-500" />
-            Direct Outreach
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Mail size={24} className="text-blue-500" />
+              Email
+            </h2>
+            <div className="flex gap-4">
+               <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs text-gray-500 uppercase font-bold">Total Usage</div>
+                  <div className="text-lg font-bold text-gray-900">47</div>
+               </div>
+               <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs text-gray-500 uppercase font-bold">Active Retailers</div>
+                  <div className="text-lg font-bold text-gray-900">38</div>
+               </div>
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Email Table */}
-            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                <h3 className="font-bold text-gray-900 text-sm">Email Templates</h3>
-                <span className="text-xs text-gray-500">Sorted by Open Rate</span>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {emailContent.map((email) => (
-                  <div key={email.id} className="p-4 hover:bg-gray-50 transition">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="font-medium text-gray-900 text-sm">{email.subject}</div>
-                      <div className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                        Used by {email.usageCount} retailers
-                      </div>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <div className="col-span-5">Subject Line</div>
+              <div className="col-span-2 text-right">Sent</div>
+              <div className="col-span-2 text-right">Open Rate</div>
+              <div className="col-span-2 text-right">Click Rate</div>
+              <div className="col-span-1 text-center">Usage</div>
+            </div>
+
+            {/* Table Body */}
+            <div className="divide-y divide-gray-100">
+              {emailContent.map((email) => (
+                <div key={email.id} className="group bg-white transition hover:bg-gray-50/50">
+                  <div className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+                    <div className="col-span-5">
+                      <div className="font-bold text-gray-900 text-sm mb-1 truncate" title={email.subject}>{email.subject}</div>
+                      <div className="text-xs text-gray-500">Template ID: {email.id}</div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 items-center">
-                      <div>
-                        <div className="text-xs text-gray-500 mb-0.5">Sent</div>
-                        <div className="text-sm font-bold text-gray-900">{email.sent}</div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs text-gray-500 mb-1">
-                          <span>Open Rate</span>
-                          <span className="font-bold text-gray-900">{email.openRate}%</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="col-span-2 text-right font-bold text-gray-900">{email.sent}</div>
+                    <div className="col-span-2 text-right">
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="font-bold text-gray-900">{email.openRate}%</span>
+                        <div className="w-20 bg-gray-100 rounded-full h-1.5 overflow-hidden">
                           <div className="h-full bg-blue-500 rounded-full" style={{ width: `${email.openRate}%` }}></div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-gray-500 mb-0.5">Click Rate</div>
-                        <div className="text-sm font-bold text-gray-900">{email.clickRate}%</div>
-                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* SMS Block */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-lg p-6 text-white flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-6">
-                  <Smartphone size={20} className="text-emerald-400" />
-                  <h3 className="font-bold text-lg">SMS Performance</h3>
-                </div>
-                
-                <div className="space-y-6">
-                  <div>
-                    <div className="text-sm text-slate-400 mb-1">Total Sent</div>
-                    <div className="text-3xl font-bold">{smsData.sent.toLocaleString()}</div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Delivery Rate</div>
-                      <div className="text-xl font-bold text-emerald-400">{smsData.deliveryRate}%</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Click Rate</div>
-                      <div className="text-xl font-bold text-blue-400">{smsData.clickRate}%</div>
+                    <div className="col-span-2 text-right font-bold text-gray-900">{email.clickRate}%</div>
+                    <div className="col-span-1 flex justify-center">
+                      <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        {email.usageCount}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-6 pt-6 border-t border-slate-700/50 text-xs text-slate-500 flex items-center gap-1">
-                <Info size={12} />
-                <span>SMS data is aggregated from all carriers</span>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* --- Section 3: Downloadable Assets --- */}
+        {/* --- Section 3: SMS --- */}
+        <div ref={smsRef} className="scroll-mt-40">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Smartphone size={24} className="text-emerald-500" />
+              SMS
+            </h2>
+            <div className="flex gap-4">
+               <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs text-gray-500 uppercase font-bold">Total Usage</div>
+                  <div className="text-lg font-bold text-gray-900">77</div>
+               </div>
+               <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs text-gray-500 uppercase font-bold">Active Retailers</div>
+                  <div className="text-lg font-bold text-gray-900">52</div>
+               </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <div className="col-span-5">Message Preview</div>
+              <div className="col-span-2 text-right">Sent</div>
+              <div className="col-span-2 text-right">Delivery Rate</div>
+              <div className="col-span-2 text-right">Click Rate</div>
+              <div className="col-span-1 text-center">Usage</div>
+            </div>
+
+            {/* Table Body */}
+            <div className="divide-y divide-gray-100">
+              {smsContent.map((sms) => (
+                <div key={sms.id} className="group bg-white transition hover:bg-gray-50/50">
+                  <div className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+                    <div className="col-span-5">
+                      <div className="font-medium text-gray-900 text-sm mb-1 truncate" title={sms.message}>{sms.message}</div>
+                    </div>
+                    <div className="col-span-2 text-right font-bold text-gray-900">{sms.sent}</div>
+                    <div className="col-span-2 text-right">
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="font-bold text-gray-900">{sms.deliveryRate}%</span>
+                        <div className="w-20 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${sms.deliveryRate}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-2 text-right font-bold text-gray-900">{sms.clickRate}%</div>
+                    <div className="col-span-1 flex justify-center">
+                      <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        {sms.usageCount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* --- Section 4: Downloadable Assets --- */}
         <div ref={assetsRef} className="scroll-mt-40">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Download size={24} className="text-purple-500" />
-            Downloadable Assets
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Download size={24} className="text-purple-500" />
+              Downloadable Assets
+            </h2>
+            <div className="flex gap-4">
+               <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs text-gray-500 uppercase font-bold">Total Downloads</div>
+                  <div className="text-lg font-bold text-gray-900">548</div>
+               </div>
+            </div>
+          </div>
 
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <table className="w-full text-left">

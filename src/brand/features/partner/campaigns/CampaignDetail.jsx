@@ -249,8 +249,8 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
 
         {/* Tabs */}
         <div className="px-6 flex items-center gap-8 border-t border-gray-100">
-          {['Overview', 'Content', 'Performance', 'Retailer Network', 'Settings']
-            .filter(tab => !(campaign.status === 'Draft' && (tab === 'Performance' || tab === 'Retailer Network')))
+          {['Overview', 'Content', 'Content Insights', 'Retailer Adoption', 'Settings']
+            .filter(tab => !(campaign.status === 'Draft' && (tab === 'Content Insights' || tab === 'Retailer Adoption')))
             .map((tab) => {
             const id = tab.toLowerCase();
             const isActive = activeTab === id;
@@ -287,12 +287,12 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
 
       {/* 2. Main Content Area */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="w-full mx-auto p-6">
-          {activeTab === 'overview' && <OverviewTab campaign={campaign} onUpdate={onUpdate} setActiveTab={setActiveTab} />}
-          {activeTab === 'content' && <ContentTab campaign={campaign} onUpdate={onUpdate} notify={notify} allFiles={allFiles} />}
-          {activeTab === 'performance' && <PerformanceTab campaign={campaign} retailers={retailers} />}
-          {activeTab === 'retailer network' && <RetailerNetworkTab campaign={campaign} retailers={retailers} />}
-          {activeTab === 'settings' && <SettingsTab campaign={campaign} onUpdate={onUpdate} />}
+        <div className="w-full mx-auto">
+          {activeTab === 'overview' && <div className="p-6"><OverviewTab campaign={campaign} onUpdate={onUpdate} setActiveTab={setActiveTab} /></div>}
+          {activeTab === 'content' && <div className="p-6"><ContentTab campaign={campaign} onUpdate={onUpdate} notify={notify} allFiles={allFiles} /></div>}
+          {activeTab === 'content insights' && <PerformanceTab campaign={campaign} retailers={retailers} />}
+          {activeTab === 'retailer adoption' && <div className="p-6"><RetailerNetworkTab campaign={campaign} retailers={retailers} /></div>}
+          {activeTab === 'settings' && <div className="p-6"><SettingsTab campaign={campaign} onUpdate={onUpdate} /></div>}
         </div>
       </div>
 
