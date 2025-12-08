@@ -128,7 +128,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
   }
 
   return (
-    <aside className="w-20 md:w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
+    <aside className="w-20 md:w-56 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
       {/* 1. Brand Logo */}
       <div className="h-20 flex items-center justify-center md:justify-start md:px-8">
         <img src={BrandLogo} alt="CrownSync" className="h-10 max-w-[160px] hidden md:block" />
@@ -173,7 +173,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
             
             {/* Logout Popover */}
             {isUserMenuOpen && (
-                <div className="absolute left-4 bottom-20 right-4 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 animate-in slide-in-from-bottom-2 fade-in duration-200 overflow-hidden z-50">
+                <div className="absolute left-4 bottom-20 w-max min-w-[240px] max-w-sm bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 animate-in slide-in-from-bottom-2 fade-in duration-200 overflow-hidden z-50">
                     {/* Popover Header */}
                     <div className="p-3 border-b border-gray-50 bg-gray-50/50 flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full flex-shrink-0 bg-gray-200 overflow-hidden ring-1 ring-gray-100">

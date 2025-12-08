@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { ArrowRightLeft, Wrench, X, MonitorOff, MonitorCheck } from 'lucide-react';
 
 const FloatingDevTools = ({ showEmptyState, setShowEmptyState }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isRetailer = location.pathname.startsWith('/retailer');
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Only show if mode=dev
+  if (searchParams.get('mode') !== 'dev') return null;
 
   return (
     <div 
