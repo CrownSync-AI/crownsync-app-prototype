@@ -63,7 +63,7 @@ const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) 
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
            <div>
-              <h3 className="text-xl font-serif font-bold text-gray-900">New Campaign</h3>
+              <h3 className="text-xl font-bold text-gray-900">New Campaign</h3>
               <p className="text-sm text-gray-500">Create a new marketing campaign for your retailers.</p>
            </div>
            <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full text-gray-500 hover:text-black transition"><X size={20}/></button>

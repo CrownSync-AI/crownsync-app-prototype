@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Trash2, Plus, Search, Grid, List as ListIcon, CheckCircle2, Image as ImageIcon, Video, FileText, Megaphone, Clock, Download, ArrowUpRight, X, ChevronRight, Filter, MoreHorizontal, ChevronDown, Folder, Lock, RefreshCw, Layout, FolderTree, Box, PanelLeft, PanelLeftClose, FolderOpen, Edit2, Info, Tag } from 'lucide-react';
+import { campaignData } from '../../../data/mockStore/campaignStore'; // Import store for asset lookup
+import { Plus, Filter, MoreHorizontal, Download, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Facebook, Twitter, Edit2, Eye, Trash2, Folder, FolderOpen, ChevronRight, ChevronDown, CheckCircle2, Lock, LayoutGrid, List as ListIcon, Grid, ArrowUpRight, Search, RefreshCw, Box, FolderTree, Info, Megaphone } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 
 const formatBytes = (bytes) => {
@@ -13,7 +14,11 @@ const formatBytes = (bytes) => {
 const FileDetailModal = ({ file, isOpen, onClose, campaigns, onDelete }) => {
   if (!isOpen || !file) return null;
 
-  const usedIn = campaigns.filter(c => c.assets.includes(file.id));
+  const usedIn = campaigns.filter(c => {
+      const contentValues = campaignData.contentMap[c.contentId];
+      const assets = contentValues?.downloadable || [];
+      return assets.some(a => a.id === file.id);
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -48,7 +53,7 @@ const FileDetailModal = ({ file, isOpen, onClose, campaigns, onDelete }) => {
          {/* Details Section */}
          <div className="w-full sm:w-1/4 bg-white flex flex-col h-full overflow-hidden">
             <div className="p-8 border-b border-gray-100">
-               <h2 className="text-2xl font-bold font-serif text-gray-900 break-words leading-tight">{file.name}</h2>
+               <h2 className="text-2xl font-bold text-gray-900 break-words leading-tight">{file.name}</h2>
                <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
                   <Clock size={14}/>
                   <span>Added on {file.date}</span>
@@ -318,7 +323,11 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
       // Check for usage
       const usedFiles = selectedFiles.filter(fid => {
          const file = files.find(f => f.id === fid);
-         return file && !file.isSystem && campaigns.some(c => c.assets.includes(fid));
+         return file && !file.isSystem && campaigns.some(c => {
+             const contentValues = campaignData.contentMap[c.contentId];
+             const assets = contentValues?.downloadable || [];
+             return assets.some(a => a.id === fid);
+         });
       });
 
       if (usedFiles.length > 0) {
@@ -350,7 +359,11 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
       }
 
       // Check usage
-      const usedIn = campaigns.filter(c => c.assets.includes(id));
+      const usedIn = campaigns.filter(c => {
+          const contentValues = campaignData.contentMap[c.contentId];
+          const assets = contentValues?.downloadable || [];
+          return assets.some(a => a.id === id);
+      });
       if (usedIn.length > 0) {
          const campaignNames = usedIn.map(c => c.title).join(', ');
          if (!confirm(`WARNING: This file is being used by '${campaignNames}'. Deleting it will cause missing assets in these campaigns. Are you sure?`)) {
@@ -407,7 +420,7 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
     <div className="h-full flex flex-col bg-white">
       {/* [A] Page Header */}
       <div className="px-8 py-6 flex items-center justify-between bg-white border-b border-gray-100">
-         <h1 className="text-2xl font-serif font-medium text-gray-900">Asset Library</h1>
+         <h1 className="text-2xl font-medium text-gray-900">Asset Library</h1>
          
          {/* Compact Storage Status */}
          <div className="hidden md:flex items-center bg-white rounded-xl border border-gray-200 shadow-sm py-2 px-5 gap-6">
@@ -678,7 +691,11 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
          ) : view === 'grid' ? (
            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pb-24">
              {filteredFiles.map(file => {
-                const usageCount = campaigns.filter(c => c.assets.includes(file.id)).length;
+                const usageCount = campaigns.filter(c => {
+                    const contentValues = campaignData.contentMap[c.contentId];
+                    const assets = contentValues?.downloadable || [];
+                    return assets.some(a => a.id === file.id);
+                }).length;
                 const isSelected = selectedFiles.includes(file.id);
                 const isFolder = file.type === 'folder';
                 
@@ -818,7 +835,11 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                      {filteredFiles.map(file => {
-                        const usageCount = campaigns.filter(c => c.assets.includes(file.id)).length;
+                        const usageCount = campaigns.filter(c => {
+                            const contentValues = campaignData.contentMap[c.contentId];
+                            const assets = contentValues?.downloadable || [];
+                            return assets.some(a => a.id === file.id);
+                        }).length;
                         const isFolder = file.type === 'folder';
                         return (
                            <tr key={file.id} className={`hover:bg-gray-50 group cursor-pointer ${selectedFiles.includes(file.id) ? 'bg-indigo-50/50' : ''}`} onClick={() => handleItemClick(file)}>

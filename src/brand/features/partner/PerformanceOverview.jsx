@@ -90,7 +90,7 @@ const PerformanceOverview = ({ campaigns }) => {
       {/* 1. Header & Controls */}
       <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
          <div className="flex items-center gap-4 py-1">
-            <h2 className="text-lg font-serif font-bold text-gray-900">Performance Overview</h2>
+            <h2 className="text-lg font-bold text-gray-900">Performance Overview</h2>
             <button 
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-1 hover:bg-gray-100 rounded-full text-gray-400 transition"
@@ -151,8 +151,8 @@ const PerformanceOverview = ({ campaigns }) => {
                    <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-medium text-gray-900">Content Impact</h3>
                       <div className="flex gap-4 text-xs">
-                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-100"></span> Reach</span>
-                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-purple-500"></span> Engagement</span>
+                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-[#C5D1C7]"></span> Reach</span>
+                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-brand-gold"></span> Engagement</span>
                       </div>
                    </div>
                    <div className="h-40 w-full">
@@ -167,9 +167,9 @@ const PerformanceOverview = ({ campaigns }) => {
                                 separator=": "
                             />
                             {/* Reach (Bar Background) */}
-                            <Bar yAxisId="left" dataKey="reach" fill="#D1FAE5" barSize={32} radius={[4, 4, 0, 0]} />
+                            <Bar yAxisId="left" dataKey="reach" fill="#C5D1C7" barSize={32} radius={[4, 4, 0, 0]} />
                             {/* Engagement (Line Foreground) */}
-                            <Line yAxisId="right" type="monotone" dataKey="engagement" stroke="#8B5CF6" strokeWidth={3} dot={{r: 3, fill: '#8B5CF6', strokeWidth: 2, stroke: '#fff'}} />
+                            <Line yAxisId="right" type="monotone" dataKey="engagement" stroke="#b5984d" strokeWidth={3} dot={{r: 3, fill: '#b5984d', strokeWidth: 2, stroke: '#fff'}} />
                          </ComposedChart>
                       </ResponsiveContainer>
                    </div>
@@ -181,7 +181,7 @@ const PerformanceOverview = ({ campaigns }) => {
                       <h3 className="text-sm font-medium text-gray-900">Retailer Participation</h3>
                       <div className="flex gap-4 text-xs">
                           <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-gray-200"></span> Invited</span>
-                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-black"></span> Participating</span>
+                          <span className="flex items-center gap-1.5 text-gray-400"><span className="w-2 h-2 rounded-full bg-brand-gold"></span> Participating</span>
                       </div>
                    </div>
                    <div className="h-40 w-full">
@@ -189,8 +189,8 @@ const PerformanceOverview = ({ campaigns }) => {
                          <AreaChart data={trendData}>
                             <defs>
                                 <linearGradient id="colorParticipating" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor="#000000" stopOpacity={0.1}/>
-                                  <stop offset="95%" stopColor="#000000" stopOpacity={0}/>
+                                  <stop offset="5%" stopColor="#b5984d" stopOpacity={0.1}/>
+                                  <stop offset="95%" stopColor="#b5984d" stopOpacity={0}/>
                                 </linearGradient>
                             </defs>
                             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#9CA3AF'}} dy={10} />
@@ -201,7 +201,7 @@ const PerformanceOverview = ({ campaigns }) => {
                             {/* Invited (Gray Area) */}
                             <Area type="monotone" dataKey="invited" stroke="#E5E7EB" strokeWidth={2} fill="transparent" strokeDasharray="4 4" />
                             {/* Participating (Black Area) */}
-                            <Area type="monotone" dataKey="participating" stroke="#000000" strokeWidth={2} fill="url(#colorParticipating)" />
+                            <Area type="monotone" dataKey="participating" stroke="#b5984d" strokeWidth={2} fill="url(#colorParticipating)" />
                          </AreaChart>
                       </ResponsiveContainer>
                    </div>

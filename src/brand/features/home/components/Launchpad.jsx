@@ -11,7 +11,7 @@ const Launchpad = () => {
    // Helper to render styled subtext based on task ID
    const renderSubtext = (task) => {
       if (task.id === 1) { // Brand Identity
-         return <span className="font-serif font-bold text-gray-900 tracking-wide">{task.subtitle}</span>;
+         return <span className="font-bold text-gray-900 tracking-wide">{task.subtitle}</span>;
       }
       if (task.id === 2) { // Domain
          return <span className="font-mono text-xs text-gray-600 bg-gray-50 px-1 py-0.5 rounded">{task.subtitle}</span>;

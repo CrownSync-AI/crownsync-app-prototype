@@ -538,7 +538,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                                    </div>
                                                </div>
                                            )}
-                                           <h3 className="font-serif font-bold text-gray-900 group-hover:text-indigo-600 transition truncate flex items-center gap-1.5">
+                                           <h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition truncate flex items-center gap-1.5">
                                                {campaign.title}
                                                {campaign.isPinned && (
                                                    <Pin size={12} className="fill-black flex-shrink-0" />

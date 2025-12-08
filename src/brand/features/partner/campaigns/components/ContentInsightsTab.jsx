@@ -5,7 +5,7 @@ import {
   BarChart3, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Info, MapPin 
 } from 'lucide-react';
 
-const PerformanceTab = ({ campaign }) => {
+const ContentInsightsTab = ({ campaign, data }) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -18,69 +18,12 @@ const PerformanceTab = ({ campaign }) => {
 
   // --- Mock Data Generation ---
   
-  // Social Content: Heterogeneous posts
-  const socialContent = [
-    {
-      id: 'post-1',
-      title: 'Summer Collection Launch',
-      thumbnail: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=100&h=100&fit=crop',
-      platforms: ['instagram', 'facebook'],
-      totalShares: 120,
-      estReach: 45000,
-      avgEngagement: 4.8,
-      details: [
-        { platform: 'instagram', shares: 85, likes: 3200, comments: 145 },
-        { platform: 'facebook', shares: 35, reactions: 850, comments: 42 }
-      ]
-    },
-    {
-      id: 'post-2',
-      title: 'Behind the Scenes Video',
-      thumbnail: 'https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?w=100&h=100&fit=crop',
-      platforms: ['twitter', 'instagram'],
-      totalShares: 280,
-      estReach: 125000,
-      avgEngagement: 7.2,
-      details: [
-        { platform: 'twitter', shares: 190, views: 85000, likes: 12400 },
-        { platform: 'instagram', shares: 90, views: 32000, likes: 4500 }
-      ]
-    },
-    {
-      id: 'post-3',
-      title: 'Store Event Promo',
-      thumbnail: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop',
-      platforms: ['google_business'],
-      totalShares: 45,
-      estReach: 12000,
-      avgEngagement: 3.5,
-      details: [
-        { platform: 'google_business', shares: 45, views: 8500, clicks: 320 }
-      ]
-    }
-  ];
-
-  // Email Content
-  const emailContent = [
-    { id: 'email-1', subject: 'VIP Invite: Summer Preview', sent: 450, openRate: 45, clickRate: 12, usageCount: 15 },
-    { id: 'email-2', subject: 'Last Chance for Early Access', sent: 320, openRate: 38, clickRate: 8, usageCount: 10 },
-    { id: 'email-3', subject: 'New Arrivals are Here', sent: 580, openRate: 25, clickRate: 4, usageCount: 22 }
-  ];
-
-  // SMS Content (List format)
-  const smsContent = [
-    { id: 'sms-1', message: 'Your exclusive access code is here! Shop now.', sent: 1200, deliveryRate: 98.5, clickRate: 18.2, usageCount: 45 },
-    { id: 'sms-2', message: 'Flash Sale starts in 1 hour. Don\'t miss out.', sent: 850, deliveryRate: 99.1, clickRate: 22.5, usageCount: 32 }
-  ];
-
-  // Asset Content
-  const assetContent = [
-    { id: 'asset-1', name: 'Lookbook_Q3_2024.pdf', type: 'PDF', size: '15 MB', downloads: 145, coverage: 80, lastActivity: '2h ago' },
-    { id: 'asset-2', name: 'Campaign_Video_Main.mp4', type: 'Video', size: '45 MB', downloads: 89, coverage: 65, lastActivity: '5h ago' },
-    { id: 'asset-3', name: 'Social_Assets_Pack.zip', type: 'ZIP', size: '128 MB', downloads: 210, coverage: 92, lastActivity: '10m ago' },
-    { id: 'asset-4', name: 'Product_Shot_01.jpg', type: 'Image', size: '2.4 MB', downloads: 56, coverage: 40, lastActivity: '1d ago' },
-    { id: 'asset-5', name: 'Product_Shot_02.jpg', type: 'Image', size: '2.2 MB', downloads: 48, coverage: 35, lastActivity: '1d ago' }
-  ];
+  // --- Mock Data Consumption (from Store) ---
+  
+  const socialContent = data?.socialContent || [];
+  const emailContent = data?.emailContent || [];
+  const smsContent = data?.smsContent || [];
+  const assetContent = data?.assetContent || [];
 
   // Counts for filters
   const counts = {
@@ -156,24 +99,35 @@ const PerformanceTab = ({ campaign }) => {
     }
   };
 
-  // Empty State for Draft
-  if (campaign.status === 'Draft') {
+  // Empty State Handling
+  // Show if status is Draft OR if data explicitly says no data
+  const showEmptyState = campaign.status === 'Draft' || (data && data.hasData === false);
+
+  if (showEmptyState) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
           <BarChart3 size={32} className="text-gray-300" />
         </div>
-        <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">No Content Insights Yet</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+            {data?.message || "No Content Insights Yet"}
+        </h3>
         <p className="text-gray-500 max-w-md mx-auto mb-8">
-          Analytics and retailer activity will appear here once you publish this campaign and retailers start interacting with it.
+          {campaign.status === 'Scheduled' 
+            ? "Insights will start appearing once the campaign goes live."
+            : "Analytics and retailer activity will appear here once you publish this campaign and retailers start interacting with it."
+          }
         </p>
-        <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm max-w-lg mx-auto border border-blue-100 flex gap-3 text-left">
-          <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
-          <div>
-            <div className="font-bold mb-1">Ready to launch?</div>
-            <div>Go to the Overview tab to complete your checklist and publish this campaign.</div>
-          </div>
-        </div>
+        
+        {campaign.status === 'Draft' && (
+            <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm max-w-lg mx-auto border border-blue-100 flex gap-3 text-left">
+            <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+            <div>
+                <div className="font-bold mb-1">Ready to launch?</div>
+                <div>Go to the Overview tab to complete your checklist and publish this campaign.</div>
+            </div>
+            </div>
+        )}
       </div>
     );
   }
@@ -539,4 +493,4 @@ const PerformanceTab = ({ campaign }) => {
   );
 };
 
-export default PerformanceTab;
+export default ContentInsightsTab;

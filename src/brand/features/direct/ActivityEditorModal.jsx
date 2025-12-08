@@ -170,7 +170,7 @@ const ActivityEditorModal = ({ isOpen, onClose, type }) => {
                   <div className="flex-1 bg-gray-50 overflow-y-auto pt-10 px-4 pb-4">
                      {/* Header */}
                      <div className="flex items-center justify-center mb-6">
-                        <div className="font-serif font-bold text-xl">BRAND</div>
+                        <div className="font-bold text-xl">BRAND</div>
                      </div>
                      
                      {/* Preview Body */}
@@ -183,7 +183,7 @@ const ActivityEditorModal = ({ isOpen, onClose, type }) => {
                            <div className="h-4 bg-gray-200 rounded w-full"></div>
                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                         </div>
-                        <div className="text-sm text-gray-600 font-serif leading-relaxed">
+                        <div className="text-sm text-gray-600 leading-relaxed">
                            {content || "Your content preview will appear here in real-time as you edit."}
                         </div>
                      </div>

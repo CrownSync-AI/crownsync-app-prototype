@@ -124,7 +124,7 @@ const PartnerBrands = ({ brands, onSelectBrand }) => {
                  <div className="pt-8 px-6 pb-6 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                        <div>
-                          <h3 className="font-serif font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition">{brand.name}</h3>
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition">{brand.name}</h3>
                           <p className="text-xs text-gray-500">{brand.campaigns} Campaigns • {brand.catalogs} Resources</p>
                        </div>
                        {/* Engagement Score */}

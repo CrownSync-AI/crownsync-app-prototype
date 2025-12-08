@@ -1,14 +1,77 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { campaignData } from '../../../../../data/mockStore/campaignStore';
+import { Search, Filter, ArrowUpRight, CheckCircle2, AlertCircle, Clock, MoreHorizontal, Mail, MessageSquare, Download, Instagram, Facebook, Twitter, Smartphone, Eye, XCircle, RefreshCw, TrendingUp, ChevronRight, X, Award, ChevronDown, Check, FileText, Video, ChevronLeft, User, Bell, Share2, Printer } from 'lucide-react'; // Added Share2, Printer
 import { createPortal } from 'react-dom';
 import Drawer from '../../../../components/Drawer';
 import { useToast } from '../../../../context/ToastContext';
-import { 
-  RefreshCw, TrendingUp, AlertCircle, CheckCircle2, Clock, Search, Filter, 
-  ChevronRight, X, Award, MessageSquare, MoreHorizontal, ChevronDown, Check,
-  Download, Share2, Mail, Smartphone, FileText, Video, ChevronLeft, User, Bell
-} from 'lucide-react';
 
-// --- Shared Components ---
+// Helper to render usage icons (Aligned with BrandCampaignList)
+const UsageIcons = ({ usage }) => {
+  if (!usage || (Array.isArray(usage) && usage.length === 0) || (typeof usage === 'object' && !usage.social && !usage.email && !usage.downloads)) return <span className="text-gray-300 text-xs">-</span>;
+
+  // Normalize usage object to array logic for visual rendering if needed, 
+  // or handle the specific 'usage' object structure from campaignStore.
+  // The store usage structure for 'good'/'avg' scenarios is currently mixed in my analysis (array vs boolean flags).
+  // Let's standardize on the array format from BrandCampaignList for display consistency: ['instagram', 'email'] etc.
+  // OR handle the object { social: true, email: true } -> ['instagram', 'facebook', 'email'] mock.
+  
+  // Quick Adapter:
+  let items = [];
+  if (Array.isArray(usage)) {
+      items = usage;
+  } else if (typeof usage === 'object') {
+      if (usage.social) items.push(['instagram', 'facebook']); // Mock social group
+      if (usage.email) items.push('email');
+      if (usage.downloads) items.push('downloadable');
+  }
+
+  const getIcon = (type) => {
+    switch(type) {
+      case 'instagram': return <Instagram size={12} />;
+      case 'facebook': return <Facebook size={12} />;
+      case 'twitter': return <Twitter size={12} />;
+      case 'email': return <Mail size={12} />;
+      case 'sms': return <MessageSquare size={12} />;
+      case 'downloadable': return <Download size={12} />;
+      case 'print': return <Printer size={12} />;
+      default: return <FileText size={12} />;
+    }
+  };
+
+  const getStyle = (type) => {
+     switch(type) {
+        case 'email': return 'bg-blue-50 text-blue-600';
+        case 'sms': return 'bg-purple-50 text-purple-600';
+        case 'downloadable': return 'bg-gray-100 text-gray-600';
+        case 'print': return 'bg-orange-50 text-orange-600'; 
+        default: return 'bg-gray-100 text-gray-600'; // Fallback
+     }
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {items.map((item, idx) => {
+         if (Array.isArray(item)) {
+             // Social Group
+             return (
+                 <div key={idx} className="flex items-center -space-x-1.5">
+                    {item.map((sub, sIdx) => (
+                        <div key={sIdx} className="w-6 h-6 rounded-full bg-white border border-gray-100 flex items-center justify-center text-pink-600 shadow-sm z-10 relative">
+                            {getIcon(sub)}
+                        </div>
+                    ))}
+                 </div>
+             );
+         }
+         return (
+             <div key={idx} className={`w-6 h-6 rounded-full flex items-center justify-center ${getStyle(item)}`}>
+                 {getIcon(item)}
+             </div>
+         );
+      })}
+    </div>
+  );
+};
 
 // Custom Dropdown Component (Consistent with RetailerList)
 const FilterDropdown = ({ label, options, value, onChange, disabled = false, multi = false }) => {
@@ -98,12 +161,21 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 };
 
 
-const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
+const RetailerAdoptionTab = ({ campaign }) => {
+  // 1. Data Source Resolution
+  // adoptionId can be 'good', 'avg', 'poor'
+  const adoptionData = campaignData.adoptionMap[campaign.adoptionId] || campaignData.adoptionMap.avg;
+  const retailers = adoptionData.list || [];
+
   // --- State ---
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterTier, setFilterTier] = useState('All');
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [filterZone, setFilterZone] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tierFilter, setTierFilter] = useState('all'); 
+  const [statusFilter, setStatusFilter] = useState('all'); 
+  const [filterZone, setFilterZone] = useState('All'); // Added back
+  
+  const [isTierOpen, setIsTierOpen] = useState(false); // For Click Trigger
+  const [isStatusOpen, setIsStatusOpen] = useState(false); // For Click Trigger
+  const [isZoneOpen, setIsZoneOpen] = useState(false); // For Click Trigger
   
   const [showNudgeModal, setShowNudgeModal] = useState(false);
   const [nudgeMessage, setNudgeMessage] = useState('');
@@ -116,81 +188,48 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // --- Mock Data Generation ---
-  // Using useMemo to prevent re-generation on every render and avoid "impure function" lint errors
+  // --- Data Simplification (Single Source of Truth) ---
+  // Transforms the raw retailer list based on the store configuration (data.list)
+  // No internal random generation allowed.
   const campaignRetailers = useMemo(() => {
     if (!retailers || retailers.length === 0) return [];
-    
-    // Scenario Simulation based on Campaign ID
-    // Scenario 1: camp-0 "Summer Sale" (Campaign 1)
-    // 20 invited, 16 participated (80%), 1 Zero-Action, 3 Viewed (Needs Attn: 3 Viewed + 1 Zero = 4 total)
-    const isScenarioSummer = campaign?.id === 'camp-0';
-    
-    // Scenario 2: camp-9 "VIP Event" (Campaign 10)
-    // 100% participated
-    const isScenarioVIP = campaign?.id === 'camp-9';
 
-    // Filter relevant retailers based on scenario
-    let targetRetailers = [...retailers];
-    
-    // Fallback zones/tiers
-    const zones = ['North', 'South', 'East', 'West', 'Central'];
-    const tiers = ['Platinum', 'Gold', 'Silver', 'Standard'];
+    // Helper: Map retailer ID to specific store configuration
+    const overrideMap = new Map();
+    if (adoptionData && adoptionData.list) {
+        adoptionData.list.forEach(item => {
+            overrideMap.set(item.id, item);
+        });
+    }
 
-    // --- SCENARIO HANDLING ---
-    // Campaign 1: Summer Sale (camp-0) -> Use first 20 retailers
-    // Campaign 10: VIP Event (camp-9) -> Use all retailers (up to 50 if avail, but we have 20 now)
-    
-    if (isScenarioSummer) {
-        // We expect at least 20 retailers from App.jsx now. 
-        // If not, we just take what we have.
-        targetRetailers = targetRetailers.slice(0, 20); 
-    } 
-    // Date Range Config
-    const dateStart = new Date('2025-11-25').getTime();
-    const dateEnd = new Date('2025-12-25').getTime();
-    const dateRange = dateEnd - dateStart;
+    return retailers.map((r) => {
+      // 1. Get base info from global retailer list
+      // Ensure zone/tier exists (App.jsx providers usually mock this, but providing safe defaults if missing)
+      const zone = r.location?.zone || r.zone || 'Central';
+      const tier = r.tier || 'Standard';
 
-    return targetRetailers.map((r, idx) => {
-      if (!r || !r.name) return null;
-
-      const zone = r.location?.zone || r.zone || zones[idx % zones.length];
-      const tier = r.tier || tiers[idx % tiers.length];
-
+      // 2. Determine Status from Store Config
+      // Default to 'Unopened' if no specific data exists in the store for this campaign
       let status = 'Unopened';
-      
-      if (isScenarioSummer) {
-        // Total 20.
-        // Needs: 16 Participated, 4 Needs Attention (1 Zero-Action).
-        if (idx < 16) {
-          status = 'Participated'; // 16 items
-        } else if (idx === 19) {
-          status = 'Unopened'; // 1 item (The Zero-Action one)
-        } else {
-          status = 'Viewed'; // 3 items (Indices 16, 17, 18) -> Participated=No, Viewed=Yes.
-        }
-      } else if (isScenarioVIP) {
-        // 100% Participation
-        status = 'Participated';
-      } else {
-        // Default random logic for others
-        const statuses = ['Participated', 'Viewed', 'Unopened'];
-        const statusIndex = idx % 10 < 6 ? 0 : idx % 10 < 8 ? 1 : 2; 
-        status = statuses[statusIndex];
-      }
-      
-      const adoptionRate = status === 'Participated' ? 40 + (idx * 7) % 61 : 0; 
-      const totalActions = status === 'Participated' ? 5 + (idx * 3) % 20 : status === 'Viewed' ? 1 : 0;
-      
-      const usage = {
-        social: status === 'Participated' && idx % 2 === 0,
-        email: status === 'Participated' && idx % 3 !== 0,
-        downloads: status === 'Participated' ? (idx % 5) + 1 : 0
-      };
+      let lastActiveOverride = null;
 
-      // Deterministic pseudo-random date based on index to satisfy "pure render" lint
-      const randomOffset = (idx * 1337) % dateRange; 
-      const randomDate = new Date(dateStart + randomOffset).toLocaleDateString();
+      if (overrideMap.has(r.id)) {
+          const override = overrideMap.get(r.id);
+          status = override.status || 'Unopened';
+          lastActiveOverride = override.lastActive;
+      } else if (adoptionData?.defaultStatus) {
+           // Allow store to set a default status for the bulk (e.g. 'Viewed') if needed
+           status = adoptionData.defaultStatus;
+      }
+
+      // 3. Derive metrics based on decided status (Deterministic)
+      const isParticipating = status === 'Participated';
+      const isViewed = status === 'Viewed';
+
+      const adoptionRate = isParticipating ? 100 : 0; 
+      const totalActions = isParticipating ? (overrideMap.get(r.id)?.actions || 1) : (isViewed ? 1 : 0);
+      
+      const usage = overrideMap.get(r.id)?.usage || [];
 
       return {
         ...r,
@@ -200,12 +239,13 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
         campaignStatus: status,
         adoptionRate,
         totalActions,
-        estReach: status === 'Participated' ? (1000 + (idx * 500)) : 0,
-        lastActive: status === 'Unopened' ? null : randomDate,
-        usage
+        estReach: isParticipating ? 1500 : 0,
+        lastActive: lastActiveOverride || (status !== 'Unopened' ? 'Recently' : null),
+        usage,
+        impact: overrideMap.get(r.id)?.impact || '-'
       };
     }).filter(Boolean);
-  }, [retailers, campaign?.id]);
+  }, [retailers, adoptionData]);
 
   // --- Derived Metrics ---
   const totalInvited = campaignRetailers.length;
@@ -227,7 +267,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   // Let's broaden the logic for the specific scenario to ensure they appear.
   const needsAttentionList = campaignRetailers
     .filter(r => {
-        if (campaign?.id === 'camp-0') return r.campaignStatus === 'Unopened' || r.campaignStatus === 'Viewed';
+        // Business Rule: High value retailers (Platinum/Gold) who haven't adopted yet
         return (r.tier === 'Platinum' || r.tier === 'Gold') && (r.campaignStatus === 'Unopened' || r.campaignStatus === 'Viewed');
     })
     .sort((a, b) => {
@@ -244,14 +284,21 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
     .slice(0, 5);
 
   // Filtered List for Table
-  const filteredList = campaignRetailers.filter(r => {
-    const matchesSearch = r.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTier = filterTier === 'All' || r.tier === filterTier;
-    const matchesStatus = filterStatus === 'All' || r.campaignStatus === filterStatus;
-    const matchesZone = filterZone === 'All' || r.zone === filterZone || r.location?.zone === filterZone;
+  const filteredList = campaignRetailers.filter(retailer => {
+    const matchesSearch = retailer.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    // 2. Status Filter
+    if (statusFilter !== 'all' && retailer.campaignStatus.toLowerCase() !== statusFilter.toLowerCase()) return false;
     
-    return matchesSearch && matchesTier && matchesStatus && matchesZone;
-  });
+    // 3. Tier Filter 
+    if (tierFilter !== 'all' && retailer.tier !== tierFilter) return false;
+
+    // 4. Zone Filter
+    if (filterZone !== 'All' && retailer.zone !== filterZone) return false;
+
+    return true;
+  });  
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
@@ -272,10 +319,10 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   const { addToast } = useToast();
 
   const handleClearFilters = () => {
-    setFilterStatus('All Status');
-    setFilterTier('All Tiers');
-    setFilterZone('All Zones');
-    setSearchTerm('');
+    setStatusFilter('all');
+    setTierFilter('all');
+    setFilterZone('All');
+    setSearchQuery('');
     setCurrentPage(1);
   };
 
@@ -405,7 +452,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        r.campaignStatus === 'Unopened' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
+                        r.campaignStatus === 'Unopened' ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600'
                       }`}>
                         {r.campaignStatus}
                       </span>
@@ -477,60 +524,113 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
         <h3 className="text-lg font-bold text-gray-900 mb-4">All Retailer Activity</h3>
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            {/* Toolbar - Removed overflow-hidden from parent card, ensured this section isn't clipping dropdowns [Request 2] */}
-            <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center z-20 relative">
-              <div className="flex items-center gap-2 w-full md:w-auto overflow-visible">
-                 <FilterDropdown 
-                    label="Status"
-                    options={['All', 'Participated', 'Viewed', 'Unopened']}
-                    value={filterStatus}
-                    onChange={(val) => { setFilterStatus(val); setCurrentPage(1); }}
-                 />
-                 <FilterDropdown 
-                    label="Tier"
-                    options={['All', 'Platinum', 'Gold', 'Silver', 'Standard']}
-                    value={filterTier}
-                    onChange={(val) => { setFilterTier(val); setCurrentPage(1); }}
-                 />
-                 <FilterDropdown 
-                    label="Sales Zone"
-                    options={['All', 'North', 'South', 'East', 'West', 'Central']}
-                    value={filterZone}
-                    onChange={(val) => { setFilterZone(val); setCurrentPage(1); }}
-                 />
+            {/* Toolbar */}
+            <div className="p-4 border-b border-gray-100 flex flex-col xl:flex-row gap-4 justify-between items-center z-20 relative">
+              <div className="flex items-center gap-2 w-full xl:w-auto overflow-visible flex-wrap">
                  
-                 {/* Clear Button */}
-                 {(filterStatus !== 'All' || filterTier !== 'All' || filterZone !== 'All' || searchTerm) && (
+                 {/* 1. Tier Filter */}
+                 <div className="relative">
+                     <button 
+                        onClick={() => { setIsTierOpen(!isTierOpen); setIsStatusOpen(false); setIsZoneOpen(false); }}
+                        className={`flex items-center gap-2 px-3 py-2 bg-white border ${tierFilter !== 'all' ? 'border-black text-black' : 'border-gray-200 text-gray-700'} rounded-lg hover:bg-gray-50 transition shadow-sm text-sm font-medium`}
+                     >
+                        <Filter size={14} className={tierFilter !== 'all' ? "text-black" : "text-gray-400"}/>
+                        <span>{tierFilter === 'all' ? 'All Tiers' : tierFilter}</span>
+                        <ChevronDown size={14} className="text-gray-400" />
+                     </button>
+                     {isTierOpen && (
+                         <>
+                         <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsTierOpen(false)}></div>
+                         <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-20 animate-in fade-in zoom-in-95">
+                            {['All Tiers', 'Platinum', 'Gold', 'Silver'].map(t => (
+                            <button 
+                                key={t}
+                                onClick={() => { setTierFilter(t === 'All Tiers' ? 'all' : t); setIsTierOpen(false); }}
+                                className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center justify-between group ${tierFilter === (t === 'All Tiers' ? 'all' : t) ? 'font-bold text-black bg-gray-50' : 'text-gray-600'}`}
+                            >
+                                {t}
+                                {tierFilter === (t === 'All Tiers' ? 'all' : t) && <Check size={14} />}
+                            </button>
+                            ))}
+                         </div>
+                         </>
+                     )}
+                 </div>
+
+                 {/* 2. Zone Filter */}
+                 <div className="relative">
+                     <button 
+                        onClick={() => { setIsZoneOpen(!isZoneOpen); setIsTierOpen(false); setIsStatusOpen(false); }}
+                        className={`flex items-center gap-2 px-3 py-2 bg-white border ${filterZone !== 'All' ? 'border-black text-black' : 'border-gray-200 text-gray-700'} rounded-lg hover:bg-gray-50 transition shadow-sm text-sm font-medium`}
+                     >
+                        <span>{filterZone === 'All' ? 'Sales Zones' : filterZone}</span>
+                        <ChevronDown size={14} className="text-gray-400" />
+                     </button>
+                     {isZoneOpen && (
+                         <>
+                         <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsZoneOpen(false)}></div>
+                         <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-20 animate-in fade-in zoom-in-95 max-h-60 overflow-y-auto">
+                            {['All', 'North', 'South', 'East', 'West', 'Central', 'Europe', 'Asia'].map(z => (
+                            <button 
+                                key={z}
+                                onClick={() => { setFilterZone(z); setIsZoneOpen(false); }}
+                                className={`w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center justify-between group ${filterZone === z ? 'font-bold text-black bg-gray-50' : 'text-gray-600'}`}
+                            >
+                                {z}
+                                {filterZone === z && <Check size={14} />}
+                            </button>
+                            ))}
+                         </div>
+                         </>
+                     )}
+                 </div>
+
+                 {/* 3. Status Filter (Pill Style) */}
+                 <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
+                    {['All', 'Participated', 'Viewed', 'Unopened'].map(s => (
+                       <button 
+                          key={s}
+                          onClick={() => setStatusFilter(s.toLowerCase())}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${statusFilter === s.toLowerCase() ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-black'}`}
+                       >
+                          {s}
+                       </button>
+                    ))}
+                 </div>
+                 
+                 {/* Clear Filters */}
+                 {(statusFilter !== 'all' || tierFilter !== 'all' || filterZone !== 'All' || searchQuery) && (
                     <button 
                         onClick={handleClearFilters}
-                        className="text-xs text-red-600 hover:text-red-800 font-medium whitespace-nowrap px-2"
+                        className="text-xs text-red-600 hover:text-red-800 font-medium whitespace-nowrap px-2 flex items-center gap-1"
                     >
-                        Clear Filters
+                        <X size={12} /> Clear
                     </button>
                  )}
               </div>
-              <div className="relative w-full md:w-64">
+
+              <div className="relative w-full xl:w-64">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
+                <input 
                   type="text"
                   placeholder="Search retailer..."
-                  value={searchTerm}
-                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black/5"
                 />
               </div>
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-b-xl">
+            <div className="overflow-x-auto rounded-b-xl min-h-[400px]">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Retailer</th>
-                    <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Zone</th>
+                    <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Tier</th>
                     <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Usage Snapshot</th>
                     <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Last Active</th>
+                    <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Usage Snapshot</th>
                     <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Impact</th>
                     <th className="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
                   </tr>
@@ -545,18 +645,26 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                           </div>
                           <div>
                             <div className="font-medium text-sm text-gray-900">{r.name}</div>
-                            <div className="text-xs text-gray-500">{r.tier}</div>
+                            <div className="text-xs text-gray-500">{r.zone}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {r.zone || r.location?.zone || '-'}
+                      <td className="px-6 py-4">
+                         {/* Dot + Text Style */}
+                         <div className="flex items-center gap-2">
+                             <div className={`w-2 h-2 rounded-full ${
+                                 r.tier === 'Platinum' ? 'bg-purple-500' :
+                                 r.tier === 'Gold' ? 'bg-amber-400' :
+                                 r.tier === 'Silver' ? 'bg-gray-400' : 'bg-gray-200'
+                             }`}></div>
+                             <span className="text-sm font-medium text-gray-700">{r.tier}</span>
+                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                           r.campaignStatus === 'Participated' ? 'bg-emerald-50 text-emerald-700' :
                           r.campaignStatus === 'Viewed' ? 'bg-amber-50 text-amber-700' :
-                          'bg-gray-100 text-gray-600'
+                          'bg-gray-100 text-gray-500'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             r.campaignStatus === 'Participated' ? 'bg-emerald-500' :
@@ -567,18 +675,13 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          {r.usage?.social && <span className="flex items-center gap-1" title="Social Posted"><Share2 size={12} className="text-blue-500" /> Social</span>}
-                          {r.usage?.email && <span className="flex items-center gap-1" title="Email Sent"><Mail size={12} className="text-purple-500" /> Email</span>}
-                          {r.usage?.downloads > 0 && <span className="flex items-center gap-1" title="Assets Downloaded"><Download size={12} className="text-gray-600" /> {r.usage.downloads}</span>}
-                          {!r.usage?.social && !r.usage?.email && r.usage?.downloads === 0 && <span className="text-gray-300">-</span>}
-                        </div>
+                        <span className="text-sm text-gray-600">{r.lastActive || '-'}</span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {r.lastActive || <span className="text-gray-300">Never</span>}
+                      <td className="px-6 py-4">
+                        <UsageIcons usage={r.usage} />
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {r.estReach > 0 ? `${(r.estReach / 1000).toFixed(1)}k Reach` : '-'}
+                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                        {r.impact || '-'}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button 
@@ -795,7 +898,7 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
                   <MessageSquare size={20} className="text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-serif font-bold text-gray-900">Smart Nudge</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Smart Nudge</h3>
                   <p className="text-sm text-gray-500">Customize your reminder message</p>
                 </div>
               </div>
@@ -840,4 +943,4 @@ const RetailerNetworkTab = ({ campaign, retailers = [] }) => {
   );
 };
 
-export default RetailerNetworkTab;
+export default RetailerAdoptionTab;

@@ -1,47 +1,35 @@
 import React, { useState } from 'react';
-import { Plus, Filter, MoreHorizontal, Download, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Facebook, Twitter, Edit2, Eye, Trash2 } from 'lucide-react';
+import { campaignData } from '../../../../../data/mockStore/campaignStore'; // Fixed path depth
+import { Plus, Filter, MoreHorizontal, Download, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Facebook, Twitter, Edit2, Eye, Trash2, UploadCloud } from 'lucide-react';
 
-const ContentTab = ({ campaign, onUpdate, notify, allFiles }) => {
+const ContentTab = ({ campaign }) => { 
   const [filter, setFilter] = useState('all'); // all, ready, assets
 
-  // Mock Content Data (if not in campaign)
-  const readyContent = [
-    {
-      id: 'rc-1',
-      type: 'social',
-      platforms: ['instagram', 'facebook'],
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop',
-      caption: 'Discover our new summer collection. #SummerVibes #Luxury',
-      lastEdited: '2 days ago'
-    },
-    {
-      id: 'rc-2',
-      type: 'email',
-      subject: 'Exclusive Invitation: VIP Summer Preview Event',
-      previewText: 'Join us for an evening of luxury and style...',
-      lastEdited: '1 day ago'
-    },
-    {
-      id: 'rc-3',
-      type: 'sms',
-      message: 'Hi {FirstName}, our Summer Collection is finally here! Stop by to see the new arrivals.',
-      lastEdited: '3 days ago'
-    },
-    {
-      id: 'rc-4',
-      type: 'social',
-      platforms: ['x'],
-      image: null, // Text only fallback
-      caption: 'The wait is over. Summer 2025 is here. Shop now.',
-      lastEdited: '5 hours ago'
-    }
-  ];
+  // 1. Data Source Resolution
+  const content = campaignData.contentMap[campaign.contentId] || { publishable: [], downloadable: [] };
 
-  const assets = [
-    { id: 'a-1', name: 'Lookbook_SS25.pdf', type: 'pdf', size: '15 MB', thumb: null },
-    { id: 'a-2', name: 'Campaign_Hero_HighRes.jpg', type: 'image', size: '4.2 MB', thumb: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000&auto=format&fit=crop' },
-    { id: 'a-3', name: 'Social_Media_Guide.pdf', type: 'pdf', size: '2.1 MB', thumb: null },
-  ];
+  // 2. Publishable Content (New Schema)
+  const readyContent = (content.publishable || []).map(t => ({
+      id: t.id,
+      // Normalize type
+      type: t.type === 'social post' ? 'social' : t.type,
+      platforms: Array.isArray(t.platform) ? t.platform.map(p => p.toLowerCase()) : [],
+      subject: t.subject || t.name || 'Untitled Content',
+      previewText: t.previewText || "Ready-to-use content",
+      message: t.message,
+      caption: t.caption,
+      image: t.image || (t.type === 'social post' ? 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop' : null),
+      lastEdited: t.lastEdited || 'Recently'
+  }));
+
+  // 3. Downloadable Assets (New Schema)
+  const assets = (content.downloadable || []).map(a => ({
+      id: a.id,
+      name: a.name,
+      type: a.type?.toLowerCase().includes('zip') ? 'zip' : a.type?.toLowerCase().includes('pdf') ? 'pdf' : 'image',
+      size: a.size,
+      thumb: a.type === 'Image' || a.type === 'image' ? 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000&auto=format&fit=crop' : null
+  }));
 
   // --- Card Components ---
 
@@ -52,7 +40,7 @@ const ContentTab = ({ campaign, onUpdate, notify, allFiles }) => {
         <img src={item.image} alt="Social Post" className="w-full h-full object-cover" />
       ) : (
         <div className="w-full h-full bg-gradient-to-br from-gray-800 to-black flex items-center justify-center p-6">
-           <span className="text-white font-serif text-2xl font-bold opacity-20">BRAND</span>
+           <span className="text-white text-2xl font-bold opacity-20">BRAND</span>
         </div>
       )}
       
@@ -90,7 +78,7 @@ const ContentTab = ({ campaign, onUpdate, notify, allFiles }) => {
          <div className="absolute top-0 left-0 w-full h-2 bg-blue-500 opacity-0 group-hover:opacity-100 transition"></div>
          
          <div className="flex-1 flex flex-col justify-center">
-            <h3 className="font-serif text-xl font-bold text-gray-900 leading-tight mb-3 line-clamp-3">
+            <h3 className="text-xl font-bold text-gray-900 leading-tight mb-3 line-clamp-3">
               {item.subject}
             </h3>
             <p className="text-sm text-gray-400 line-clamp-2">{item.previewText}</p>

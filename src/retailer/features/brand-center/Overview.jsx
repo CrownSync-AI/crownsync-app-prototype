@@ -69,7 +69,7 @@ const Overview = ({ campaigns, brands, templates, files }) => {
       {newArrivals.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-serif font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <Sparkles size={18} className="text-blue-600 fill-blue-100" />
               New Arrivals
             </h2>

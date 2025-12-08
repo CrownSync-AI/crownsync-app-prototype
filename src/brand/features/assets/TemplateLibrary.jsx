@@ -23,7 +23,7 @@ const TemplateLibrary = ({ templates, setTemplates, notify, isEmpty }) => {
     <div className="p-6 h-full flex flex-col">
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h2 className="text-2xl font-serif text-gray-900">Template Library</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Template Library</h2>
           <p className="text-sm text-gray-500 mt-1">
             Manage reusable designs for Retailers.
           </p>

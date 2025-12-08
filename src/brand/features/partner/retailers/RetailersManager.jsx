@@ -312,7 +312,7 @@ const RetailersManager = ({ notify }) => {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between sticky top-0 z-10">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-gray-900">Retailers</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Retailers</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your retailer network, quotas, and performance.</p>
         </div>
         <div className="flex items-center gap-4">

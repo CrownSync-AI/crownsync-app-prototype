@@ -29,7 +29,7 @@ const CompactCampaignCard = ({ campaign, brand }) => {
        {/* Info */}
        <div className="flex-1 min-w-0">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5 truncate">{brand?.name}</div>
-          <h4 className="font-serif font-bold text-gray-900 text-sm leading-tight truncate mb-1 group-hover:text-red-600 transition-colors">{campaign.title}</h4>
+          <h4 className="font-bold text-gray-900 text-sm leading-tight truncate mb-1 group-hover:text-red-600 transition-colors">{campaign.title}</h4>
           
           <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full inline-flex">
              <Clock size={10} />

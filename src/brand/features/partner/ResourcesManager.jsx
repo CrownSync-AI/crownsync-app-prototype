@@ -95,7 +95,7 @@ const ResourcesManager = ({ catalogs, setCatalogs, notify, isEmpty, files, setFi
     <div className="h-full flex flex-col p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-serif text-gray-900">Resources</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Resources</h2>
           <p className="text-sm text-gray-500">Always-on resource folders for Retailers.</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition" onClick={handleCreate}>

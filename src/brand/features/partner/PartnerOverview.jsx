@@ -19,7 +19,7 @@ const PartnerOverview = ({ files, campaigns, notify, isEmpty }) => {
 
   return (
     <div className="p-6 h-full overflow-auto">
-      <h2 className="text-2xl font-serif text-gray-900 mb-6">Overview</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Overview</h2>
       
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

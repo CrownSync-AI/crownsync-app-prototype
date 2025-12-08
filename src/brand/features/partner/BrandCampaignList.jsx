@@ -3,8 +3,9 @@ import { Plus, Search, Grid, List as ListIcon, ChevronDown, Check, MoreHorizonta
 import PerformanceOverview from './PerformanceOverview';
 import EmptyState from '../../components/EmptyState';
 import Tooltip from '../../components/Tooltip';
+import { campaignData } from '../../../data/mockStore/campaignStore';
 
-const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, onEdit, onDelete, onDuplicate, onPin, onArchive, onEnd, onPublish }) => {
+const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, onDuplicate, onPin, onArchive, onEnd, onPublish }) => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -22,7 +23,12 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
       return true;
   }).sort((a, b) => {
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
-      if (sortBy === 'newest') return b.id.toString().localeCompare(a.id.toString()); // Ensure string comparison for IDs
+      if (sortBy === 'newest') {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          if (dateA.getTime() !== dateB.getTime()) return dateB - dateA; // Sort by Date Descending
+          return b.id.toString().localeCompare(a.id.toString()); // Fallback to ID
+      }
       if (sortBy === 'ending') {
           if (a.endDate === 'Permanent') return 1;
           if (b.endDate === 'Permanent') return -1;
@@ -93,63 +99,88 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
 
   // Helper for asset icons
   const renderAssetIcons = (campaign) => {
-      const assetIds = campaign.assets || [];
-      const templateIds = campaign.templates || [];
-      
-      // 1. Derive Social Platforms from Templates
-      const socialPlatforms = new Set();
-      let hasEmail = false;
-      let hasSms = false;
+      let contentTypes = campaign.contentType;
 
-      templateIds.forEach(tid => {
-          const t = templates?.find(temp => temp.id === tid);
-          if (t) {
-              if (t.type === 'social' && t.platforms) {
-                  t.platforms.forEach(p => socialPlatforms.add(p));
-              }
-              if (t.type === 'email') hasEmail = true;
-              if (t.type === 'sms') hasSms = true;
+      // Dynamic Derivation if Manual Config is missing
+      if (!contentTypes || contentTypes.length === 0) {
+          const content = campaignData.contentMap[campaign.contentId];
+          contentTypes = [];
+          
+          if (content) {
+             const socialPlatforms = new Set();
+             let hasEmail = false;
+             let hasSms = false;
+             
+             // Scan Publishable
+             (content.publishable || []).forEach(item => {
+                 if (item.type === 'social post' && Array.isArray(item.platform)) {
+                     item.platform.forEach(p => socialPlatforms.add(p.toLowerCase()));
+                 } else if (item.type === 'email') {
+                     hasEmail = true;
+                 } else if (item.type === 'sms') {
+                     hasSms = true;
+                 }
+             });
+
+             // Build Types Array
+             if (socialPlatforms.size > 0) {
+                 contentTypes.push(Array.from(socialPlatforms));
+             }
+             if (hasEmail) contentTypes.push('email');
+             if (hasSms) contentTypes.push('sms');
+             
+             // Scan Downloadable
+             if (content.downloadable && content.downloadable.length > 0) {
+                 contentTypes.push('downloadable');
+             }
           }
-      });
-
-      // 2. Check for Files
-      const hasFile = assetIds.some(id => files?.some(f => f.id === id)); // Check if any asset ID exists in files
+      }
 
       const getPlatformIcon = (p) => {
-          switch(p) {
+          const lowerP = p.toLowerCase();
+          switch(lowerP) {
               case 'instagram': return <Instagram size={14} className="text-pink-600"/>;
               case 'facebook': return <div className="w-3.5 h-3.5 bg-blue-600 rounded-full flex items-center justify-center text-[9px] text-white font-bold">f</div>;
               case 'x': 
               case 'twitter': return <div className="w-3.5 h-3.5 bg-black rounded-sm flex items-center justify-center text-white font-black text-[10px]">𝕏</div>;
               case 'google':
-              case 'gmb': return <div className="w-3.5 h-3.5 rounded-sm flex items-center justify-center text-white font-bold text-[9px]" style={{backgroundColor: '#4285F4'}}>G</div>;
+              case 'gmb': 
+              case 'google business profile': return <div className="w-3.5 h-3.5 rounded-sm flex items-center justify-center text-white font-bold text-[9px]" style={{backgroundColor: '#4285F4'}}>G</div>;
               default: return null;
           }
       };
 
-      const uniqueSocials = Array.from(socialPlatforms);
-
       return (
           <div className="flex items-center gap-1.5 text-gray-400">
-              {/* Social Group */}
-              {uniqueSocials.length > 0 && (
-                 <div className="flex items-center -space-x-1.5">
-                    {uniqueSocials.map(p => (
-                       <div key={p} className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shadow-sm z-10 relative border border-white">
-                          {getPlatformIcon(p)}
-                       </div>
-                    ))}
-                 </div>
-              )}
+              {contentTypes.map((type, index) => {
+                  // 1. Grouped Social Icons (Array)
+                  if (Array.isArray(type)) {
+                      return (
+                          <div key={index} className="flex items-center -space-x-1.5">
+                              {type.map(p => (
+                                  <div key={p} className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shadow-sm z-10 relative border border-white">
+                                      {getPlatformIcon(p)}
+                                  </div>
+                              ))}
+                          </div>
+                      );
+                  }
 
-              {/* Email */}
-              {hasEmail && <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600" title="Email"><Mail size={12}/></div>}
-              
-              {/* SMS */}
-              {hasSms && <div className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-600" title="SMS"><Smartphone size={12}/></div>}
-
-              {/* File */}
-              {hasFile && <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600" title="Downloadable"><Download size={12}/></div>}
+                  // 2. Single Types (String)
+                  switch(type) {
+                      case 'email': 
+                          return <div key={index} className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600" title="Email"><Mail size={12}/></div>;
+                      case 'sms': 
+                          return <div key={index} className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-600" title="SMS"><Smartphone size={12}/></div>;
+                      case 'downloadable': 
+                      case 'file':
+                          return <div key={index} className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600" title="Downloadable Assets"><Download size={12}/></div>;
+                      case 'print':
+                           return <div key={index} className="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center text-orange-600" title="Print"><FileText size={12}/></div>;
+                      default:
+                          return null;
+                  }
+              })}
           </div>
       );
   };
@@ -232,7 +263,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
     <div className="h-full overflow-auto">
       {/* [A] Page Header */}
       <div className="flex items-center justify-between mb-6 px-6 pt-6">
-         <h2 className="text-2xl font-serif text-gray-900">Campaigns</h2>
+         <h2 className="text-2xl font-bold text-gray-900">Campaigns</h2>
          <button 
             onClick={onCreate}
             className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition shadow-sm"
@@ -373,7 +404,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                       {/* Info Area */}
                       <div className="p-5 flex-1 flex flex-col">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                              <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-indigo-600 transition">{campaign.title}</h3>
+                              <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-brand-gold transition">{campaign.title}</h3>
                               {campaign.isPinned && <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>}
                           </div>
                           
@@ -456,7 +487,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                                           <div className={`w-full h-full ${campaign.cover} absolute inset-0 ${campaign.coverImage ? 'hidden' : ''}`}></div>
                                       </div>
                                       <div>
-                                          <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition flex items-center gap-2">
+                                          <div className="font-bold text-gray-900 group-hover:text-brand-gold transition flex items-center gap-2">
                                               {campaign.title}
                                               {campaign.isPinned && <Pin size={12} className="fill-black"/>}
                                           </div>
@@ -499,7 +530,7 @@ const BrandCampaignList = ({ campaigns, files, templates, onCreate, onSelect, on
                                   {campaign.adoptionRate !== null ? (
                                       <>
                                           <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${campaign.adoptionRate}%` }}></div>
+                                              <div className="h-full bg-brand-gold rounded-full" style={{ width: `${campaign.adoptionRate}%` }}></div>
                                           </div>
                                           <div className="text-xs text-gray-400 mt-1">{campaign.adoptionRate}%</div>
                                       </>

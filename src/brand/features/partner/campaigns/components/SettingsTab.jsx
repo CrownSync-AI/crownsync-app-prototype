@@ -1,34 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users, Calendar, Shield, Lock, Unlock, Upload, Image as ImageIcon, X, Check, AlertCircle } from 'lucide-react';
 
+import cover1 from '@/assets/mock/verragio/brand/cover/cover1.png';
+import cover2 from '@/assets/mock/verragio/brand/cover/cover2.png';
+import cover3 from '@/assets/mock/verragio/brand/cover/cover3.png';
+import cover4 from '@/assets/mock/verragio/brand/cover/cover4.png';
+import cover5 from '@/assets/mock/verragio/brand/cover/cover5.png';
+import cover6 from '@/assets/mock/verragio/brand/cover/cover6.png';
+import cover7 from '@/assets/mock/verragio/brand/cover/cover7.png';
+import cover8 from '@/assets/mock/verragio/brand/cover/cover8.png';
+
 const SettingsTab = ({ campaign, onUpdate }) => {
   // Local state for buffering changes
+  // Local state for buffering changes
   const [localCampaign, setLocalCampaign] = useState(campaign);
-  const [hasChanges, setHasChanges] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Sync local state when prop changes (only if not dirty, or force sync?)
-  // Usually for settings, we reset if the campaign ID changes.
+  // Sync local state when prop changes
   useEffect(() => {
     setLocalCampaign(campaign);
-    setHasChanges(false);
-  }, [campaign.id]);
+  }, [campaign]);
 
-  // Check for changes
-  useEffect(() => {
-    const isDirty = JSON.stringify(localCampaign) !== JSON.stringify(campaign);
-    setHasChanges(isDirty);
-  }, [localCampaign, campaign]);
+  // Derived state for dirty check (fixes ESLint sync-state-in-effect error)
+  const isDirty = JSON.stringify(localCampaign) !== JSON.stringify(campaign);
 
   const handleSave = () => {
     onUpdate(localCampaign);
-    setHasChanges(false);
+    // Local state will resync via useEffect when parent updates 'campaign' prop
   };
 
   const handleCancel = () => {
     setLocalCampaign(campaign);
-    setHasChanges(false);
   };
 
   const handleFileUpload = (e) => {
@@ -40,10 +43,8 @@ const SettingsTab = ({ campaign, onUpdate }) => {
   };
 
   const mockLibraryImages = [
-    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&auto=format&fit=crop',
+    cover1, cover2, cover3, cover4,
+    cover5, cover6, cover7, cover8
   ];
 
   return (
@@ -268,7 +269,7 @@ const SettingsTab = ({ campaign, onUpdate }) => {
       </section>
 
       {/* Sticky Action Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-transform duration-300 z-50 ${hasChanges ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] transition-transform duration-300 z-50 ${isDirty ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
             <div className="flex items-center gap-2 text-amber-600">
                 <AlertCircle size={20} />

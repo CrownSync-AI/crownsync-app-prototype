@@ -16,8 +16,8 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
   return (
     <aside className="w-20 md:w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300">
       <div className="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-gray-100">
-        <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold">R</div>
-        <span className="hidden md:block ml-3 font-serif font-bold tracking-wide text-gray-900">Retailer Portal</span>
+        <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-bold">R</div>
+        <span className="hidden md:block ml-3 font-bold tracking-wide text-gray-900">Retailer Portal</span>
       </div>
 
       <nav className="flex-1 py-6 space-y-1 overflow-y-auto">

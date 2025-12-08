@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, MoreHorizontal, Settings, Share2, AlertCircle, Clock, Users, Calendar, CheckCircle2, Pin, X } from 'lucide-react';
+import { campaignData } from '../../../../data/mockStore/campaignStore'; // Added import
 import OverviewTab from './components/OverviewTab';
 import ContentTab from './components/ContentTab';
-import PerformanceTab from './components/PerformanceTab';
+import ContentInsightsTab from './components/ContentInsightsTab';
 import SettingsTab from './components/SettingsTab';
-import RetailerNetworkTab from './components/RetailerNetworkTab';
+import RetailerAdoptionTab from './components/RetailerAdoptionTab';
 import ReadinessChecklist from './components/ReadinessChecklist';
 
 const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailers }) => {
@@ -76,6 +77,15 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
      return campaign.audience || 'Unspecified Audience';
   };
 
+  // Resolve Tab Data based on campaign IDs
+  // CRITICAL: Look up fresh campaign object from store to support HMR/Live Editing
+  const freshCampaign = campaignData.campaigns.find(c => c.id === campaign.id) || campaign;
+
+  const overviewData = campaignData.overviewMap[freshCampaign.overviewId] || campaignData.overviewMap['draft'];
+  const contentData = campaignData.contentMap[freshCampaign.contentId] || campaignData.contentMap['draft-empty'];
+  const insightsData = campaignData.insightsMap[freshCampaign.insightsId] || campaignData.insightsMap['empty'];
+  const adoptionData = campaignData.adoptionMap[freshCampaign.adoptionId] || campaignData.adoptionMap['empty'];
+
   return (
     <div className="flex flex-col h-full bg-white relative">
       {/* 1. Context Bar (Sticky Header) */}
@@ -107,7 +117,7 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
             {/* Title & Meta */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1.5">
-                 <h1 className="text-xl font-serif font-bold text-gray-900 leading-tight truncate" title={campaign.title}>{campaign.title}</h1>
+                 <h1 className="text-xl font-bold text-gray-900 leading-tight truncate" title={campaign.title}>{campaign.title}</h1>
                  
                  {/* Pin Button */}
                  <button 
@@ -250,7 +260,7 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
         {/* Tabs */}
         <div className="px-6 flex items-center gap-8 border-t border-gray-100">
           {['Overview', 'Content', 'Content Insights', 'Retailer Adoption', 'Settings']
-            .filter(tab => !(campaign.status === 'Draft' && (tab === 'Content Insights' || tab === 'Retailer Adoption')))
+            .filter(tab => !((campaign.status === 'Draft' || campaign.status === 'Scheduled') && (tab === 'Content Insights' || tab === 'Retailer Adoption')))
             .map((tab) => {
             const id = tab.toLowerCase();
             const isActive = activeTab === id;
@@ -275,7 +285,7 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={() => setIsDescriptionOpen(false)}></div>
             <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 animate-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-serif font-bold text-gray-900">About this Campaign</h3>
+                    <h3 className="text-xl font-bold text-gray-900">About this Campaign</h3>
                     <button onClick={() => setIsDescriptionOpen(false)} className="p-1 hover:bg-gray-100 rounded-full text-gray-500"><X size={20}/></button>
                 </div>
                 <div className="prose prose-sm max-w-none text-gray-600">
@@ -288,10 +298,43 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
       {/* 2. Main Content Area */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="w-full mx-auto">
-          {activeTab === 'overview' && <div className="p-6"><OverviewTab campaign={campaign} onUpdate={onUpdate} setActiveTab={setActiveTab} /></div>}
-          {activeTab === 'content' && <div className="p-6"><ContentTab campaign={campaign} onUpdate={onUpdate} notify={notify} allFiles={allFiles} /></div>}
-          {activeTab === 'content insights' && <PerformanceTab campaign={campaign} retailers={retailers} />}
-          {activeTab === 'retailer adoption' && <div className="p-6"><RetailerNetworkTab campaign={campaign} retailers={retailers} /></div>}
+          {activeTab === 'overview' && (
+            <div className="p-6">
+                <OverviewTab 
+                    campaign={campaign} 
+                    data={overviewData} 
+                    onUpdate={onUpdate} 
+                    setActiveTab={setActiveTab} 
+                />
+            </div>
+          )}
+          {activeTab === 'content' && (
+            <div className="p-6">
+                <ContentTab 
+                    campaign={campaign} 
+                    data={contentData} 
+                    onUpdate={onUpdate} 
+                    notify={notify} 
+                    allFiles={allFiles} 
+                />
+            </div>
+          )}
+          {activeTab === 'content insights' && (
+             <ContentInsightsTab 
+                campaign={campaign} 
+                data={insightsData}
+                retailers={retailers} 
+             />
+          )}
+          {activeTab === 'retailer adoption' && (
+             <div className="p-6">
+                <RetailerAdoptionTab 
+                    campaign={campaign} 
+                    data={adoptionData}
+                    retailers={retailers} 
+                />
+             </div>
+          )}
           {activeTab === 'settings' && <div className="p-6"><SettingsTab campaign={campaign} onUpdate={onUpdate} /></div>}
         </div>
       </div>
@@ -334,7 +377,7 @@ const CampaignDetail = ({ campaign, onBack, onUpdate, notify, allFiles, retailer
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={() => setShowReadinessModal(false)}></div>
             <div className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-serif font-bold text-gray-900">Campaign Not Ready</h3>
+                    <h3 className="text-xl font-bold text-gray-900">Campaign Not Ready</h3>
                     <button onClick={() => setShowReadinessModal(false)} className="p-1 hover:bg-gray-100 rounded-full text-gray-500"><X size={20}/></button>
                 </div>
                 <p className="text-gray-500 mb-6">Please complete the following items before publishing this campaign.</p>

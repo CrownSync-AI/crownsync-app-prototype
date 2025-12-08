@@ -122,7 +122,7 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
          {/* Row 2: Title + Pin */}
          <div className="flex items-start justify-between gap-2 mb-1">
             <div className="mb-3 min-h-[40px] flex-1">
-             <h3 className={`font-serif font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-red-600 transition-colors'}`}>
+             <h3 className={`font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-red-600 transition-colors'}`}>
                 {campaign.title}
              </h3>
             </div>
