@@ -66,7 +66,7 @@ Together, they embody elegance, commitment, and individuality.
       cover: "bg-amber-100",
       audience: "VIP Retailers",
       isPinned: true,
-      updatePending: true,
+      updatePending: false,
       adoptionRate: 45,
       usageCount: 890,
       overviewId: "active-high",
