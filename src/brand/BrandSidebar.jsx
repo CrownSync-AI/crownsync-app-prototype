@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, FolderOpen, Users, BarChart3, ChevronDown, MoreHorizontal, Settings, LogOut, Target } from 'lucide-react';
+import { currentUser } from '../data/mockStore/userStore.js';
+import React, { useState, useEffect, useRef } from 'react';
+import { Home, LayoutDashboard, FolderOpen, Users, BarChart3, ChevronDown, MoreHorizontal, Settings, LogOut, Target } from 'lucide-react';
+
+// ... (existing imports and component definition)
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 const BrandSidebar = ({ activePage, setActivePage }) => {
   const [openMenu, setOpenMenu] = useState(null); // 'partner', 'direct', 'assets', 'analytics'
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Sidebar Menu Structure
   const MENU_ITEMS = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'home', icon: Home, label: 'Home' },
     { 
       id: 'partner', 
       icon: Users, 
@@ -26,12 +44,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
       id: 'direct',
       icon: Target, 
       label: 'Direct Marketing',
-      hasSubmenu: true,
-      subItems: [
-        { id: 'direct-social', label: 'Social Posts' },
-        { id: 'direct-email', label: 'Email' },
-        { id: 'direct-sms', label: 'SMS' },
-      ]
+      hasSubmenu: false
     },
     { 
       id: 'assets', 
@@ -118,33 +131,63 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
          ))}
       </nav>
 
-      {/* User Info Section */}
-      <div className="p-4 border-t border-gray-100 mt-auto relative group cursor-pointer">
-         <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg">
-               LB
+      {/* User Info Section (Refactored) */}
+      <div className="p-4 border-t border-gray-100 mt-auto relative" ref={userMenuRef}>
+         <div 
+            className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition ${isUserMenuOpen ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+         >
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-white">
+               {currentUser.avatarType === 'image' ? (
+                  <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-full h-full object-cover rounded-full" />
+               ) : (
+                  currentUser.avatarInitial
+               )}
             </div>
             <div className="hidden md:block flex-1 min-w-0">
-               <div className="text-sm font-medium text-gray-900 truncate">Luxury Boutique</div>
-               <div className="text-xs text-gray-500 truncate">Brand Admin</div>
+               <div className="text-sm font-bold text-gray-900 truncate">{currentUser.name}</div>
+               <div className="flex items-center mt-0.5">
+                  <span className="text-[10px] uppercase font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 tracking-wide">
+                     {currentUser.role}
+                  </span>
+               </div>
             </div>
-            <MoreHorizontal size={16} className="text-gray-400 hidden md:block"/>
+            <MoreHorizontal size={16} className={`text-gray-400 hidden md:block transition-transform ${isUserMenuOpen ? 'rotate-90 text-gray-600' : ''}`}/>
          </div>
          
          {/* Logout Popover */}
-         <div className="absolute bottom-full left-4 w-56 bg-white rounded-lg shadow-xl border border-gray-200 mb-2 hidden group-hover:block animate-in slide-in-from-bottom-2 fade-in duration-200 overflow-hidden z-50">
-            <div className="p-3 border-b border-gray-100">
-               <div className="text-sm font-bold text-gray-900">Luxury Boutique</div>
-               <div className="text-xs text-gray-500">admin@luxuryboutique.com</div>
+         {isUserMenuOpen && (
+            <div className="absolute left-full bottom-0 ml-1 min-w-[220px] w-max bg-white rounded-2xl shadow-2xl border border-gray-100 animate-in slide-in-from-left-2 fade-in duration-200 overflow-hidden z-50">
+               {/* Header */}
+               <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                     {currentUser.avatarType === 'image' ? (
+                        <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-full h-full object-cover" />
+                     ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-indigo-500 text-white font-bold">{currentUser.avatarInitial}</div>
+                     )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                     <div className="text-sm font-bold text-gray-900 truncate">{currentUser.name}</div>
+                     <div className="text-xs text-gray-500 truncate font-mono">{currentUser.email}</div>
+                  </div>
+               </div>
+               
+               {/* Menu Items */}
+               <div className="p-2 space-y-0.5">
+                  <button className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg text-sm text-gray-700 flex items-center gap-3 transition">
+                     <Settings size={18} className="text-gray-400"/> Personal Settings
+                  </button>
+               </div>
+
+               {/* Footer */}
+               <div className="p-2 border-t border-gray-100 mt-1">
+                  <button onClick={() => console.log('Logout')} className="w-full text-left px-3 py-2.5 hover:bg-red-50 rounded-lg text-sm text-red-600 flex items-center gap-3 transition font-medium">
+                     <LogOut size={18}/> Log out
+                  </button>
+               </div>
             </div>
-            <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-600 hover:text-black flex items-center gap-2 transition">
-               <Settings size={16}/> Account Settings
-            </button>
-            <div className="h-px bg-gray-100"></div>
-            <button onClick={() => console.log('Logout')} className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm text-red-600 flex items-center gap-2 transition">
-               <LogOut size={16}/> Logout
-            </button>
-         </div>
+         )}
       </div>
     </aside>
   );

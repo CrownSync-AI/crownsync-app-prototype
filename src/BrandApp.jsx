@@ -6,6 +6,8 @@ import ResourcesManager from './brand/features/partner/ResourcesManager';
 import AssetLibrary from './brand/features/assets/AssetLibrary';
 import TemplateLibrary from './brand/features/assets/TemplateLibrary';
 import RetailersManager from './brand/features/partner/retailers/RetailersManager';
+import DirectMarketingPage from './brand/features/direct/DirectMarketingPage';
+import BrandHome from './brand/features/home/BrandHome';
 
 import { useToast } from './brand/context/ToastContext';
 
@@ -17,7 +19,7 @@ const BrandApp = ({
   retailers,
   showEmptyState 
 }) => {
-  const [activePage, setActivePage] = useState('dashboard');
+  const [activePage, setActivePage] = useState('home');
   const { addToast } = useToast();
 
   const notify = (message, type = 'success') => {
@@ -26,15 +28,9 @@ const BrandApp = ({
 
   const renderContent = () => {
       switch(activePage) {
-          // Dashboard
-          case 'dashboard':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">📊</div>
-                      <div className="text-xl font-medium">Dashboard Coming Soon</div>
-                      <div className="text-sm">Global overview of brand performance.</div>
-                  </div>
-              );
+          // Home (Command Center)
+          case 'home':
+              return <BrandHome />;
 
           // Assets (Global)
           case 'assets-library':
@@ -61,30 +57,8 @@ const BrandApp = ({
               return <RetailersManager notify={notify} />;
 
           // Direct Marketing
-          case 'direct-social':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">📱</div>
-                      <div className="text-xl font-medium">Social Posts</div>
-                      <div className="text-sm">Manage official brand social media.</div>
-                  </div>
-              );
-          case 'direct-email':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">📧</div>
-                      <div className="text-xl font-medium">Email Blasts</div>
-                      <div className="text-sm">Send newsletters to customers.</div>
-                  </div>
-              );
-          case 'direct-sms':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">💬</div>
-                      <div className="text-xl font-medium">SMS Marketing</div>
-                      <div className="text-sm">Send text message campaigns.</div>
-                  </div>
-              );
+          case 'direct':
+              return <DirectMarketingPage />;
 
           // Analytics
           case 'analytics':
