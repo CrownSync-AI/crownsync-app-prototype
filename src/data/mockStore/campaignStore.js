@@ -1,20 +1,28 @@
-import coverImage_1 from "../../assets/mock/verragio/brand/campaigns/1/cover.png";
-import coverImage_2 from "../../assets/mock/verragio/brand/campaigns/2/cover.png";
-import coverImage_3 from "../../assets/mock/verragio/brand/campaigns/3/cover.png";
-import coverImage_4 from "../../assets/mock/verragio/brand/campaigns/4/cover.png";
-import coverImage_5 from "../../assets/mock/verragio/brand/campaigns/5/cover.png";
-import coverImage_6 from "../../assets/mock/verragio/brand/campaigns/6/cover.png";
-import coverImage_7 from "../../assets/mock/verragio/brand/campaigns/7/cover.png";
-import coverImage_8 from "../../assets/mock/verragio/brand/campaigns/8/cover.png";
-import coverImage_9 from "../../assets/mock/verragio/brand/campaigns/9/cover.png";
-import coverImage_10 from "../../assets/mock/verragio/brand/campaigns/10/cover.png";
-import coverImage_11 from "../../assets/mock/verragio/brand/campaigns/11/cover.png";
-import coverImage_12 from "../../assets/mock/verragio/brand/campaigns/12/cover.png";
-import coverImage_13 from "../../assets/mock/verragio/brand/campaigns/13/cover.png";
-import coverImage_14 from "../../assets/mock/verragio/brand/campaigns/14/cover.png";
-import coverImage_15 from "../../assets/mock/verragio/brand/campaigns/15/cover.png";
-import coverImage_16 from "../../assets/mock/verragio/brand/campaigns/16/cover.png";
-import coverImage_17 from "../../assets/mock/verragio/brand/campaigns/17/cover.png";
+import coverImage_1 from "@/assets/mock/verragio/brand/campaigns/1/cover.png";
+import coverImage_2 from "@/assets/mock/verragio/brand/campaigns/2/cover.png";
+import coverImage_3 from "@/assets/mock/verragio/brand/campaigns/3/cover.png";
+import coverImage_4 from "@/assets/mock/verragio/brand/campaigns/4/cover.png";
+import coverImage_5 from "@/assets/mock/verragio/brand/campaigns/5/cover.png";
+import coverImage_6 from "@/assets/mock/verragio/brand/campaigns/6/cover.png";
+import coverImage_7 from "@/assets/mock/verragio/brand/campaigns/7/cover.png";
+import coverImage_8 from "@/assets/mock/verragio/brand/campaigns/8/cover.png";
+import coverImage_9 from "@/assets/mock/verragio/brand/campaigns/9/cover.png";
+import coverImage_10 from "@/assets/mock/verragio/brand/campaigns/10/cover.png";
+import coverImage_11 from "@/assets/mock/verragio/brand/campaigns/11/cover.png";
+import coverImage_12 from "@/assets/mock/verragio/brand/campaigns/12/cover.png";
+import coverImage_13 from "@/assets/mock/verragio/brand/campaigns/13/cover.png";
+import coverImage_14 from "@/assets/mock/verragio/brand/campaigns/14/cover.png";
+import coverImage_15 from "@/assets/mock/verragio/brand/campaigns/15/cover.png";
+import coverImage_16 from "@/assets/mock/verragio/brand/campaigns/16/cover.png";
+import coverImage_17 from "@/assets/mock/verragio/brand/campaigns/17/cover.png";
+
+import mediaImage_1 from "@/assets/mock/verragio/brand/campaigns/1/product.jpg";
+import mediaImage_2 from "@/assets/mock/verragio/brand/campaigns/2/product.jpg";
+import mediaImage_3 from "@/assets/mock/verragio/brand/campaigns/3/product.jpg";
+import mediaImage_4 from "@/assets/mock/verragio/brand/campaigns/4/product.jpg";
+import mediaImage_5 from "@/assets/mock/verragio/brand/campaigns/5/product.png";
+import mediaImage_6 from "@/assets/mock/verragio/brand/campaigns/6/product.jpg";
+import mediaImage_7 from "@/assets/mock/verragio/brand/campaigns/7/product.jpg";
 
 import { getMember } from "./memberStore";
 
@@ -693,16 +701,32 @@ This is more than an engagement ring—it’s a statement of your journey.
           id: "t-soc-1",
           type: "social post",
           platform: ["instagram", "facebook"],
-          caption: "Discover the new Winter Collection. Elegant. Timeless.",
-          image:
-            "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1000&auto=format&fit=crop",
+          caption: `A perfect pair in radiant yellow gold. 💛
+
+Celebrate your love story with two timeless designs:
+💍 Tradition-250DFR – A classic engagement ring with Verragio’s signature detailing and unmatched craftsmanship.
+💍 VWRD7703 – A bold men’s band featuring channel-set round diamonds for a look that’s strong, sleek, and sophisticated.
+Together, they embody elegance, commitment, and individuality.
+
+🔗 Explore more and schedule your private viewing at Verragio.com
+
+#Verragio
+#YellowGoldRing #EngagementRing`,
+          image: mediaImage_1,
           lastEdited: "2 days ago",
         },
         {
           id: "t-soc-2",
           type: "social post",
           platform: ["x", "google business profile"],
-          caption: "New arrivals valid until Feb 28.",
+          caption: `✨ Celebrate Love This Thanksgiving ✨
+
+Gratitude is all about cherishing the moments that truly matter, and what could be more meaningful than a love that stands the test of time? Our gorgeous bridal set, radiating in yellow gold, showcases an elegant oval-cut diamond engagement ring, perfectly complemented by a stunning diamond wedding band. For him, a stylish yellow gold band with channel-set diamonds offers a touch of refined sophistication, making this a perfect way to say 'I love you' this holiday season. ❤️
+
+💍: Couture-489OV, 489W & VWRD-7703 #Verragio
+
+#HappyThanksgiving #Love`,
+          image: mediaImage_2,
           lastEdited: "2 days ago",
         },
         {
@@ -736,15 +760,32 @@ This is more than an engagement ring—it’s a statement of your journey.
           id: "t-soc-h-1",
           type: "social post",
           platform: ["instagram"],
-          caption: "Flash Sale starts tomorrow!",
-          image: coverImage_4,
+          caption: `Delicate or dramatic--you decide! The elegant twist of the Verragio 18k yellow gold and diamond braided hoop is made to be cherished.
+
+ℹ️: J-0196222-YH
+
+#Verragio
+
+#DiamondEarrings`,
+          image: mediaImage_3,
           lastEdited: "5 hours ago",
         },
         {
           id: "t-soc-h-2",
           type: "social post",
           platform: ["facebook", "x"],
-          caption: "Don't miss out on our seasonal favorites.",
+          caption: `LUMINO Collection. Pure brilliance.
+
+An oval-cut diamond. Sleek white gold. Every detail is designed for those who value understated luxury and unparalleled craftsmanship.
+
+This is more than an engagement ring—it’s a statement of your journey.
+
+💍: Lumino-801-Oval {NEW}
+
+#Verragio
+
+#EngagementRing #DiamondRing`,
+          image: mediaImage_4,
           lastEdited: "5 hours ago",
         },
       ],
@@ -1094,8 +1135,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-1",
           title: "Summer Collection Launch",
-          thumbnail:
-            "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_5,
           platforms: ["instagram", "facebook"],
           totalShares: 445,
           estReach: 45000,
@@ -1108,8 +1148,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-2",
           title: "Behind the Scenes Video",
-          thumbnail:
-            "https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_6,
           platforms: ["twitter", "instagram"],
           totalShares: 280,
           estReach: 125000,
@@ -1122,8 +1161,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-3",
           title: "Store Event Promo",
-          thumbnail:
-            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_7,
           platforms: ["google_business"],
           totalShares: 45,
           estReach: 12000,

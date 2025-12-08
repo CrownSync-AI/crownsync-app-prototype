@@ -11,6 +11,7 @@ import DirectMarketingPage from './brand/features/direct/DirectMarketingPage';
 import BrandAnalytics from './brand/features/analytics/BrandAnalytics';
 import BrandHome from './brand/features/home/BrandHome';
 
+import UnifiedInbox from './brand/features/inbox/UnifiedInbox';
 import { useToast } from './brand/context/ToastContext';
 
 const BrandApp = ({ 
@@ -33,6 +34,10 @@ const BrandApp = ({
           // Home (Command Center)
           case 'home':
               return <BrandHome />;
+          
+          // Unified Inbox
+          case 'inbox':
+              return <UnifiedInbox />;
 
           // Files (Global)
           case 'files':
