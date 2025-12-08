@@ -130,13 +130,13 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
   return (
     <aside className="w-20 md:w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
       {/* 1. Brand Logo */}
-      <div className="h-16 flex items-center justify-center md:justify-start md:px-8">
+      <div className="h-20 flex items-center justify-center md:justify-start md:px-8">
         <img src={BrandLogo} alt="CrownSync" className="h-10 max-w-[160px] hidden md:block" />
         <div className="md:hidden w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-bold text-xs ring-4 ring-gray-50">CS</div>
       </div>
 
       {/* 2. Scrollable Navigation Area */}
-      <nav className="flex-1 py-6 overflow-y-auto space-y-1 custom-scrollbar px-4">
+      <nav className="flex-1 py-4 overflow-y-auto space-y-1 custom-scrollbar px-4">
          {MAIN_MENU.map((item) => (
            item.type !== 'separator' && <NavItem key={item.id} item={item} />
          ))}
