@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { campaignData } from '../../../data/mockStore/campaignStore'; // Import store for asset lookup
-import { Plus, Filter, MoreHorizontal, Download, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Facebook, Twitter, Edit2, Eye, Trash2, Folder, FolderOpen, ChevronRight, ChevronDown, CheckCircle2, Lock, LayoutGrid, List as ListIcon, Grid, ArrowUpRight, Search, RefreshCw, Box, FolderTree, Info, Megaphone } from 'lucide-react';
+import { Plus, Filter, MoreHorizontal, Download, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Facebook, Twitter, Edit2, Eye, Trash2, Folder, FolderOpen, ChevronRight, ChevronDown, CheckCircle2, Lock, LayoutGrid, List as ListIcon, Grid, ArrowUpRight, Search, RefreshCw, Box, FolderTree, Info, Megaphone, X, Clock, Tag } from 'lucide-react';
 import EmptyState from '../../components/EmptyState';
 
 const formatBytes = (bytes) => {
@@ -231,7 +231,7 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [detailFile, setDetailFile] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null); // null means root
-  const [isFolderPanelOpen, setIsFolderPanelOpen] = useState(false);
+  const [isFolderPanelOpen, setIsFolderPanelOpen] = useState(true);
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const [isSyncOpen, setIsSyncOpen] = useState(false);
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest'
@@ -420,7 +420,10 @@ const AssetLibrary = ({ files, setFiles, campaigns, notify, isEmpty }) => {
     <div className="h-full flex flex-col bg-white">
       {/* [A] Page Header */}
       <div className="px-8 py-6 flex items-center justify-between bg-white border-b border-gray-100">
-         <h1 className="text-2xl font-medium text-gray-900">Asset Library</h1>
+         <div>
+             <h1 className="text-2xl font-bold text-gray-900 mb-1">Brand Files</h1>
+             <p className="text-gray-500 text-sm">The centralized library for all your internal media, documents, and creative assets.</p>
+         </div>
          
          {/* Compact Storage Status */}
          <div className="hidden md:flex items-center bg-white rounded-xl border border-gray-200 shadow-sm py-2 px-5 gap-6">

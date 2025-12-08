@@ -47,14 +47,10 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
       hasSubmenu: false
     },
     { 
-      id: 'assets', 
+      id: 'files', 
       icon: FolderOpen, 
-      label: 'Assets',
-      hasSubmenu: true,
-      subItems: [
-        { id: 'assets-library', label: 'Library' },
-        { id: 'assets-templates', label: 'Templates' },
-      ]
+      label: 'Files',
+      hasSubmenu: false,
     },
     { 
       id: 'analytics', 

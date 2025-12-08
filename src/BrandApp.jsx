@@ -33,11 +33,9 @@ const BrandApp = ({
           case 'home':
               return <BrandHome />;
 
-          // Assets (Global)
-          case 'assets-library':
+          // Files (Global)
+          case 'files':
               return <AssetLibrary files={files} setFiles={setFiles} campaigns={campaigns} notify={notify} isEmpty={showEmptyState} />;
-          case 'assets-templates':
-              return <TemplateLibrary templates={templates} setTemplates={setTemplates} notify={notify} isEmpty={showEmptyState} />;
 
           // Partner Hub
           case 'partner-overview':
