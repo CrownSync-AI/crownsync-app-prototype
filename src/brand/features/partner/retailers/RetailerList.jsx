@@ -330,7 +330,7 @@ const RetailerList = ({ retailers, onSelectRetailer, onEditRetailer, onInviteRet
                                 {retailer.name.substring(0, 2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                                <div className="font-medium text-gray-900 group-hover:text-indigo-600 transition truncate max-w-[180px] flex items-center gap-2">
+                                <div className="font-medium text-gray-900 group-hover:text-brand-gold transition truncate max-w-[180px] flex items-center gap-2">
                                     {retailer.hasPendingAction && (
                                         <Tooltip content="Pending Request">
                                             <Bell size={14} className="text-amber-500 fill-amber-500 animate-pulse" />

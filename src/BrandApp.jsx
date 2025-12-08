@@ -6,6 +6,7 @@ import ResourcesManager from './brand/features/partner/ResourcesManager';
 import AssetLibrary from './brand/features/assets/AssetLibrary';
 import TemplateLibrary from './brand/features/assets/TemplateLibrary';
 import RetailersManager from './brand/features/partner/retailers/RetailersManager';
+import TasksManager from './brand/features/partner/TasksManager';
 import DirectMarketingPage from './brand/features/direct/DirectMarketingPage';
 import BrandHome from './brand/features/home/BrandHome';
 
@@ -46,13 +47,7 @@ const BrandApp = ({
           case 'partner-resources':
               return <ResourcesManager catalogs={catalogs} setCatalogs={setCatalogs} notify={notify} isEmpty={showEmptyState} files={files} setFiles={setFiles} />;
           case 'partner-tasks':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">✅</div>
-                      <div className="text-2xl font-bold text-gray-900">Retailer Tasks</div>
-                      <div className="text-sm text-gray-500">Track task completion and approve retailer submissions.</div>
-                  </div>
-              );
+              return <TasksManager notify={notify} />;
           case 'partner-retailers':
               return <RetailersManager notify={notify} />;
 

@@ -147,7 +147,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
             <div className="hidden md:block flex-1 min-w-0">
                <div className="text-sm font-bold text-gray-900 truncate">{currentUser.name}</div>
                <div className="flex items-center mt-0.5">
-                  <span className="text-[10px] uppercase font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 tracking-wide">
+                  <span className="text-[10px] uppercase font-bold text-brand-gold bg-[#b5984d]/10 px-1.5 py-0.5 rounded border border-[#b5984d]/20 tracking-wide">
                      {currentUser.role}
                   </span>
                </div>
