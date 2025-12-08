@@ -49,8 +49,8 @@ const BrandApp = ({
               return (
                   <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
                       <div className="text-6xl">✅</div>
-                      <div className="text-xl font-medium">Partner Tasks</div>
-                      <div className="text-sm">Assign and track tasks for retailers.</div>
+                      <div className="text-2xl font-bold text-gray-900">Retailer Tasks</div>
+                      <div className="text-sm text-gray-500">Track task completion and approve retailer submissions.</div>
                   </div>
               );
           case 'partner-retailers':

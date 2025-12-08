@@ -262,23 +262,16 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
   return (
     <div className="h-full overflow-auto">
       {/* [A] Page Header */}
-      <div className="flex items-center justify-between mb-6 px-6 pt-6">
-         <h2 className="text-2xl font-bold text-gray-900">Campaigns</h2>
-         <button 
-            onClick={onCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition shadow-sm"
-         >
-            <Plus size={16} /> New Campaign
-         </button>
-      </div>
+
+
 
       {/* [B] Performance Overview */}
-      <div className="px-6">
+      <div className="px-8">
           <PerformanceOverview campaigns={campaigns} />
       </div>
 
       {/* [C] Filter & Control Bar (Sticky) */}
-      <div className="sticky top-0 z-40 bg-gray-50 pt-2 pb-4 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 px-6 shadow-sm">
+      <div className="sticky top-0 z-40 bg-gray-50 pt-2 pb-4 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 px-8 shadow-sm">
          {/* Left: Status Tabs */}
          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             {statusTabs.map(tab => {
@@ -349,7 +342,7 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
       </div>
 
       {/* [D] Content Area */}
-      <div className="px-6 pb-20">
+      <div className="px-8 pb-20">
       {viewMode === 'grid' ? (
           /* [D1] Grid View */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -156,7 +156,7 @@ This is more than an engagement ring—it’s a statement of your journey.
       adoptionRate: 0,
       usageCount: 0,
       overviewId: "scheduled",
-      contentId: "draft-empty",
+      contentId: "full-content",
       insightsId: "empty",
       adoptionId: "empty",
       createdAt: "2025-12-01",

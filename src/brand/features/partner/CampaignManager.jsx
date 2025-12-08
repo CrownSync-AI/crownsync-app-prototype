@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plus } from 'lucide-react';
 import { campaignData } from '../../../data/mockStore/campaignStore';
 import BrandCampaignList from './BrandCampaignList';
 import CampaignDetail from './campaigns/CampaignDetail';
@@ -90,6 +91,18 @@ const CampaignManager = ({ campaigns: initialCampaigns, setCampaigns: setParentC
 
   return (
     <>
+      <div className="flex justify-between items-end mb-6 px-8 pt-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Marketing Campaigns</h1>
+          <p className="text-gray-500 text-sm">Distribute seasonal collections and promotional assets to your network.</p>
+        </div>
+        <button 
+            onClick={handleCreate}
+            className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition shadow-sm"
+        >
+            <Plus size={18} /> New Campaign
+        </button>
+      </div>
       <BrandCampaignList 
         campaigns={campaigns}
         // Removed unused files/templates props as they are now handled via internal campaign structure or no longer needed for list view

@@ -18,8 +18,11 @@ const PartnerOverview = ({ files, campaigns, notify, isEmpty }) => {
   const totalDownloads = campaigns.reduce((acc, c) => acc + c.downloads, 0);
 
   return (
-    <div className="p-6 h-full overflow-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Overview</h2>
+    <div className="px-8 py-6 h-full overflow-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Network Overview</h1>
+        <p className="text-gray-500 text-sm">Monitor the performance and adoption health of your B2B partners.</p>
+      </div>
       
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
