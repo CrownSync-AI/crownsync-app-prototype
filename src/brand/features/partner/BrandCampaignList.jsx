@@ -260,7 +260,7 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
   }
 
   return (
-    <div className="h-full overflow-auto">
+    <div className="h-full overflow-auto pb-10">
       {/* [A] Page Header */}
 
 

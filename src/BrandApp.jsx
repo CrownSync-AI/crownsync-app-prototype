@@ -8,6 +8,7 @@ import TemplateLibrary from './brand/features/assets/TemplateLibrary';
 import RetailersManager from './brand/features/partner/retailers/RetailersManager';
 import TasksManager from './brand/features/partner/TasksManager';
 import DirectMarketingPage from './brand/features/direct/DirectMarketingPage';
+import BrandAnalytics from './brand/features/analytics/BrandAnalytics';
 import BrandHome from './brand/features/home/BrandHome';
 
 import { useToast } from './brand/context/ToastContext';
@@ -55,13 +56,7 @@ const BrandApp = ({
 
           // Analytics
           case 'analytics':
-              return (
-                  <div className="p-12 flex items-center justify-center h-full text-gray-400 flex-col gap-4">
-                      <div className="text-6xl">📈</div>
-                      <div className="text-xl font-medium">Analytics</div>
-                      <div className="text-sm">Deep dive into data.</div>
-                  </div>
-              );
+              return <BrandAnalytics />;
 
           // Settings
           case 'settings':

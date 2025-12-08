@@ -56,11 +56,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
       id: 'analytics', 
       icon: BarChart3, 
       label: 'Analytics',
-      hasSubmenu: true,
-      subItems: [
-        { id: 'analytics-partner', label: 'Partner Insights' },
-        { id: 'analytics-direct', label: 'Direct Channel Stats' },
-      ]
+      hasSubmenu: false,
     },
     { id: 'settings', icon: Settings, label: 'Settings' }
   ];
