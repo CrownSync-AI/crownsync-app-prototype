@@ -130,7 +130,7 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
   return (
     <aside className="w-20 md:w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
       {/* 1. Brand Logo */}
-      <div className="h-24 flex items-center justify-center md:justify-start md:px-8 border-b border-gray-100/50">
+      <div className="h-16 flex items-center justify-center md:justify-start md:px-8">
         <img src={BrandLogo} alt="CrownSync" className="h-10 max-w-[160px] hidden md:block" />
         <div className="md:hidden w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-bold text-xs ring-4 ring-gray-50">CS</div>
       </div>
@@ -174,9 +174,24 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
             {/* Logout Popover */}
             {isUserMenuOpen && (
                 <div className="absolute left-4 bottom-20 right-4 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 animate-in slide-in-from-bottom-2 fade-in duration-200 overflow-hidden z-50">
+                    {/* Popover Header */}
+                    <div className="p-3 border-b border-gray-50 bg-gray-50/50 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex-shrink-0 bg-gray-200 overflow-hidden ring-1 ring-gray-100">
+                             {currentUser.avatarType === 'image' ? (
+                                <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-full h-full object-cover" />
+                             ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-brand-gold text-white font-bold text-xs">{currentUser.avatarInitial}</div>
+                             )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-sm font-bold text-gray-900 truncate">{currentUser.name}</div>
+                            <div className="text-xs text-gray-500 truncate font-medium">{currentUser.email}</div>
+                        </div>
+                    </div>
+                    
                     <div className="p-1 space-y-0.5">
                         <button className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg text-sm text-gray-700 flex items-center gap-3 transition">
-                            <LinkIcon size={16} className="text-gray-400"/> Switch Account
+                            <Settings size={16} className="text-gray-400"/> Personal Settings
                         </button>
                     </div>
                     <div className="p-1 border-t border-gray-50">
@@ -191,8 +206,5 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
     </aside>
   );
 };
-
-// Temp icon fix for popover
-const LinkIcon = ({size, className}) => <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>;
 
 export default BrandSidebar;

@@ -1,36 +1,55 @@
-import React from 'react';
-import { MessageSquare, Search } from 'lucide-react';
-import EmptyState from '../../components/EmptyState';
+import React, { useState } from 'react';
+import { Mail, MessageSquare, Share2 } from 'lucide-react';
+import EmailView from './components/EmailView';
+import SmsView from './components/SmsView';
+import SocialView from './components/SocialView';
 
 const UnifiedInbox = () => {
+    const [activeChannel, setActiveChannel] = useState('email'); // 'email', 'sms', 'social'
+
     return (
-        <div className="flex h-full bg-white">
-            {/* Sidebar List */}
-            <div className="w-80 border-r border-gray-200 flex flex-col">
-                <div className="p-4 border-b border-gray-100">
-                    <h2 className="font-bold text-lg mb-4">Inbox</h2>
-                    <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input 
-                            type="text" 
-                            placeholder="Search messages..." 
-                            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold"
-                        />
-                    </div>
-                </div>
-                <div className="flex-1 overflow-y-auto p-2">
-                     <div className="text-center py-10 text-gray-400 text-sm">No new messages</div>
+        <div className="flex flex-col h-full bg-white font-sans">
+            {/* Top Channel Switcher */}
+            <div className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white shrink-0">
+                <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                    <button 
+                        onClick={() => setActiveChannel('email')}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            activeChannel === 'email' 
+                                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5' 
+                                : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                    >
+                        <Mail size={16} /> Email
+                    </button>
+                    <button 
+                        onClick={() => setActiveChannel('sms')}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            activeChannel === 'sms' 
+                                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5' 
+                                : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                    >
+                        <MessageSquare size={16} /> SMS
+                    </button>
+                    <button 
+                        onClick={() => setActiveChannel('social')}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            activeChannel === 'social' 
+                                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5' 
+                                : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                    >
+                        <Share2 size={16} /> Social
+                    </button>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col items-center justify-center bg-gray-50/30">
-                <EmptyState 
-                    title="Select a Conversation"
-                    description="Choose a message from the list to view details."
-                    icon={MessageSquare}
-                    action="Compose New"
-                />
+            {/* Main Content Area */}
+            <div className="flex-1 overflow-hidden relative">
+                {activeChannel === 'email' && <EmailView />}
+                {activeChannel === 'sms' && <SmsView />}
+                {activeChannel === 'social' && <SocialView />}
             </div>
         </div>
     );

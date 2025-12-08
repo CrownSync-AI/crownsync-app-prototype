@@ -26,6 +26,45 @@ import mediaImage_7 from "@/assets/mock/verragio/brand/campaigns/7/product.jpg";
 
 import { getMember } from "./memberStore";
 
+const LUXURY_RETAILERS = [
+  "Alson Jewelers",
+  "Brent L. Miller Jewelers & Goldsmiths",
+  "CD Peacock",
+  "Clarkson Jewelers",
+  "Davis Jewelers",
+  "De Boulle Diamond & Jewelry",
+  "DeVons Jewelers",
+  "Feldmar Watch Co.",
+  "Gunderson’s Jewelers",
+  "Heller Jewelers",
+  "Henne Jewelers",
+  "J.R Dunn Jewelry",
+  "James & Sons Fine Jewelers",
+  "James Free Jewelers",
+  "King Jewelers Fine Jewelry & Luxury",
+  "Lee Michaels Fine Jewelry",
+  "Leonardo Jewelers",
+  "Little Switzerland",
+  "Littlebirdms",
+  "London Jewelers",
+  "Long’s Jewelers",
+  "Louis Anthony Jewelers",
+  "Lux Bond & Green",
+  "Manfredi Jewels",
+  "MP Demetre Jewelers",
+  "O.C. Tanner Jewelers",
+  "Polacheck’s Jewelers",
+  "Razny Jewelers",
+  "REEDS Jewelers",
+  "R.F. Moeller Jeweler",
+  "Richter & Phillips Jewelers",
+  "The 1916 Company",
+  "TIVOL",
+  "Tourneau | Bucherer",
+  "Trout Fine Jewellers",
+  "Walters & Hogsett Jewelers",
+];
+
 export const campaignData = {
   // 1. Master Campaign List
   // ORDER: Newest Created First
@@ -877,43 +916,9 @@ This is more than an engagement ring—it’s a statement of your journey.
 
       // Full List (32 items)
       list: Array.from({ length: 32 }).map((_, i) => {
-        const luxuryRetailers = [
-          "Saks Fifth Avenue",
-          "Neiman Marcus",
-          "Bergdorf Goodman",
-          "Nordstrom",
-          "Bloomingdales",
-          "Harrods",
-          "Selfridges",
-          "Lane Crawford",
-          "Galeries Lafayette",
-          "Holt Renfrew",
-          "David Jones",
-          "Myer",
-          "TsUM",
-          "La Rinascente",
-          "KaDeWe",
-          "Isetan",
-          "Takashimaya",
-          "Hankyu",
-          "SKP Beijing",
-          "The Hour Glass",
-          "Cortina Watch",
-          "Seddiqi & Sons",
-          "Bucherer",
-          "Wempe",
-          "Watches of Switzerland",
-          "Mayors",
-          "Ben Bridge",
-          "Harding & Co",
-          "London Jewelers",
-          "Reeds Jewelers",
-          "Govberg",
-          "Westime",
-        ];
         return {
           id: `r-good-${i}`,
-          name: luxuryRetailers[i] || `Retailer ${i + 1}`,
+          name: LUXURY_RETAILERS[i % LUXURY_RETAILERS.length],
           tier: i < 10 ? "Platinum" : i < 20 ? "Gold" : "Silver",
           status: "Participated", // Critical Fix: Capitalized
           usage:
@@ -943,58 +948,6 @@ This is more than an engagement ring—it’s a statement of your journey.
 
       // Full List (50 items: 35 Active, 15 Inactive)
       list: Array.from({ length: 50 }).map((_, i) => {
-        const luxuryRetailers = [
-          "Harrods",
-          "Selfridges",
-          "Lane Crawford",
-          "Galeries Lafayette",
-          "Holt Renfrew",
-          "Saks Fifth Avenue",
-          "Neiman Marcus",
-          "Bergdorf Goodman",
-          "Nordstrom",
-          "Bloomingdales",
-          "David Jones",
-          "Myer",
-          "TsUM",
-          "La Rinascente",
-          "KaDeWe",
-          "Isetan",
-          "Takashimaya",
-          "Hankyu",
-          "SKP Beijing",
-          "The Hour Glass",
-          "Cortina Watch",
-          "Seddiqi & Sons",
-          "Bucherer",
-          "Wempe",
-          "Watches of Switzerland",
-          "Mayors",
-          "Ben Bridge",
-          "Harding & Co",
-          "London Jewelers",
-          "Reeds Jewelers",
-          "Govberg",
-          "Westime",
-          "Patek Salon",
-          "Rolex Boutique",
-          "Cartier Mansion",
-          "Van Cleef & Arpels",
-          "Tiffany & Co.",
-          "Bulgari",
-          "Chopard",
-          "Graff",
-          "Harry Winston",
-          "Piaget",
-          "Breguet",
-          "Audemars Piguet",
-          "Vacheron Constantin",
-          "Jaeger-LeCoultre",
-          "Omega",
-          "IWC",
-          "Panerai",
-          "Hublot",
-        ];
         // Logic:
         // 0-34 (35): Participated (High tiers)
         // 35-39 (5): Viewed (Should include some high tiers for Needs Attention)
@@ -1009,7 +962,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         if (i >= 35 && i < 40) status = "Viewed";
         if (i >= 40) status = "Unopened";
 
-        const name = luxuryRetailers[i] || `Retailer ${i + 1}`;
+        const name = LUXURY_RETAILERS[i % LUXURY_RETAILERS.length];
 
         return {
           id: `r-avg-${i}`,
@@ -1036,61 +989,6 @@ This is more than an engagement ring—it’s a statement of your journey.
 
       // Full List (120 items: 48 Active, 72 Inactive)
       list: Array.from({ length: 120 }).map((_, i) => {
-        const luxuryRetailers = [
-          "Saks Fifth Avenue",
-          "Neiman Marcus",
-          "Bergdorf Goodman",
-          "Nordstrom",
-          "Bloomingdales",
-          "Harrods",
-          "Selfridges",
-          "Lane Crawford",
-          "Galeries Lafayette",
-          "Holt Renfrew",
-          "David Jones",
-          "Myer",
-          "TsUM",
-          "La Rinascente",
-          "KaDeWe",
-          "Isetan",
-          "Takashimaya",
-          "Hankyu",
-          "SKP Beijing",
-          "The Hour Glass",
-          "Cortina Watch",
-          "Seddiqi & Sons",
-          "Bucherer",
-          "Wempe",
-          "Watches of Switzerland",
-          "Mayors",
-          "Ben Bridge",
-          "Harding & Co",
-          "London Jewelers",
-          "Reeds Jewelers",
-          "Govberg",
-          "Westime",
-          "Patek Salon",
-          "Rolex Boutique",
-          "Cartier Mansion",
-          "Van Cleef & Arpels",
-          "Tiffany & Co.",
-          "Bulgari",
-          "Chopard",
-          "Graff",
-          "Harry Winston",
-          "Piaget",
-          "Breguet",
-          "Audemars Piguet",
-          "Vacheron Constantin",
-          "Jaeger-LeCoultre",
-          "Omega",
-          "IWC",
-          "Panerai",
-          "Hublot",
-          "Richard Mille",
-          "F.P. Journe",
-        ];
-
         // 0-47: Participated
         // 48-59: Viewed
         // 60-119: Unopened
@@ -1106,8 +1004,7 @@ This is more than an engagement ring—it’s a statement of your journey.
 
         return {
           id: `r-poor-${i}`,
-          name:
-            luxuryRetailers[i % luxuryRetailers.length] || `Retailer ${i + 1}`,
+          name: LUXURY_RETAILERS[i % LUXURY_RETAILERS.length],
           tier,
           status,
           usage: i < 48 ? { downloads: true } : {},
@@ -1279,8 +1176,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-1",
           title: "Summer Collection Launch",
-          thumbnail:
-            "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_5,
           platforms: ["instagram", "facebook"],
           totalShares: 445,
           estReach: 45000,
@@ -1293,8 +1189,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-2",
           title: "Behind the Scenes Video",
-          thumbnail:
-            "https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_6,
           platforms: ["twitter", "instagram"],
           totalShares: 280,
           estReach: 125000,
@@ -1307,8 +1202,7 @@ This is more than an engagement ring—it’s a statement of your journey.
         {
           id: "post-3",
           title: "Store Event Promo",
-          thumbnail:
-            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop",
+          thumbnail: mediaImage_7,
           platforms: ["google_business"],
           totalShares: 45,
           estReach: 12000,
