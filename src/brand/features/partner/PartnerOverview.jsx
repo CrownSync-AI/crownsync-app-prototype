@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, Minus, Users, Download, Activity, AlertCircle, Eye, Bell, Calendar, Filter } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Minus, Users, Download, Activity, AlertCircle, Eye, Bell, Calendar, Filter, PieChart, MousePointerClick, XCircle } from 'lucide-react';
 import { networkOverviewData } from '../../../data/mockStore/networkOverviewStore';
 import FilterDropdown from '../analytics/components/FilterDropdown';
 import TierBadge from './retailers/TierBadge';
@@ -11,20 +11,57 @@ const KpiCard = ({ kpi, onReview }) => {
     const isUp = kpi.trendDirection === 'up';
     const isNeutral = kpi.trendDirection === 'neutral';
     
+    // Icon Mapping based on data or defaults
+    const Icon = kpi.iconName === 'Users' ? Users 
+        : kpi.iconName === 'PieChart' ? PieChart 
+        : kpi.iconName === 'MousePointerClick' ? MousePointerClick
+        : Activity;
+        
+    // Specific icon assignment if needed, or rely on mapping
+    const DisplayIcon = kpi.isAlert ? AlertCircle : (Icon || Activity);
+
     return (
-        <div className={`p-6 rounded-xl border shadow-sm hover:shadow-md transition relative flex flex-col justify-between h-full ${kpi.isAlert ? 'bg-red-50 border-red-100' : 'bg-white border-gray-100'}`}>
+        <div className={`p-5 rounded-xl border shadow-sm transition relative flex flex-col justify-between h-36 ${kpi.isAlert ? 'bg-gradient-to-br from-red-50 to-white border-red-100 ring-1 ring-red-50' : 'bg-white border-gray-100 hover:shadow-md'}`}>
+            
+            {/* Header Section */}
+            <div className="flex justify-between items-start">
+                <div className="flex flex-col">
+                    <span className={`text-sm font-semibold tracking-tight ${kpi.isAlert ? 'text-red-700' : 'text-gray-500'}`}>
+                        {kpi.label}
+                    </span>
+                    {/* Standard Card Subtext */}
+                    {!kpi.isAlert && (
+                        <span className="text-[10px] text-gray-400 mt-0.5">{kpi.description}</span>
+                    )}
+                </div>
+                
+                 {/* Top Right: Icon for Standard, Action Button for Alert */}
+                 {kpi.isAlert ? (
+                     <button 
+                         onClick={onReview}
+                         className="text-[10px] font-bold text-red-600 border border-red-200 bg-white px-2 py-1 rounded hover:bg-red-50 hover:border-red-300 transition shadow-sm uppercase tracking-wide"
+                     >
+                         Review
+                     </button>
+                 ) : (
+                     <DisplayIcon size={18} className="text-gray-400 opacity-80"/>
+                 )}
+            </div>
+
+            {/* Main Value Section */}
+            <div className="flex items-end gap-2 mt-auto mb-1">
+                 <h3 className={`text-3xl font-bold tracking-tight leading-none ${kpi.isAlert ? 'text-red-600' : 'text-gray-900'}`}>
+                    {kpi.value}
+                 </h3>
+                 {kpi.total && <span className="text-sm text-gray-400 font-medium mb-1">/ {kpi.total}</span>}
+            </div>
+
+            {/* Footer Section */}
             <div>
-                <div className="flex justify-between items-start mb-2">
-                    <span className={`text-sm font-medium ${kpi.isAlert ? 'text-red-600' : 'text-gray-500'}`}>{kpi.label}</span>
-                    {kpi.isAlert ? <AlertCircle size={18} className="text-red-400"/> : <Activity size={18} className="text-gray-300"/>}
-                </div>
-                <div className="flex items-baseline gap-2 mb-1">
-                    <h3 className={`text-3xl font-bold ${kpi.isAlert ? 'text-red-900' : 'text-gray-900'}`}>{kpi.value}</h3>
-                    {kpi.total && <span className="text-sm text-gray-400">/ {kpi.total}</span>}
-                </div>
-                {kpi.trend && (
+                 {/* Standard Trend */}
+                 {!kpi.isAlert && kpi.trend && (
                     <div className="flex items-center gap-2">
-                        <span className={`flex items-center text-xs font-medium px-1.5 py-0.5 rounded ${
+                        <span className={`flex items-center text-xs font-bold px-1.5 py-0.5 rounded ${
                             isUp ? 'bg-emerald-50 text-emerald-600' :
                             isNeutral ? 'bg-gray-100 text-gray-600' :
                             'bg-red-50 text-red-600'
@@ -32,21 +69,35 @@ const KpiCard = ({ kpi, onReview }) => {
                             {isUp ? <ArrowUpRight size={12} className="mr-1"/> : isNeutral ? <Minus size={12} className="mr-1"/> : <ArrowDownRight size={12} className="mr-1"/>}
                             {kpi.trend}
                         </span>
-                        <span className={`text-xs ${kpi.isAlert ? 'text-red-400' : 'text-gray-400'}`}>{kpi.description}</span>
                     </div>
                 )}
-                {!kpi.trend && <div className="text-xs text-red-400 mt-1">{kpi.description}</div>}
+
+                {/* Alert Breakdown Footer */}
+                {kpi.isAlert && kpi.breakdown && (
+                    <div className="flex items-center justify-between border-t border-red-100/50 pt-2 mt-1">
+                        <div className="flex items-center gap-3">
+                             {kpi.breakdown.map((item, idx) => {
+                                 // Dynamic Icon for breakdown
+                                 const ItemIcon = item.icon === 'XCircle' ? XCircle : AlertCircle;
+                                 return (
+                                     <React.Fragment key={idx}>
+                                        <div className="flex items-center gap-1.5" title={item.label}>
+                                            <ItemIcon size={12} className={item.color || "text-gray-500"} />
+                                            <span className="text-[10px] font-bold text-gray-600">{item.value} {item.label}</span>
+                                        </div>
+                                        {/* Add separator if not last item */}
+                                        {idx < kpi.breakdown.length - 1 && <div className="w-px h-3 bg-red-200"></div>}
+                                     </React.Fragment>
+                                 );
+                             })}
+                        </div>
+                        {/* Time Context */}
+                        <div className="text-[9px] font-medium text-red-400 bg-red-50 px-1.5 py-0.5 rounded">
+                           30d
+                        </div>
+                    </div>
+                )}
             </div>
-            
-            {/* Review Button for Alert Card */}
-            {kpi.isAlert && (
-                <button 
-                    onClick={onReview}
-                    className="mt-4 w-full py-2 bg-red-100 text-red-700 text-xs font-bold rounded-lg hover:bg-red-200 transition"
-                >
-                    Review Inactive
-                </button>
-            )}
         </div>
     );
 };

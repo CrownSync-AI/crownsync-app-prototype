@@ -49,6 +49,11 @@ const BrandSidebar = ({ activePage, setActivePage }) => {
       label: 'Direct Marketing',
       hasSubmenu: false
     },
+    {
+      id: 'analytics',
+      icon: BarChart3,
+      label: 'Analytics',
+    },
     { type: 'separator' },
   ];
 

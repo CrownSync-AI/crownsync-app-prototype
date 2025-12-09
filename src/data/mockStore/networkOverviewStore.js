@@ -7,7 +7,8 @@ export const networkOverviewData = {
       total: "150",
       trend: "+2 (New)",
       trendDirection: "up",
-      description: "Logins in last 30d",
+      description: "Retailers with login activity.",
+      iconName: "Users",
     },
     {
       id: "adoption_rate",
@@ -15,15 +16,17 @@ export const networkOverviewData = {
       value: "68%",
       trend: "5%",
       trendDirection: "up",
-      description: "Downloaded campaign assets",
+      description: "Partners using campaign assets.",
+      iconName: "PieChart",
     },
     {
-      id: "asset_downloads",
-      label: "Asset Downloads",
+      id: "total_actions",
+      label: "Total Actions",
       value: "1,240",
       trend: "12%",
       trendDirection: "up",
-      description: "Total assets downloaded",
+      description: "Total meaningful interactions.",
+      iconName: "MousePointerClick",
     },
     {
       id: "needs_attention",
@@ -33,6 +36,15 @@ export const networkOverviewData = {
       trendDirection: "neutral",
       description: "Inactive > 30 days",
       isAlert: true,
+      breakdown: [
+        { label: "Inactive", value: 5, color: "text-red-500", icon: "XCircle" },
+        {
+          label: "Zero Actions",
+          value: 8,
+          color: "text-orange-500",
+          icon: "AlertCircle",
+        },
+      ],
     },
   ],
   zoneMap: [
