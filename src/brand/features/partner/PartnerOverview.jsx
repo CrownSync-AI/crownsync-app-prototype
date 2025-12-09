@@ -4,8 +4,20 @@ import { networkOverviewData } from '../../../data/mockStore/networkOverviewStor
 import FilterDropdown from '../analytics/components/FilterDropdown';
 import TierBadge from './retailers/TierBadge';
 import PartnerAttentionDrawer from '../home/components/PartnerAttentionDrawer';
-import NudgeModal from './NudgeModal';
+import NudgeModal, { RISKS } from './NudgeModal';
 import { useToast } from '../../context/ToastContext';
+
+// Helper for Risk Type
+const getRiskType = (retailer) => {
+    if (!retailer) return RISKS.GENERIC;
+    const { lastActive } = retailer;
+    if (lastActive === 'Never') return RISKS.ZERO_ACTIONS;
+    if (typeof lastActive === 'string' && lastActive.includes('days ago')) {
+        const days = parseInt(lastActive, 10);
+        if (days > 30) return RISKS.INACTIVE;
+    }
+    return RISKS.GENERIC;
+};
 
 const KpiCard = ({ kpi, onReview }) => {
     const isUp = kpi.trendDirection === 'up';
@@ -174,15 +186,27 @@ const PartnerOverview = () => {
 
     // Modals
     const [isAttentionDrawerOpen, setIsAttentionDrawerOpen] = useState(false);
-    const [nudgeModalState, setNudgeModalState] = useState({ isOpen: false, retailer: null });
+    const [nudgeModalState, setNudgeModalState] = useState({ 
+        isOpen: false, 
+        retailer: null, 
+        mode: 'single', 
+        riskType: RISKS.GENERIC 
+    });
 
     const openNudge = (retailer) => {
-        setNudgeModalState({ isOpen: true, retailer });
+        const riskType = getRiskType(retailer);
+        setNudgeModalState({ 
+            isOpen: true, 
+            retailer, 
+            mode: 'single', 
+            riskType 
+        });
     };
 
-    const handleSendNudge = (msg) => {
-        addToast(`Nudge sent to ${nudgeModalState.retailer.name}: "${msg}"`, 'success');
-        // Logic to update state could go here
+    const handleSendNudge = (data) => {
+        // data contains { count, subject, message, recipients }
+        addToast(`Nudge sent to ${data.count} retailer(s): "${data.subject}"`, 'success');
+        setNudgeModalState(prev => ({ ...prev, isOpen: false }));
     };
 
     return (
@@ -330,7 +354,9 @@ const PartnerOverview = () => {
             <NudgeModal 
                 isOpen={nudgeModalState.isOpen}
                 onClose={() => setNudgeModalState(prev => ({ ...prev, isOpen: false }))}
-                retailerName={nudgeModalState.retailer?.name}
+                mode={nudgeModalState.mode}
+                retailer={nudgeModalState.retailer}
+                riskType={nudgeModalState.riskType}
                 onSend={handleSendNudge}
             />
         </div>

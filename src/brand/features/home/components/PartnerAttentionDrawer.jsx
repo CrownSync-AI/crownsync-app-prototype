@@ -1,18 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Drawer from '../../../components/Drawer';
 import { AlertCircle, Users, ArrowRight, X, Copy, CheckCircle2 } from 'lucide-react';
 import { homeData } from '../../../../data/mockStore/homeStore';
 import { useToast } from '../../../context/ToastContext';
+import NudgeModal, { RISKS } from '../../partner/NudgeModal';
 
 const PartnerAttentionDrawer = ({ isOpen, onClose }) => {
    const { metrics } = homeData;
    const groups = metrics.partner.attentionGroups; 
    const { addToast } = useToast();
-   const [resolvedIds, setResolvedIds] = React.useState([]);
+   const [resolvedIds, setResolvedIds] = useState([]);
+   
+   // Modal State
+   const [nudgeModalState, setNudgeModalState] = useState({
+       isOpen: false,
+       retailers: [],
+       riskType: RISKS.GENERIC,
+       groupId: null
+   });
 
-   const handleAction = (actionName, group) => {
-      addToast(`Action sent: ${actionName} for "${group.reason}"`, 'success');
-      setResolvedIds(prev => [...prev, group.id]);
+   const getRiskForGroup = (reason) => {
+       if (reason.includes("Inactive")) return RISKS.INACTIVE;
+       if (reason.includes("Profile")) return RISKS.INCOMPLETE;
+       if (reason.includes("Missed")) return RISKS.ZERO_ACTIONS;
+       return RISKS.GENERIC;
+   };
+
+   const handleAction = (group) => {
+      setNudgeModalState({
+          isOpen: true,
+          retailers: group.retailers.map((r, i) => ({ ...r, id: i })), // Mock ID if missing
+          riskType: getRiskForGroup(group.reason),
+          groupId: group.id
+      });
+   };
+
+   const handleSendNudge = (data) => {
+       addToast(`Bulk Action Sent: ${data.subject} to ${data.count} retailers.`, 'success');
+       if (nudgeModalState.groupId) {
+           setResolvedIds(prev => [...prev, nudgeModalState.groupId]);
+       }
+       setNudgeModalState(prev => ({ ...prev, isOpen: false }));
    };
 
    return (
@@ -84,7 +112,7 @@ const PartnerAttentionDrawer = ({ isOpen, onClose }) => {
                         {/* CTA Button */}
                         <button 
                            disabled={isResolved}
-                           onClick={() => handleAction(group.action, group)}
+                           onClick={() => handleAction(group)}
                            className={`w-full py-2.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 ${
                               isResolved 
                                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
@@ -102,6 +130,15 @@ const PartnerAttentionDrawer = ({ isOpen, onClose }) => {
                })}
             </div>
          </div>
+
+         <NudgeModal 
+             isOpen={nudgeModalState.isOpen}
+             onClose={() => setNudgeModalState(prev => ({ ...prev, isOpen: false }))}
+             mode="bulk"
+             retailers={nudgeModalState.retailers}
+             riskType={nudgeModalState.riskType}
+             onSend={handleSendNudge}
+         />
       </Drawer>
    );
 };

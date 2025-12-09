@@ -73,7 +73,7 @@ const PerformanceOverview = ({ campaigns }) => {
        </div>
        <div className="flex items-end justify-between">
           <div>
-             <div className="text-4xl font-semibold text-gray-900 leading-none mb-2">{metric.value}</div>
+             <div className="text-3xl font-semibold text-gray-900 leading-none mb-2">{metric.value}</div>
              <div className="text-[11px] text-gray-400 font-medium">{metric.sub}</div>
           </div>
           <div className={`flex items-center gap-1 text-xs font-bold ${metric.trendDir === 'up' ? colors.emeraldText : colors.coralText}`}>

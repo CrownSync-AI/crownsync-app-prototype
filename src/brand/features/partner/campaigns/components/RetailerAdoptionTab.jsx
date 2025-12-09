@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { campaignData } from '../../../../../data/mockStore/campaignStore';
 import { Search, Filter, ArrowUpRight, CheckCircle2, AlertCircle, Clock, MoreHorizontal, Mail, MessageSquare, Download, Instagram, Facebook, Twitter, Smartphone, Eye, XCircle, RefreshCw, TrendingUp, ChevronRight, X, Award, ChevronDown, Check, FileText, Video, ChevronLeft, User, Bell, Share2, Printer } from 'lucide-react'; // Added Share2, Printer
-import { createPortal } from 'react-dom';
 import Drawer from '../../../../components/Drawer';
 import { useToast } from '../../../../context/ToastContext';
+import NudgeModal, { RISKS } from '../../NudgeModal';
 
 // Helper to render usage icons (Aligned with BrandCampaignList)
 const UsageIcons = ({ usage }) => {
@@ -178,8 +178,9 @@ const RetailerAdoptionTab = ({ campaign }) => {
   const [isZoneOpen, setIsZoneOpen] = useState(false); // For Click Trigger
   
   const [showNudgeModal, setShowNudgeModal] = useState(false);
-  const [nudgeMessage, setNudgeMessage] = useState('');
+  // nudgeMessage removed as it is handled internally by NudgeModal
   const [selectedRetailer, setSelectedRetailer] = useState(null);
+  const [nudgeTarget, setNudgeTarget] = useState(null);
   const [drawerTab, setDrawerTab] = useState('usage'); // 'usage' | 'timeline'
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -327,17 +328,20 @@ const RetailerAdoptionTab = ({ campaign }) => {
   };
 
   const handleNudgeAll = () => {
-    setNudgeMessage(`Hi there! Just a friendly reminder that our new ${campaign.title} campaign is live. We noticed you haven't had a chance to check it out yet.`);
+    setNudgeTarget(null); // Ensure bulk mode
     setShowNudgeModal(true);
   };
 
-  const confirmSendNudge = () => {
+  const handleNudgeSingle = (retailer, e) => {
+      if(e) e.stopPropagation();
+      setNudgeTarget(retailer);
+      setShowNudgeModal(true);
+  };
+
+  const handleSendNudge = (data) => {
     // Mock API call
-    const targetName = selectedRetailer ? selectedRetailer.name : `${needsAttentionList.length} retailers`;
-    console.log(`Sending nudge to ${targetName}: "${nudgeMessage}"`);
-    
+    console.log(`Sending nudge:`, data);
     setShowNudgeModal(false);
-    setNudgeMessage('');
     addToast('Reminder sent successfully!', 'success');
   };
 
@@ -457,10 +461,7 @@ const RetailerAdoptionTab = ({ campaign }) => {
                         {r.campaignStatus}
                       </span>
                       <button 
-                        onClick={() => {
-                            setNudgeMessage(`Hi ${r.contact?.name || 'Partner'}, \n\nJust a friendly reminder that our ${campaign.title} campaign is live. We'd love for you to participate!\n\nBest,\nThe CrownSync Team`);
-                            setShowNudgeModal(true);
-                        }}
+                        onClick={(e) => handleNudgeSingle(r, e)}
                         className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-full transition opacity-0 group-hover:opacity-100"
                         title="Send Reminder"
                       >
@@ -732,9 +733,8 @@ const RetailerAdoptionTab = ({ campaign }) => {
         footer={
            <div className="flex gap-3 w-full">
                <button 
-                 onClick={() => {
-                    setNudgeMessage(`Hi ${selectedRetailer?.contact?.name || 'there'}, just a friendly reminder...`);
-                    setShowNudgeModal(true);
+                 onClick={(e) => {
+                    handleNudgeSingle(selectedRetailer, e);
                  }}
                  className="flex-1 py-2.5 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2"
                >
@@ -888,56 +888,16 @@ const RetailerAdoptionTab = ({ campaign }) => {
       </Drawer>
 
       {/* --- Nudge Modal --- */}
-      {showNudgeModal && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={() => setShowNudgeModal(false)}></div>
-          <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-100 rounded-lg">
-                  <MessageSquare size={20} className="text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">Smart Nudge</h3>
-                  <p className="text-sm text-gray-500">Customize your reminder message</p>
-                </div>
-              </div>
-              <button onClick={() => setShowNudgeModal(false)} className="p-1 hover:bg-gray-100 rounded-full text-gray-500">
-                <X size={20}/>
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Message Content
-              </label>
-              <textarea
-                value={nudgeMessage}
-                onChange={(e) => setNudgeMessage(e.target.value)}
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 resize-none"
-                placeholder="Write a friendly reminder..."
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowNudgeModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmSendNudge}
-                className="px-6 py-2 text-sm font-bold text-white bg-black hover:bg-gray-800 rounded-lg shadow-sm transition"
-              >
-                Send Reminder
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* --- Nudge Modal --- */}
+      <NudgeModal 
+        isOpen={showNudgeModal}
+        onClose={() => setShowNudgeModal(false)}
+        mode={nudgeTarget ? 'single' : 'bulk'}
+        retailer={nudgeTarget}
+        retailers={needsAttentionList}
+        riskType={RISKS.GENERIC}
+        onSend={handleSendNudge}
+      />
 
     </div>
   );
