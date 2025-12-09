@@ -68,12 +68,12 @@ const PerformanceOverview = ({ campaigns }) => {
   const MetricCard = ({ metric }) => (
     <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition duration-300 group h-32 flex flex-col justify-between">
        <div className="flex justify-between items-start">
-          <span className="text-xs font-medium text-gray-500 tracking-wide uppercase">{metric.label}</span>
+          <span className="text-xs font-semibold text-gray-500  tracking-wide uppercase mb-2">{metric.label}</span>
           {metric.icon}
        </div>
        <div className="flex items-end justify-between">
           <div>
-             <div className="text-4xl font-medium text-gray-900 leading-none mb-2">{metric.value}</div>
+             <div className="text-4xl font-semibold text-gray-900 leading-none mb-2">{metric.value}</div>
              <div className="text-[11px] text-gray-400 font-medium">{metric.sub}</div>
           </div>
           <div className={`flex items-center gap-1 text-xs font-bold ${metric.trendDir === 'up' ? colors.emeraldText : colors.coralText}`}>

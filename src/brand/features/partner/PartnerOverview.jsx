@@ -21,18 +21,14 @@ const KpiCard = ({ kpi, onReview }) => {
     const DisplayIcon = kpi.isAlert ? AlertCircle : (Icon || Activity);
 
     return (
-        <div className={`p-5 rounded-xl border shadow-sm transition relative flex flex-col justify-between h-36 ${kpi.isAlert ? 'bg-gradient-to-br from-red-50 to-white border-red-100 ring-1 ring-red-50' : 'bg-white border-gray-100 hover:shadow-md'}`}>
+        <div className={`p-5 rounded-xl border shadow-sm transition relative flex flex-col h-36 ${kpi.isAlert ? 'bg-gradient-to-br from-red-50 to-white border-red-100 ring-1 ring-red-50' : 'bg-white border-gray-100 hover:shadow-md'}`}>
             
-            {/* Header Section */}
-            <div className="flex justify-between items-start">
+            {/* Header Section - Fixed Height for Alignment */}
+            <div className="flex justify-between items-center h-7 mb-2">
                 <div className="flex flex-col">
-                    <span className={`text-sm font-semibold tracking-tight ${kpi.isAlert ? 'text-red-700' : 'text-gray-500'}`}>
+                    <span className={`text-xs font-semibold uppercase tracking-wide ${kpi.isAlert ? 'text-red-700' : 'text-gray-500'}`}>
                         {kpi.label}
                     </span>
-                    {/* Standard Card Subtext */}
-                    {!kpi.isAlert && (
-                        <span className="text-[10px] text-gray-400 mt-0.5">{kpi.description}</span>
-                    )}
                 </div>
                 
                  {/* Top Right: Icon for Standard, Action Button for Alert */}
@@ -48,20 +44,21 @@ const KpiCard = ({ kpi, onReview }) => {
                  )}
             </div>
 
-            {/* Main Value Section */}
-            <div className="flex items-end gap-2 mt-auto mb-1">
-                 <h3 className={`text-3xl font-bold tracking-tight leading-none ${kpi.isAlert ? 'text-red-600' : 'text-gray-900'}`}>
+            {/* Main Value Section - Top Pinned */}
+            <div className="flex items-end gap-2 mb-1">
+                 <h3 className={`text-3xl font-semibold tracking-tight leading-none ${kpi.isAlert ? 'text-red-600' : 'text-gray-900'}`}>
                     {kpi.value}
                  </h3>
                  {kpi.total && <span className="text-sm text-gray-400 font-medium mb-1">/ {kpi.total}</span>}
             </div>
 
-            {/* Footer Section */}
-            <div>
+            {/* Footer Section - Bottom Pinned */}
+            <div className="mt-auto">
                  {/* Standard Trend */}
                  {!kpi.isAlert && kpi.trend && (
-                    <div className="flex items-center gap-2">
-                        <span className={`flex items-center text-xs font-bold px-1.5 py-0.5 rounded ${
+                    <div className="flex items-center justify-between">
+                         <span className="text-[10px] text-gray-400 font-medium">{kpi.description}</span>
+                         <span className={`flex items-center text-xs font-bold px-1.5 py-0.5 rounded ${
                             isUp ? 'bg-emerald-50 text-emerald-600' :
                             isNeutral ? 'bg-gray-100 text-gray-600' :
                             'bg-red-50 text-red-600'
