@@ -241,7 +241,13 @@ const NudgeModal = ({ isOpen, onClose, mode = 'single', retailer, retailers = []
                             <div className="flex-1 flex flex-col">
                                 <div className="flex justify-between items-center mb-2">
                                      <label className="text-xs font-bold text-gray-900 uppercase tracking-wider">Email Message</label>
-                                     {/* Template badge removed */}
+                                     <button 
+                                          onClick={() => setShowPreview(!showPreview)}
+                                          className={`text-[10px] font-bold px-2 py-1 rounded transition flex items-center gap-1.5 ${showPreview ? 'bg-black text-white' : 'text-gray-500 hover:text-black hover:bg-gray-100'}`}
+                                     >
+                                          {showPreview ? <Minimize2 size={12}/> : <Eye size={12}/>}
+                                          {showPreview ? 'Hide Preview' : 'Preview Email'}
+                                     </button>
                                 </div>
                                 <RichTextEditor 
                                     value={message} 
@@ -260,14 +266,8 @@ const NudgeModal = ({ isOpen, onClose, mode = 'single', retailer, retailers = []
                         </div>
 
                         {/* Footer */}
-                        <div className="p-6 border-t border-gray-100 flex items-center justify-between bg-white mt-auto">
-                           <button 
-                                onClick={() => setShowPreview(!showPreview)}
-                                className={`text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-2 ${showPreview ? 'bg-gray-100 text-black' : 'text-gray-500 hover:text-black hover:bg-gray-50'}`}
-                           >
-                               {showPreview ? <Minimize2 size={14}/> : <Eye size={14}/>}
-                               {showPreview ? 'Hide Preview' : 'Preview Email'}
-                           </button>
+                        <div className="p-6 border-t border-gray-100 flex items-center justify-end bg-white mt-auto">
+
 
                             <div className="flex items-center gap-3">
                                 <button 

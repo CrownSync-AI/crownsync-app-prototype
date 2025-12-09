@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, Minus, Users, Download, Activity, AlertCircle, Eye, Bell, Calendar, Filter, PieChart, MousePointerClick, XCircle } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Minus, Users, Download, Activity, AlertCircle, Eye, Bell, Calendar, Filter, PieChart, MousePointerClick, XCircle, ChevronRight, ShieldAlert } from 'lucide-react';
 import { networkOverviewData } from '../../../data/mockStore/networkOverviewStore';
 import FilterDropdown from '../analytics/components/FilterDropdown';
 import TierBadge from './retailers/TierBadge';
@@ -33,7 +33,10 @@ const KpiCard = ({ kpi, onReview }) => {
     const DisplayIcon = kpi.isAlert ? AlertCircle : (Icon || Activity);
 
     return (
-        <div className={`p-5 rounded-xl border shadow-sm transition relative flex flex-col h-36 ${kpi.isAlert ? 'bg-gradient-to-br from-red-50 to-white border-red-100 ring-1 ring-red-50' : 'bg-white border-gray-100 hover:shadow-md'}`}>
+        <div 
+            onClick={kpi.isAlert ? onReview : undefined}
+            className={`p-5 rounded-xl border shadow-sm transition relative flex flex-col h-36 group ${kpi.isAlert ? 'bg-gradient-to-br from-red-50 to-white border-red-100 ring-1 ring-red-50 cursor-pointer hover:shadow-md hover:border-red-200 hover:ring-red-100' : 'bg-white border-gray-100 hover:shadow-md'}`}
+        >
             
             {/* Header Section - Fixed Height for Alignment */}
             <div className="flex justify-between items-center h-7 mb-2">
@@ -43,14 +46,29 @@ const KpiCard = ({ kpi, onReview }) => {
                     </span>
                 </div>
                 
-                 {/* Top Right: Icon for Standard, Action Button for Alert */}
+                 {/* Top Right: Icon for Standard, Navigation Icon for Alert */}
                  {kpi.isAlert ? (
-                     <button 
-                         onClick={onReview}
-                         className="text-[10px] font-bold text-red-600 border border-red-200 bg-white px-2 py-1 rounded hover:bg-red-50 hover:border-red-300 transition shadow-sm uppercase tracking-wide"
-                     >
-                         Review
-                     </button>
+                     <div className="relative flex items-center justify-center text-red-500 transition duration-300">
+                        
+                        {/* Default State: Shield + Dot */}
+                        <div className="absolute inset-0 flex items-center justify-center transition duration-300 group-hover:scale-0 group-hover:opacity-0 origin-center">
+                            <ShieldAlert size={18} />
+                            {parseInt(kpi.value) > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Hover State: Chevron */}
+                        <div className="flex items-center justify-center absolute inset-0 transition duration-300 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100">
+                             <ChevronRight size={18} />
+                        </div>
+                        
+                        {/* Spacer to maintain layout height since absolute children don't contribute size */}
+                        <div className="w-[18px] h-[18px]"></div>
+                     </div>
                  ) : (
                      <DisplayIcon size={18} className="text-gray-400 opacity-80"/>
                  )}
