@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowDownRight, Minus, Users, Download, Activity, AlertCi
 import { networkOverviewData } from '../../../data/mockStore/networkOverviewStore';
 import FilterDropdown from '../analytics/components/FilterDropdown';
 import TierBadge from './retailers/TierBadge';
-import PartnerAttentionDrawer from '../home/components/PartnerAttentionDrawer';
+import PartnerAttentionDrawer from '../../components/PartnerAttentionDrawer';
 import NudgeModal, { RISKS } from './NudgeModal';
 import { useToast } from '../../context/ToastContext';
 

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Users, AlertCircle } from 'lucide-react';
 import { homeData } from '../../../../data/mockStore/homeStore';
-import PartnerAttentionDrawer from './PartnerAttentionDrawer';
+import { attentionData } from '../../../../data/mockStore/attentionStore';
+import PartnerAttentionDrawer from '../../../components/PartnerAttentionDrawer';
 
 const PartnerNetwork = () => {
    const { metrics } = homeData;
+   // Use data from attention store for the counter if available, else fallback
+   const attentionCount = attentionData.needsAttentionCount || metrics.partner.needsAttentionCount;
    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
    return (
@@ -54,7 +57,7 @@ const PartnerNetwork = () => {
                                    <AlertCircle size={12} /> Attention
                                </div>
                                <div className="flex items-end justify-between">
-                                   <div className="text-2xl font-bold text-gray-900 leading-none">{metrics.partner.needsAttentionCount}</div>
+                                   <div className="text-2xl font-bold text-gray-900 leading-none">{attentionCount}</div>
                                    <button 
                                        onClick={() => setIsDrawerOpen(true)}
                                        className="px-2 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold rounded hover:bg-amber-100 transition"
