@@ -133,7 +133,7 @@ const PartnerBrands = ({ brands, onSelectBrand }) => {
                  <div className="pt-8 px-6 pb-6 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                        <div>
-                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition">{brand.name}</h3>
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#C5A065] transition">{brand.name}</h3>
                           <p className="text-xs text-gray-500">{brand.campaigns} Campaigns • {brand.catalogs} Resources</p>
                        </div>
                        {/* Engagement Score */}
@@ -172,7 +172,7 @@ const PartnerBrands = ({ brands, onSelectBrand }) => {
                     </div>
    
                     {/* CTA (Icon Only) */}
-                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-end text-gray-400 group-hover:text-indigo-600 transition">
+                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-end text-gray-400 group-hover:text-[#C5A065] transition">
                        <ArrowRight size={20} className="transform group-hover:translate-x-1 transition" />
                     </div>
                  </div>
