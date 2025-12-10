@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, Pin, Instagram, Facebook, Mail, FileText, Download, Smartphone, Linkedin, Twitter, Globe, MessageSquare, Share2, Check, Flame, ArrowRight, Lock } from 'lucide-react';
 
-const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
+const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpiringStatus = false }) => {
   // Calculate asset counts
   const linkedTemplates = templates.filter(t => campaign.templates?.includes(t.id));
   const linkedAssets = files.filter(f => campaign.assets?.includes(f.id));
@@ -61,7 +61,10 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
       {/* Visual Area (Fixed Aspect Ratio 16:9) */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100 rounded-t-xl flex-shrink-0">
         {/* Cover Image */}
-        <div className={`absolute inset-0 ${campaign.cover} transition-transform duration-700 ${!isExpired && 'group-hover:scale-105'}`}></div>
+        <div 
+           className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${!isExpired && 'group-hover:scale-105'} ${campaign.coverImage && typeof campaign.coverImage === 'string' && campaign.coverImage.startsWith('http') ? '' : campaign.cover}`}
+           style={campaign.coverImage ? { backgroundImage: `url(${campaign.coverImage})` } : {}}
+        ></div>
         
         {/* Expired Overlay */}
         {isExpired && <div className="absolute inset-0 bg-white/30 backdrop-grayscale"></div>}
@@ -87,12 +90,12 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
                    </div>
                </div>
             )}
-           {expiration.type === 'urgent' && (
+           {expiration.type === 'urgent' && !hideExpiringStatus && (
               <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider flex items-center gap-1 animate-pulse border border-red-700">
                  <Flame size={10} className="fill-white"/> Ends Today
               </div>
            )}
-           {isExpired && (
+           {isExpired && !hideExpiringStatus && (
               <div className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider border border-black flex items-center gap-1">
                  <Lock size={10} /> EXPIRED
               </div>
@@ -122,7 +125,7 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
          {/* Row 2: Title + Pin */}
          <div className="flex items-start justify-between gap-2 mb-1">
             <div className="mb-3 min-h-[40px] flex-1">
-             <h3 className={`font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-red-600 transition-colors'}`}>
+             <h3 className={`font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-[#C5A065] transition-colors'}`}>
                 {campaign.title}
              </h3>
             </div>
@@ -193,7 +196,7 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [] }) => {
              )}
 
              {/* Arrow Icon (Bottom Right) */}
-             <div className="ml-auto text-gray-300 group-hover:text-indigo-600 transition">
+             <div className="ml-auto text-gray-300 group-hover:text-[#C5A065] transition">
                 <ArrowRight size={16} />
              </div>
          </div>

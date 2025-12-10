@@ -129,9 +129,9 @@ import { campaignData } from './data/mockStore/campaignStore'; // Import Central
 
 const App = () => {
   // State lifting for persistence across views
-  const [files, setFiles] = useState(INITIAL_FILES);
+  const [files, setFiles] = useState([...INITIAL_FILES, ...campaignData.downloadableFiles]);
   const [campaigns, setCampaigns] = useState(campaignData.campaigns); // Initialize from Store
-  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [templates, setTemplates] = useState([...INITIAL_TEMPLATES, ...campaignData.publishableContent]);
   const [catalogs, setCatalogs] = useState(INITIAL_CATALOGS);
   const [retailers] = useState(INITIAL_RETAILERS);
   

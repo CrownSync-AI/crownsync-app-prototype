@@ -8,6 +8,11 @@ const Overview = ({ campaigns, brands, templates, files }) => {
   // Expiring Soon: EndDate < Now + 3 Days (72h)
   const expiringCampaigns = campaigns.filter(c => {
       if (c.endDate === 'Permanent') return false;
+      
+      // Exclude Used Campaigns
+      const isUsed = c.retailerUsage && Object.values(c.retailerUsage).some(v => v === true);
+      if (isUsed) return false;
+
       const end = new Date(c.endDate);
       const now = new Date('2025-11-26'); // Simulated "Now"
       const diffTime = end - now;

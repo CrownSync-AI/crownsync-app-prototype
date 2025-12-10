@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, ChevronRight, LayoutGrid, List, Search, Instagram, Facebook, Mail, Download, MessageSquare, Smartphone, Check, ArrowRight, Flame, ChevronDown, X, Pin } from 'lucide-react';
+import { Filter, ChevronRight, LayoutGrid, List, Search, Instagram, Facebook, Mail, Download, MessageSquare, Smartphone, Check, ArrowRight, Flame, ChevronDown, X, Pin, Lock } from 'lucide-react';
 import CampaignCard from './components/CampaignCard';
 
 const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'all' }) => {
@@ -88,7 +88,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
       } else {
           // Past View
           // Show: Expired only
-          if (!isExpired) return false;
+          if (!isExpired) return false; // This is correct: Past tab shows ONLY expired. Expiring Soon is NOT expired, so it stays in Active.
       }
 
       // Search Filter
@@ -464,13 +464,13 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                 /* List View - Light Data Grid */
                 <div className="bg-white rounded-lg overflow-hidden border border-gray-200 overflow-x-auto">
                    {/* Header Row */}
-                    <div className="grid grid-cols-[28%_8%_10%_24%_15%_15%] w-full min-w-[1000px] gap-6 px-6 py-3 border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                       <div className="whitespace-nowrap">Campaign Name</div>
-                       <div className="whitespace-nowrap">Status</div>
-                       <div className="whitespace-nowrap">Brand</div>
-                       <div className="whitespace-nowrap">Assets & Usage</div>
-                       <div className="text-left whitespace-nowrap">Ends On</div>
-                       <div className="whitespace-nowrap">Last Updated</div>
+                    <div className="min-w-[1000px] grid grid-cols-[28%_100px_140px_1fr_120px_120px] w-full gap-4 px-6 py-3 border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                       <div className="whitespace-nowrap">Campaign Info</div>
+                       <div className="whitespace-nowrap hidden md:block">Status</div>
+                       <div className="whitespace-nowrap hidden lg:block">Brand</div>
+                       <div className="whitespace-nowrap hidden sm:block">Assets & Usage</div>
+                       <div className="text-left whitespace-nowrap hidden xl:block">Ends On</div>
+                       <div className="whitespace-nowrap hidden 2xl:block">Last Updated</div>
                     </div>
 
                    {/* Data Rows */}
@@ -489,7 +489,12 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
 
                           // Expiration Logic
                           const getExpiration = () => {
-                             if (campaign.endDate === 'Permanent') return { label: 'No Expiration', color: 'text-green-600', icon: <div className="text-lg leading-none">∞</div> };
+                             // Override if status is explicitly Ended/Archived
+      if (campaign.status === 'Ended' || campaign.status === 'Archived') {
+         return { isExpired: true, isExpiring: false, label: `Expired ${campaign.endDate}`, color: 'text-gray-400', icon: <Lock size={14} /> };
+      }
+
+      if (campaign.endDate === 'Permanent') return { isExpired: false, isExpiring: false, label: 'No Expiration', color: 'text-green-600', icon: <span className="text-lg leading-none">∞</span> };
                              const end = new Date(campaign.endDate);
                              const now = new Date('2025-11-26');
                              const diffTime = end - now;
@@ -513,10 +518,13 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                            const isUpdated = !isNew && lastUpdated && (now - lastUpdated) / (1000 * 60 * 60) <= 48;
 
                           return (
-                             <div key={campaign.id} className="grid grid-cols-[28%_8%_10%_24%_15%_15%] w-full min-w-[1000px] gap-6 px-6 py-4 items-center hover:bg-gray-50 transition group cursor-pointer">
+                             <div key={campaign.id} className="min-w-[1000px] grid grid-cols-[28%_100px_140px_1fr_120px_120px] w-full gap-4 px-6 py-4 items-center hover:bg-gray-50 transition group cursor-pointer">
                                 {/* Campaign Name */}
                                 <div className="flex items-center gap-4 min-w-0">
-                                   <div className={`w-24 h-[54px] rounded-lg ${campaign.cover} flex-shrink-0 bg-cover bg-center`}></div>
+                                   <div 
+                                      className={`w-24 h-[54px] rounded-lg flex-shrink-0 bg-cover bg-center ${campaign.coverImage && typeof campaign.coverImage === 'string' && campaign.coverImage.startsWith('http') ? '' : campaign.cover}`}
+                                      style={campaign.coverImage ? { backgroundImage: `url(${campaign.coverImage})` } : {}}
+                                   ></div>
                                    <div className="min-w-0">
                                       <div className="flex items-center gap-2">
                                           {isNew && (
@@ -538,7 +546,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                                    </div>
                                                </div>
                                            )}
-                                           <h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition truncate flex items-center gap-1.5">
+                                           <h3 className="font-bold text-gray-900 group-hover:text-[#C5A065] transition truncate flex items-center gap-1.5">
                                                {campaign.title}
                                                {campaign.isPinned && (
                                                    <Pin size={12} className="fill-black flex-shrink-0" />
@@ -551,6 +559,8 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
 
                                 {/* Status Column */}
                                 <div>
+                                {/* Status Column */}
+                                <div className="hidden md:block">
                                    {expiration.isExpired ? (
                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500">
                                            Expired
@@ -565,9 +575,10 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                        </span>
                                    )}
                                 </div>
+                                </div>
 
                                 {/* Brand (Logo + Name with Tooltip) */}
-                                <div className="flex items-center gap-2 group/brand relative cursor-help min-w-0">
+                                <div className="hidden lg:flex items-center gap-2 group/brand relative cursor-help min-w-0">
                                    <div className={`w-6 h-6 rounded-full ${brand?.logo} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}>
                                       {brand?.name?.substring(0,1)}
                                    </div>
@@ -579,7 +590,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Assets & Usage (Merged) */}
-                                <div className="flex items-center gap-1.5 flex-wrap">
+                                <div className="hidden sm:flex items-center gap-1.5 flex-wrap">
                                    {/* Social Platforms */}
                                    {platforms.map(p => {
                                        const isUsed = usage.social;
@@ -659,7 +670,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Ends On (Left Aligned) */}
-                                <div className="text-left flex items-center justify-start gap-2 min-w-0">
+                                <div className="hidden xl:flex text-left items-center justify-start gap-2 min-w-0">
                                    <div className={`text-sm font-normal whitespace-nowrap ${expiration.color} flex items-center gap-1`}>
                                       {expiration.icon}
                                       {expiration.label}
@@ -667,7 +678,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Last Updated */}
-                                <div className="text-sm text-gray-500 font-normal whitespace-nowrap">
+                                <div className="hidden 2xl:block text-sm text-gray-500 font-normal whitespace-nowrap">
                                     {campaign.lastUpdated ? new Date(campaign.lastUpdated).toLocaleDateString('en-CA') : '--'}
                                 </div>
                             </div>

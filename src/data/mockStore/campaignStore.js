@@ -16,6 +16,16 @@ import coverImage_15 from "@/assets/mock/verragio/brand/campaigns/15/cover.png";
 import coverImage_16 from "@/assets/mock/verragio/brand/campaigns/16/cover.png";
 import coverImage_17 from "@/assets/mock/verragio/brand/campaigns/17/cover.png";
 
+// External Covers for Other Brands
+const ROLEX_COVER =
+  "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=800";
+const CARTIER_COVER =
+  "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&q=80&w=800";
+const PATEK_COVER =
+  "https://images.unsplash.com/photo-1596568359553-a56de6970068?auto=format&fit=crop&q=80&w=800";
+const OMEGA_COVER =
+  "https://images.unsplash.com/photo-1622434641406-a158105c9fc7?auto=format&fit=crop&q=80&w=800"; // Fixed URL
+
 import mediaImage_1 from "@/assets/mock/verragio/brand/campaigns/1/product.jpg";
 import mediaImage_2 from "@/assets/mock/verragio/brand/campaigns/2/product.jpg";
 import mediaImage_3 from "@/assets/mock/verragio/brand/campaigns/3/product.jpg";
@@ -97,6 +107,10 @@ Together, they embody elegance, commitment, and individuality.
       createdAt: "2025-12-05",
       startDate: "2025-12-15",
       endDate: "2026-1-15",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: false, sms: false, download: true },
+      templates: ["t-1", "t-2"],
+      assets: ["f-full-1"],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -123,6 +137,15 @@ Together, they embody elegance, commitment, and individuality.
       createdAt: "2025-12-04",
       startDate: "2025-12-10",
       endDate: "2026-02-28",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-1"],
+      assets: [],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -149,6 +172,10 @@ Together, they embody elegance, commitment, and individuality.
       createdAt: "2025-12-03",
       startDate: "2026-02-01",
       endDate: "2026-02-14",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: true, sms: true, download: true },
+      templates: ["t-3", "t-5"],
+      assets: ["f-full-2"],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -184,10 +211,173 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-12-02",
       startDate: "2025-11-01",
       endDate: "Permanent",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: [],
+      assets: ["f-full-1", "f-full-2"],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
       },
+    },
+    // --- Other Strategies (Rolex, Cartier, etc) ---
+    // 18. Cartier (Expiring Soon)
+    {
+      id: "camp-ext-001",
+      title: "Panthère de Cartier Collection",
+      description:
+        "The timeless icon returns. Push the new collection assets to your top clients.",
+      status: "Active",
+      coverImage: CARTIER_COVER, // External
+      cover: "bg-red-50",
+      audience: "All Retailers",
+      isPinned: true,
+      updatePending: false,
+      adoptionRate: 85,
+      usageCount: 5000,
+      overviewId: "active-high",
+      contentId: "full-content",
+      insightsId: "high-perf",
+      adoptionId: "good",
+      brandId: "b-cartier",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      createdAt: "2025-11-20",
+      startDate: "2025-11-01",
+      endDate: "2025-11-27", // Expires tomorrow (1 day left)
+      createdby: { name: "Cartier Admin", avatar: "C" },
+      templates: ["t-1", "t-2"], // Mock linking
+      assets: ["f-full-1"],
+    },
+    // 18b. Burberry (Expiring Soon & Unused)
+    {
+      id: "camp-ext-005",
+      title: "Burberry Check Collection",
+      description: "Iconic patterns for the holiday season.",
+      status: "Active",
+      coverImage:
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=800",
+      cover: "bg-amber-100",
+      brandId: "b-burberry", // Using explicit ID we will create
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      createdAt: "2025-11-15",
+      startDate: "2025-11-01",
+      endDate: "2025-11-28", // Expiring
+      createdBy: { name: "Burberry Admin", avatar: "B" },
+      templates: ["t-1", "t-3"],
+      assets: [],
+      // Standard Fields
+      audience: "All Retailers",
+      isPinned: false,
+      updatePending: false,
+      adoptionRate: 70,
+      usageCount: 3000,
+      overviewId: "active-high",
+      contentId: "full-content",
+      insightsId: "high-perf",
+      adoptionId: "good",
+    },
+    // 19. Rolex (New Arrival)
+    {
+      id: "camp-ext-002",
+      title: "Rolex Deepsea Challenge",
+      description: "The ultimate diver's watch. Assets for digital and print.",
+      status: "Active",
+      coverImage: ROLEX_COVER,
+      cover: "bg-green-900",
+      audience: "Select Retailers",
+      isPinned: false,
+      updatePending: false,
+      adoptionRate: 10,
+      usageCount: 50,
+      overviewId: "active-low",
+      contentId: "files-only",
+      insightsId: "med-perf",
+      adoptionId: "poor",
+      brandId: "b-rolex",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      createdAt: "2025-11-25", // Yesterday
+      startDate: "2025-11-25", // New Arrival
+      endDate: "Permanent",
+      createdBy: { name: "Rolex Admin", avatar: "R" },
+      templates: ["t-1", "t-5"], // Added t-5
+      assets: ["f-full-2"],
+    },
+    // 20. Patek Philippe (Active)
+    {
+      id: "camp-ext-003",
+      title: "Nautilus Annual Calendar",
+      description: "Focus on the Ref. 5726/1A-014. Blue dial elegance.",
+      status: "Active",
+      coverImage: PATEK_COVER,
+      cover: "bg-slate-800",
+      audience: "All Retailers",
+      isPinned: false,
+      updatePending: true,
+      adoptionRate: 40,
+      usageCount: 300,
+      overviewId: "active-avg",
+      contentId: "social-heavy",
+      insightsId: "avg-perf",
+      adoptionId: "avg",
+      brandId: "b-patek",
+      retailerUsage: {
+        social: true,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      createdAt: "2025-11-10",
+      startDate: "2025-11-15",
+      endDate: "2026-06-01",
+      createdBy: { name: "Patek Admin", avatar: "P" },
+      templates: ["t-1", "t-x"],
+      assets: [],
+    },
+    // 21. Omega (Expired)
+    {
+      id: "camp-ext-004",
+      title: "Speedmaster '57",
+      description: "Celebrating the 65th anniversary.",
+      status: "Ended", // Should be in Past tab
+      coverImage: OMEGA_COVER,
+      cover: "bg-gray-800",
+      audience: "All Retailers",
+      isPinned: false,
+      updatePending: false,
+      adoptionRate: 60,
+      usageCount: 1500,
+      overviewId: "ended-avg",
+      contentId: "full-content",
+      insightsId: "avg-perf",
+      adoptionId: "avg",
+      brandId: "b-omega",
+      retailerUsage: { social: true, email: true, sms: true, download: true },
+      createdAt: "2025-10-01",
+      startDate: "2025-10-01",
+      endDate: "2025-11-20", // Expired
+      createdBy: { name: "Omega Admin", avatar: "O" },
+      templates: ["t-1", "t-2", "t-3"],
+      assets: ["f-full-3"],
     },
     // 5. Scheduled
     {
@@ -209,6 +399,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-12-01",
       startDate: "2026-03-01",
       endDate: "2026-04-30",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-1"], // Added template to ensure icon
+      assets: [],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -234,6 +433,10 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-30",
       startDate: "TBD",
       endDate: "Permanent",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: false, sms: false, download: true },
+      templates: ["t-1"],
+      assets: [],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -258,7 +461,11 @@ This is more than an engagement ring—it’s a statement of your journey.
       adoptionId: "good",
       createdAt: "2025-11-29",
       startDate: "2025-09-01",
-      endDate: "2025-11-30",
+      endDate: "2025-11-20",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: true, sms: true, download: true },
+      templates: ["t-2", "t-3"],
+      assets: ["f-full-3"],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -284,6 +491,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-28",
       startDate: "2026-04-01",
       endDate: "2026-05-10",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-1", "t-2"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -309,6 +525,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-27",
       startDate: "2025-01-01",
       endDate: "Permanent",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: true,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-3", "t-x"], // Added templates
+      assets: ["f-full-3"],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -334,6 +559,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-26",
       startDate: "2025-06-01",
       endDate: "2025-08-31",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-2"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -359,6 +593,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-25",
       startDate: "2025-10-01",
       endDate: "2026-03-31",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-2"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -384,10 +627,14 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-24",
       startDate: "2025-09-15",
       endDate: "2026-02-14",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: true, sms: false, download: false },
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
       },
+      templates: ["t-1", "t-2", "t-3"],
+      assets: [],
     },
     // 13. Draft
     {
@@ -409,6 +656,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-23",
       startDate: "TBD",
       endDate: "Permanent",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-ins-x"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -434,6 +690,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-22",
       startDate: "2025-08-01",
       endDate: "Permanent",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: true,
+      },
+      templates: ["t-x-google"], // Added template
+      assets: ["f-full-1"],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -459,6 +724,10 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-21",
       startDate: "2024-11-01",
       endDate: "2024-11-30",
+      brandId: "b-verragio",
+      retailerUsage: { social: true, email: true, sms: true, download: true },
+      templates: ["t-all-social"],
+      assets: ["f-full-1"],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -484,6 +753,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-20",
       startDate: "2025-05-01",
       endDate: "2026-05-01",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: true,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-all-social"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-admin").name,
         avatar: getMember("u-admin").avatarUrl,
@@ -509,6 +787,15 @@ This is more than an engagement ring—it’s a statement of your journey.
       createdAt: "2025-11-19",
       startDate: "2025-11-01",
       endDate: "2026-01-31",
+      brandId: "b-verragio",
+      retailerUsage: {
+        social: false,
+        email: false,
+        sms: false,
+        download: false,
+      },
+      templates: ["t-7"], // Added template
+      assets: [],
       createdBy: {
         name: getMember("u-guest").name,
         avatar: getMember("u-guest").avatarUrl,
@@ -535,7 +822,12 @@ This is more than an engagement ring—it’s a statement of your journey.
       platforms: ["instagram", "facebook", "x", "google"],
     },
   ],
-  downloadableFiles: [],
+  downloadableFiles: [
+    { id: "f-full-1", type: "image/jpeg", name: "Campaign_Hero.jpg" },
+    { id: "f-full-2", type: "application/pdf", name: "Lookbook.pdf" },
+    { id: "f-full-3", type: "video/mp4", name: "Social_Teaser.mp4" },
+    { id: "f-1", type: "image/png", name: "Banner.png" },
+  ],
 
   // 2. Tab Data: Overview Maps
   overviewMap: {
