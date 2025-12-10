@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { campaignData } from '../../../../../data/mockStore/campaignStore';
 import { Search, Filter, ArrowUpRight, CheckCircle2, AlertCircle, Clock, MoreHorizontal, Mail, MessageSquare, Download, Instagram, Facebook, Twitter, Smartphone, Eye, XCircle, RefreshCw, TrendingUp, ChevronRight, X, Award, ChevronDown, Check, FileText, Video, ChevronLeft, User, Bell, Share2, Printer } from 'lucide-react'; // Added Share2, Printer
-import Drawer from '../../../../components/Drawer';
+import Drawer from '../../../../../components/Drawer';
 import { useToast } from '../../../../context/ToastContext';
 import NudgeModal, { RISKS } from '../../NudgeModal';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Drawer from './Drawer'; // Assuming global Drawer is in the same folder or adjusted path
+import Drawer from '../../components/Drawer';
 import { AlertCircle, ChevronDown, ChevronUp, CheckCircle2, MoreHorizontal, Bell, Clock, ShieldAlert } from 'lucide-react';
 import { attentionData } from '../../data/mockStore/attentionStore';
 import NudgeModal, { RISKS } from '../features/partner/NudgeModal';

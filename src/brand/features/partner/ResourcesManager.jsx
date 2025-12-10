@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { resourceData } from '../../../data/mockStore/resourceStore';
 import { useToast } from '../../context/ToastContext';
+import AudienceSelector from '../../components/audience/AudienceSelector';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -14,14 +15,33 @@ const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 const CreateFolderModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState('');
-  const [audience, setAudience] = useState('All Retailers');
+  const [audience, setAudience] = useState({ type: 'all', segments: [], retailers: [] });
+  const [errors, setErrors] = useState({});
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreate({ name, audience });
-    setName(''); // Reset after create
+    
+    // Simple Validation
+    const newErrors = {};
+    if (audience.type === 'segment' && audience.segments.length === 0) newErrors.audience = 'Select at least one segment';
+    if (audience.type === 'specific' && audience.retailers.length === 0) newErrors.audience = 'Select at least one retailer';
+    
+    if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+    }
+
+    // Format for legacy/display compatibility
+    let audienceLabel = 'All Retailers';
+    if (audience.type === 'segment') audienceLabel = 'Targeted Segment';
+    if (audience.type === 'specific') audienceLabel = `${audience.retailers.length} Specific Retailers`;
+
+    onCreate({ name, audience: audienceLabel }); // Keeping simple signature for now
+    setName(''); 
+    setAudience({ type: 'all', segments: [], retailers: [] });
+    setErrors({});
   };
 
   return (
@@ -53,22 +73,14 @@ const CreateFolderModal = ({ isOpen, onClose, onCreate }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Audience</label>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition group">
-                <input type="radio" name="audience" value="All Retailers" checked={audience === 'All Retailers'} onChange={(e) => setAudience(e.target.value)} className="text-black focus:ring-black" />
-                <div>
-                  <div className="text-sm font-medium text-gray-900">All Retailers</div>
-                  <div className="text-xs text-gray-500">Publicly available to the entire network</div>
-                </div>
-              </label>
-              <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition group">
-                <input type="radio" name="audience" value="Platinum Only" checked={audience === 'Platinum Only'} onChange={(e) => setAudience(e.target.value)} className="text-black focus:ring-black" />
-                <div>
-                  <div className="text-sm font-medium text-gray-900">Platinum Only</div>
-                  <div className="text-xs text-gray-500">Restricted to top-tier partners</div>
-                </div>
-              </label>
-            </div>
+            <AudienceSelector 
+                value={audience}
+                onChange={(val) => {
+                    setAudience(val);
+                    if (errors.audience) setErrors({...errors, audience: null});
+                }}
+            />
+            {errors.audience && <p className="text-xs text-red-500 mt-1">{errors.audience}</p>}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

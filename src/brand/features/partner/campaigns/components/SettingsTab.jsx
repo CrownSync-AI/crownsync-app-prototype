@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users, Calendar, Shield, Lock, Unlock, Upload, Image as ImageIcon, X, Check, AlertCircle } from 'lucide-react';
+import AudienceSelector from '../../../../components/audience/AudienceSelector';
 
 import cover1 from '@/assets/mock/verragio/brand/cover/cover1.png';
 import cover2 from '@/assets/mock/verragio/brand/cover/cover2.png';
@@ -19,7 +20,18 @@ const SettingsTab = ({ campaign, onUpdate }) => {
 
   // Sync local state when prop changes
   useEffect(() => {
-    setLocalCampaign(campaign);
+    // Enrich with audienceData if missing
+    let enriched = { ...campaign };
+    if (!enriched.audienceData) {
+        if (enriched.audience === 'All Retailers') {
+            enriched.audienceData = { type: 'all', segments: [], retailers: [] };
+        } else if (enriched.audience.includes('Group') || enriched.audience.includes('Segment')) {
+            enriched.audienceData = { type: 'segment', segments: [], retailers: [] };
+        } else {
+            enriched.audienceData = { type: 'specific', segments: [], retailers: [] };
+        }
+    }
+    setLocalCampaign(enriched);
   }, [campaign]);
 
   // Derived state for dirty check (fixes ESLint sync-state-in-effect error)
@@ -165,63 +177,21 @@ const SettingsTab = ({ campaign, onUpdate }) => {
         <h3 className="text-lg font-bold text-gray-900 mb-1">Audience</h3>
         <p className="text-sm text-gray-500 mb-6">Define which retailers can access this campaign.</p>
         
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-           <div 
-             className={`p-4 border-b border-gray-100 transition cursor-pointer flex items-start gap-4 ${localCampaign.audience === 'All Retailers' ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
-             onClick={() => setLocalCampaign({...localCampaign, audience: 'All Retailers'})}
-           >
-              <input 
-                type="radio" 
-                name="audience" 
-                className="mt-1 w-4 h-4 text-black border-gray-300 focus:ring-black"
-                checked={localCampaign.audience === 'All Retailers'}
-                readOnly
-              />
-              <div>
-                 <div className="font-medium text-gray-900">All Retailers</div>
-                 <div className="text-sm text-gray-500">Distribute to your entire network.</div>
-              </div>
-           </div>
-           
-           <div 
-             className={`p-4 border-b border-gray-100 transition cursor-pointer flex items-start gap-4 ${localCampaign.audience === '3 Groups' ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
-             onClick={() => setLocalCampaign({...localCampaign, audience: '3 Groups'})}
-           >
-              <input 
-                type="radio" 
-                name="audience" 
-                className="mt-1 w-4 h-4 text-black border-gray-300 focus:ring-black"
-                checked={localCampaign.audience === '3 Groups'}
-                readOnly
-              />
-              <div className="flex-1">
-                 <div className="font-medium text-gray-900">By Segment</div>
-                 <div className="text-sm text-gray-500 mb-2">Target specific zones, tiers, or groups.</div>
-                 {localCampaign.audience === '3 Groups' && (
-                    <div className="flex gap-2">
-                       <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-600">Northeast</span>
-                       <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-600">Gold Tier</span>
-                    </div>
-                 )}
-              </div>
-           </div>
-
-           <div 
-             className={`p-4 transition cursor-pointer flex items-start gap-4 ${localCampaign.audience === 'Specific Retailers' ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
-             onClick={() => setLocalCampaign({...localCampaign, audience: 'Specific Retailers'})}
-           >
-              <input 
-                type="radio" 
-                name="audience" 
-                className="mt-1 w-4 h-4 text-black border-gray-300 focus:ring-black"
-                checked={localCampaign.audience === 'Specific Retailers'}
-                readOnly
-              />
-              <div>
-                 <div className="font-medium text-gray-900">Specific Retailers</div>
-                 <div className="text-sm text-gray-500">Manually select retailers.</div>
-              </div>
-           </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+           <AudienceSelector 
+              value={localCampaign.audienceData || { type: 'all', segments: [], retailers: [] }}
+              onChange={(val) => {
+                  let str = 'All Retailers';
+                  if (val.type === 'segment') str = 'Targeted Segment';
+                  if (val.type === 'specific') str = 'Specific Retailers';
+                  
+                  setLocalCampaign({
+                      ...localCampaign, 
+                      audience: str,
+                      audienceData: val
+                  });
+              }}
+           />
         </div>
       </section>
 

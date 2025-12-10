@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, UploadCloud, Calendar, Users, Image as ImageIcon, CheckCircle2 } from 'lucide-react';
+import { X, Image as ImageIcon } from 'lucide-react';
+import AudienceSelector from '../../../../components/audience/AudienceSelector';
 
-const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) => {
+const CreateCampaignModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -9,8 +10,12 @@ const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) 
     validityType: 'permanent', // 'permanent' | 'custom'
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
-    audienceType: 'all', // 'all' | 'segment' | 'specific'
-    selectedRetailers: [] // Mock for specific selection
+    // Universal Audience Structure
+    audience: {
+      type: 'all', // 'all' | 'segment' | 'specific'
+      segments: [],
+      retailers: [] 
+    }
   });
 
   const [errors, setErrors] = useState({});
@@ -23,6 +28,14 @@ const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) 
     if (!formData.coverImage) newErrors.coverImage = 'Cover image is required';
     if (formData.validityType === 'custom' && !formData.endDate) newErrors.endDate = 'End date is required';
     
+    // Audience Validation
+    if (formData.audience.type === 'segment' && formData.audience.segments.length === 0) {
+       newErrors.audience = 'Please select at least one segment';
+    }
+    if (formData.audience.type === 'specific' && formData.audience.retailers.length === 0) {
+       newErrors.audience = 'Please select at least one retailer';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -30,28 +43,30 @@ const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
+      // Map audience to readable format for the existing store, or just keep the object
+      // For prototype display, we often use a string. Let's create a display string.
+      let audienceLabel = 'All Retailers';
+      if (formData.audience.type === 'segment') audienceLabel = 'By Segment';
+      if (formData.audience.type === 'specific') audienceLabel = `${formData.audience.retailers.length} Retailers`;
+
       onSave({
         ...formData,
-        // Mock processing
         coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1000&auto=format&fit=crop',
-        audience: formData.audienceType === 'all' ? 'All Retailers' : formData.audienceType === 'segment' ? 'By Segment' : `${formData.selectedRetailers.length} Retailers`
+        audience: audienceLabel, // Legacy support
+        audienceData: formData.audience // New structured data
       });
       onClose();
     }
   };
 
+  // ... (Image Upload Logic same as before) ...
   const handleImageUpload = (e) => {
-    // Mock upload - in real app, would handle file reading
-    // For prototype, we'll just set a valid URL if they "upload" something, or toggle a state
-    // Here we simulate a successful upload of a file
     const file = e.target.files[0];
     if (file) {
-       // Check size < 1MB mock
        if (file.size > 1024 * 1024) {
           alert('File size must be less than 1MB');
           return;
        }
-       // Set a mock URL for preview
        setFormData({...formData, coverImage: URL.createObjectURL(file)});
     }
   };
@@ -197,31 +212,15 @@ const CreateCampaignModal = ({ isOpen, onClose, onSave, retailersCount = 180 }) 
 
               {/* 4. Audience */}
               <div>
-                 <label className="block text-sm font-bold text-gray-900 mb-2">Audience</label>
-                 <div className="space-y-2">
-                    {[
-                       { id: 'all', label: `All Retailers (${retailersCount})`, desc: 'Distribute to your entire network.' },
-                       { id: 'segment', label: 'By Segment', desc: 'Target specific zones, tiers, or groups.' },
-                       { id: 'specific', label: 'Specific Retailers', desc: 'Manually select retailers.' }
-                    ].map(opt => (
-                       <label key={opt.id} className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${formData.audienceType === opt.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                          <input 
-                            type="radio" 
-                            name="audience" 
-                            className="hidden"
-                            checked={formData.audienceType === opt.id}
-                            onChange={() => setFormData({...formData, audienceType: opt.id})}
-                          />
-                          <div className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center flex-shrink-0 ${formData.audienceType === opt.id ? 'border-black' : 'border-gray-300'}`}>
-                             {formData.audienceType === opt.id && <div className="w-2 h-2 bg-black rounded-full"></div>}
-                          </div>
-                          <div>
-                             <div className="text-sm font-medium text-gray-900">{opt.label}</div>
-                             <div className="text-xs text-gray-500">{opt.desc}</div>
-                          </div>
-                       </label>
-                    ))}
-                 </div>
+                 <label className="block text-sm font-bold text-gray-900 mb-2">Audience <span className="text-red-500">*</span></label>
+                 <AudienceSelector 
+                    value={formData.audience}
+                    onChange={(newAudience) => {
+                       setFormData({...formData, audience: newAudience});
+                       if (errors.audience) setErrors({...errors, audience: null});
+                    }}
+                 />
+                 {errors.audience && <p className="text-xs text-red-500 mt-1">{errors.audience}</p>}
               </div>
 
            </form>
