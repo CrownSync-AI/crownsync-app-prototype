@@ -4,21 +4,11 @@ import AllCampaigns from './AllCampaigns';
 import Overview from './Overview';
 import PartnerBrands from './PartnerBrands';
 
+import { brands } from '../../../data/mockStore/brandStore';
+
 // --- Mock Data for Retailer View ---
-const MOCK_BRANDS = [
-  { id: 'b-verragio', name: 'Verragio', logo: 'bg-black text-white', campaigns: 12, catalogs: 4, heroImage: 'bg-gradient-to-r from-gray-900 to-black', engagement: 95, unreadCampaigns: 3, expiringCampaigns: 0, newResources: 2 },
-  { id: 'b-gucci', name: 'Gucci', logo: 'bg-green-700 text-white', campaigns: 8, catalogs: 2, heroImage: 'bg-gradient-to-r from-green-800 to-red-800', engagement: 88, unreadCampaigns: 1, expiringCampaigns: 1, newResources: 5 },
-  { id: 'b-louisvuitton', name: 'Louis Vuitton', logo: 'bg-amber-800 text-white', campaigns: 15, catalogs: 6, heroImage: 'bg-gradient-to-r from-amber-900 to-yellow-700', engagement: 92, unreadCampaigns: 4, expiringCampaigns: 0, newResources: 1 },
-  { id: 'b-dior', name: 'Dior', logo: 'bg-gray-200 text-black', campaigns: 10, catalogs: 3, heroImage: 'bg-gradient-to-r from-gray-100 to-gray-300', engagement: 85, unreadCampaigns: 2, expiringCampaigns: 1, newResources: 0 },
-  { id: 'b-hermes', name: 'Hermès', logo: 'bg-orange-600 text-white', campaigns: 6, catalogs: 2, heroImage: 'bg-gradient-to-r from-orange-500 to-orange-700', engagement: 78, unreadCampaigns: 0, expiringCampaigns: 0, newResources: 3 },
-  { id: 'b-prada', name: 'Prada', logo: 'bg-black text-white', campaigns: 9, catalogs: 3, heroImage: 'bg-gradient-to-r from-slate-900 to-slate-800', engagement: 82, unreadCampaigns: 1, expiringCampaigns: 0, newResources: 0 },
-  { id: 'b-tiffany', name: 'Tiffany & Co.', logo: 'bg-teal-300 text-black', campaigns: 7, catalogs: 2, heroImage: 'bg-gradient-to-r from-teal-200 to-teal-400', engagement: 90, unreadCampaigns: 2, expiringCampaigns: 0, newResources: 1 },
-  { id: 'b-cartier', name: 'Cartier', logo: 'bg-red-700 text-white', campaigns: 5, catalogs: 1, heroImage: 'bg-gradient-to-r from-red-800 to-red-600', engagement: 75, unreadCampaigns: 0, expiringCampaigns: 0, newResources: 0 },
-  { id: 'b-rolex', name: 'Rolex', logo: 'bg-emerald-800 text-white', campaigns: 4, catalogs: 1, heroImage: 'bg-gradient-to-r from-emerald-900 to-green-800', engagement: 70, unreadCampaigns: 0, expiringCampaigns: 0, newResources: 0 },
-  { id: 'b-patek', name: 'Patek Philippe', logo: 'bg-slate-800 text-white', campaigns: 11, catalogs: 4, heroImage: 'bg-gradient-to-r from-slate-900 to-slate-700', engagement: 80, unreadCampaigns: 1, expiringCampaigns: 1, newResources: 2 },
-  { id: 'b-omega', name: 'Omega', logo: 'bg-red-600 text-white', campaigns: 6, catalogs: 2, heroImage: 'bg-gradient-to-r from-gray-900 to-gray-800', engagement: 78, unreadCampaigns: 0, expiringCampaigns: 0, newResources: 1 },
-  { id: 'b-burberry', name: 'Burberry', logo: 'bg-amber-100 text-black', campaigns: 3, catalogs: 1, heroImage: 'bg-gradient-to-r from-amber-200 to-yellow-100', engagement: 65, unreadCampaigns: 1, expiringCampaigns: 1, newResources: 0 },
-];
+// MOCK_BRANDS removed, using imported brands
+
 
 const AllCatalogs = ({ catalogs, brands }) => {
   const [filterBrand, setFilterBrand] = useState('all');
@@ -110,43 +100,43 @@ const BrandCenter = ({ campaigns, catalogs, templates, files }) => {
 
        <div className="flex-1 overflow-hidden">
           {view === 'overview' && (
-            <div className="h-full overflow-auto">
-              <Overview 
-                campaigns={campaigns} 
-                brands={MOCK_BRANDS} 
-                templates={templates} 
-                files={files} 
-                onNavigate={handleNavigate} 
-              />
-            </div>
-          )}
-          {view === 'brands' && (
-            <div className="h-full overflow-auto">
-              <PartnerBrands 
-                brands={MOCK_BRANDS} 
-                onSelectBrand={handleSelectBrand} 
-              />
-            </div>
-          )}
-          {view === 'brand-detail' && selectedBrand && (
              <div className="h-full overflow-auto">
-                <RetailerBrandDetail 
-                   brand={selectedBrand}
-                   onBack={() => setView('brands')}
-                />
+               <Overview 
+                 campaigns={campaigns} 
+                 brands={brands} 
+                 templates={templates} 
+                 files={files} 
+                 onNavigate={handleNavigate} 
+               />
              </div>
-          )}
-          {view === 'campaigns' && (
-             <AllCampaigns 
-               key={selectedBrandId} // Force re-render when brand changes
-               campaigns={campaigns} 
-               brands={MOCK_BRANDS} 
-               templates={templates}
-               files={files}
-               initialBrandId={selectedBrandId}
-             />
-          )}
-          {view === 'catalogs' && <div className="p-6 overflow-auto h-full"><AllCatalogs catalogs={catalogs} brands={MOCK_BRANDS} /></div>}
+           )}
+           {view === 'brands' && (
+             <div className="h-full overflow-auto">
+               <PartnerBrands 
+                 brands={brands} 
+                 onSelectBrand={handleSelectBrand} 
+               />
+             </div>
+           )}
+           {view === 'brand-detail' && selectedBrand && (
+              <div className="h-full overflow-auto">
+                 <RetailerBrandDetail 
+                    brand={selectedBrand}
+                    onBack={() => setView('brands')}
+                 />
+              </div>
+           )}
+           {view === 'campaigns' && (
+              <AllCampaigns 
+                key={selectedBrandId} // Force re-render when brand changes
+                campaigns={campaigns} 
+                brands={brands} 
+                templates={templates}
+                files={files}
+                initialBrandId={selectedBrandId}
+              />
+           )}
+           {view === 'catalogs' && <div className="p-6 overflow-auto h-full"><AllCatalogs catalogs={catalogs} brands={brands} /></div>}
        </div>
     </div>
   );

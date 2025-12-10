@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Filter, ChevronRight, LayoutGrid, List, Search, Instagram, Facebook, Mail, Download, MessageSquare, Smartphone, Check, ArrowRight, Flame, ChevronDown, X, Pin, Lock } from 'lucide-react';
+import Tooltip from '../../../components/Tooltip';
 import CampaignCard from './components/CampaignCard';
 
 const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'all' }) => {
@@ -464,8 +465,8 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                 /* List View - Light Data Grid */
                 <div className="bg-white rounded-lg overflow-hidden border border-gray-200 overflow-x-auto">
                    {/* Header Row */}
-                    <div className="min-w-[1000px] grid grid-cols-[28%_100px_140px_1fr_120px_120px] w-full gap-4 px-6 py-3 border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                       <div className="whitespace-nowrap">Campaign Info</div>
+                     <div className="min-w-[1000px] grid grid-cols-[1fr_120px_160px_300px_140px_120px] w-full gap-4 px-6 py-3 border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                       <div className="whitespace-nowrap min-w-72">Campaign Info</div>
                        <div className="whitespace-nowrap hidden md:block">Status</div>
                        <div className="whitespace-nowrap hidden lg:block">Brand</div>
                        <div className="whitespace-nowrap hidden sm:block">Assets & Usage</div>
@@ -491,7 +492,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                           const getExpiration = () => {
                              // Override if status is explicitly Ended/Archived
       if (campaign.status === 'Ended' || campaign.status === 'Archived') {
-         return { isExpired: true, isExpiring: false, label: `Expired ${campaign.endDate}`, color: 'text-gray-400', icon: <Lock size={14} /> };
+         return { isExpired: true, isExpiring: false, label: `${campaign.endDate}`, color: 'text-gray-400', icon: <Lock size={14} /> };
       }
 
       if (campaign.endDate === 'Permanent') return { isExpired: false, isExpiring: false, label: 'No Expiration', color: 'text-green-600', icon: <span className="text-lg leading-none">∞</span> };
@@ -518,47 +519,41 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                            const isUpdated = !isNew && lastUpdated && (now - lastUpdated) / (1000 * 60 * 60) <= 48;
 
                           return (
-                             <div key={campaign.id} className="min-w-[1000px] grid grid-cols-[28%_100px_140px_1fr_120px_120px] w-full gap-4 px-6 py-4 items-center hover:bg-gray-50 transition group cursor-pointer">
-                                {/* Campaign Name */}
-                                <div className="flex items-center gap-4 min-w-0">
+                             <div key={campaign.id} className="min-w-[1000px] grid grid-cols-[1fr_120px_160px_300px_140px_120px] w-full gap-4 px-6 py-4 items-start hover:bg-gray-50 transition group cursor-pointer">
+                                {/* Campaign Info */}
+                                <div className="flex items-start gap-4 min-w-72 pr-4">
                                    <div 
-                                      className={`w-24 h-[54px] rounded-lg flex-shrink-0 bg-cover bg-center ${campaign.coverImage && typeof campaign.coverImage === 'string' && campaign.coverImage.startsWith('http') ? '' : campaign.cover}`}
+                                      className={`w-16 h-9 rounded flex-shrink-0 bg-cover bg-center shadow-sm mt-1 bg-gray-100 ${campaign.coverImage && typeof campaign.coverImage === 'string' && campaign.coverImage.startsWith('http') ? '' : campaign.cover}`}
                                       style={campaign.coverImage ? { backgroundImage: `url(${campaign.coverImage})` } : {}}
                                    ></div>
-                                   <div className="min-w-0">
-                                      <div className="flex items-center gap-2">
-                                          {isNew && (
-                                              <div className="relative overflow-hidden bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm uppercase tracking-wider border border-yellow-300 flex-shrink-0">
-                                                  <span className="relative z-10">New</span>
-                                                  <div className="absolute inset-0 bg-white/40 skew-x-12 animate-[shimmer_2s_infinite] -translate-x-full"></div>
-                                              </div>
-                                          )}
-                                           {isUpdated && (
-                                               <div className="relative group/updated cursor-help flex-shrink-0">
-                                                   <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm uppercase tracking-wider border border-blue-400">
+                                    <div className="min-w-0 flex-1">
+                                       <Tooltip content={campaign.title}>
+                                            <h3 className="font-bold text-gray-900 leading-tight line-clamp-2 text-ellipsis group-hover:text-[#C5A065] transition">
+                                                {isNew && (
+                                                   <span className="inline-flex items-center justify-center align-middle mr-1.5 relative overflow-hidden bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm uppercase tracking-wider border border-yellow-300">
+                                                       <span className="relative z-10">New</span>
+                                                       <div className="absolute inset-0 bg-white/40 skew-x-12 animate-[shimmer_2s_infinite] -translate-x-full"></div>
+                                                   </span>
+                                                )}
+                                                {isUpdated && (
+                                                   <span className="inline-flex items-center justify-center align-middle mr-1.5 relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm uppercase tracking-wider border border-blue-400">
                                                        <span className="relative z-10">Updated</span>
                                                        <div className="absolute inset-0 bg-white/20 skew-x-12 animate-[shimmer_2s_infinite] -translate-x-full"></div>
-                                                   </div>
-                                                   {/* Tooltip */}
-                                                   <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover/updated:opacity-100 transition pointer-events-none whitespace-nowrap z-50 shadow-lg font-sans font-normal min-w-[200px]">
-                                                       <div className="font-bold mb-0.5">Updated</div>
-                                                       <div className="text-gray-300 text-[10px] whitespace-normal leading-tight">This campaign has been updated within the last 48 hours.</div>
-                                                   </div>
-                                               </div>
-                                           )}
-                                           <h3 className="font-bold text-gray-900 group-hover:text-[#C5A065] transition truncate flex items-center gap-1.5">
-                                               {campaign.title}
-                                               {campaign.isPinned && (
-                                                   <Pin size={12} className="fill-black flex-shrink-0" />
-                                               )}
-                                           </h3>
-                                      </div>
+                                                   </span>
+                                                )}
+                                                <span className="align-middle">{campaign.title}</span>
+                                            </h3>
+                                       </Tooltip>
                                       <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">{campaign.description}</p>
                                    </div>
+                                    {campaign.isPinned && (
+                                       <Pin size={14} className="fill-black flex-shrink-0 mt-1" />
+                                    )}
                                 </div>
 
+
                                 {/* Status Column */}
-                                <div>
+                                <div className="self-center">
                                 {/* Status Column */}
                                 <div className="hidden md:block">
                                    {expiration.isExpired ? (
@@ -578,9 +573,13 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Brand (Logo + Name with Tooltip) */}
-                                <div className="hidden lg:flex items-center gap-2 group/brand relative cursor-help min-w-0">
-                                   <div className={`w-6 h-6 rounded-full ${brand?.logo} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0`}>
-                                      {brand?.name?.substring(0,1)}
+                                <div className="hidden lg:flex items-center gap-2 group/brand relative cursor-help min-w-0 self-center">
+                                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 overflow-hidden ${brand?.logo?.startsWith('bg-') ? `${brand.logo} text-white` : 'bg-white'}`}>
+                                      {brand?.logo?.startsWith('bg-') ? (
+                                         brand?.name?.substring(0,1)
+                                      ) : (
+                                         <img src={brand?.logo} alt={brand?.name} className="w-full h-full object-cover" />
+                                      )}
                                    </div>
                                    <span className="text-xs font-medium text-gray-900 truncate">{brand?.name}</span>
                                    {/* Tooltip */}
@@ -590,7 +589,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Assets & Usage (Merged) */}
-                                <div className="hidden sm:flex items-center gap-1.5 flex-wrap">
+                                <div className="hidden sm:flex items-center gap-1.5 flex-wrap self-center">
                                    {/* Social Platforms */}
                                    {platforms.map(p => {
                                        const isUsed = usage.social;
@@ -670,7 +669,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Ends On (Left Aligned) */}
-                                <div className="hidden xl:flex text-left items-center justify-start gap-2 min-w-0">
+                                <div className="hidden xl:flex text-left items-center justify-start gap-2 min-w-0 self-center">
                                    <div className={`text-sm font-normal whitespace-nowrap ${expiration.color} flex items-center gap-1`}>
                                       {expiration.icon}
                                       {expiration.label}
@@ -678,7 +677,7 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
                                 </div>
 
                                 {/* Last Updated */}
-                                <div className="hidden 2xl:block text-sm text-gray-500 font-normal whitespace-nowrap">
+                                <div className="hidden 2xl:block text-sm text-gray-500 font-normal whitespace-nowrap self-center">
                                     {campaign.lastUpdated ? new Date(campaign.lastUpdated).toLocaleDateString('en-CA') : '--'}
                                 </div>
                             </div>

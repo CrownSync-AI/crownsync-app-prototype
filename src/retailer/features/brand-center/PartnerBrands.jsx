@@ -4,7 +4,9 @@ import { ArrowRight, Bell, AlertTriangle, FileText, TrendingUp, Search, Star, Ch
 const PartnerBrands = ({ brands, onSelectBrand }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('latest'); // 'latest', 'engagement_high', 'engagement_low', 'starred', 'az'
-  const [starredBrands, setStarredBrands] = useState([]);
+  const [starredBrands, setStarredBrands] = useState(
+    brands.filter(b => b.isStarred).map(b => b.id)
+  );
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
   const toggleStar = (e, brandId) => {
@@ -111,12 +113,19 @@ const PartnerBrands = ({ brands, onSelectBrand }) => {
                  </button>
    
                  {/* Hero Section */}
-                 <div className={`h-32 ${brand.heroImage || 'bg-gray-100'} relative p-6 flex items-end`}>
+                 <div 
+                    className={`h-32 relative p-6 flex items-end ${brand.heroImage?.startsWith('bg-') ? brand.heroImage : 'bg-cover bg-center bg-no-repeat'}`}
+                    style={!brand.heroImage?.startsWith('bg-') ? { backgroundImage: `url(${brand.heroImage})` } : {}}
+                 >
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition"></div>
                     
                     {/* Logo */}
-                    <div className={`w-16 h-16 rounded-full ${brand.logo} border-4 border-white shadow-md flex items-center justify-center text-xl font-bold absolute bottom-[-20px] left-6 z-10`}>
-                       {brand.name.substring(0,1)}
+                    <div className={`w-16 h-16 rounded-full border-4 border-white shadow-md flex items-center justify-center text-xl font-bold absolute bottom-[-20px] left-6 z-10 overflow-hidden ${brand.logo?.startsWith('bg-') ? brand.logo : 'bg-white'}`}>
+                       {brand.logo?.startsWith('bg-') ? (
+                          brand.name.substring(0,1)
+                       ) : (
+                          <img src={brand.logo} alt={brand.name} className="w-full h-full object-cover" />
+                       )}
                     </div>
                  </div>
    

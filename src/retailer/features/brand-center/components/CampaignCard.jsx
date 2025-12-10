@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Pin, Instagram, Facebook, Mail, FileText, Download, Smartphone, Linkedin, Twitter, Globe, MessageSquare, Share2, Check, Flame, ArrowRight, Lock } from 'lucide-react';
+import Tooltip from '../../../../components/Tooltip';
 
 const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpiringStatus = false }) => {
   // Calculate asset counts
@@ -116,8 +117,12 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
       <div className="flex-1 p-4 flex flex-col bg-white relative z-20 rounded-b-xl">
          {/* Row 1: Brand Logo + Name */}
          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-5 h-5 rounded-full ${brand?.logo || 'bg-gray-200'} flex items-center justify-center text-white text-[8px] font-bold`}>
-               {brand?.name?.substring(0, 1)}
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold overflow-hidden ${brand?.logo?.startsWith('bg-') ? `${brand.logo} text-white` : 'bg-white'}`}>
+               {brand?.logo?.startsWith('bg-') ? (
+                  brand?.name?.substring(0, 1)
+               ) : (
+                  <img src={brand?.logo} alt={brand?.name} className="w-full h-full object-cover" />
+               )}
             </div>
             <span className="text-xs font-medium text-gray-500">{brand?.name}</span>
          </div>
@@ -125,9 +130,11 @@ const CampaignCard = ({ campaign, brand, templates = [], files = [], hideExpirin
          {/* Row 2: Title + Pin */}
          <div className="flex items-start justify-between gap-2 mb-1">
             <div className="mb-3 min-h-[40px] flex-1">
-             <h3 className={`font-bold text-lg leading-tight mb-1 line-clamp-2 inline ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-[#C5A065] transition-colors'}`}>
-                {campaign.title}
-             </h3>
+              <Tooltip content={campaign.title}>
+                 <h3 className={`font-bold text-lg leading-tight mb-1 line-clamp-2 ${isExpired ? 'text-gray-400' : 'text-gray-900 group-hover:text-[#C5A065] transition-colors'}`}>
+                    {campaign.title}
+                 </h3>
+              </Tooltip>
             </div>
             {campaign.isPinned && (
                <Pin size={14} className="fill-black flex-shrink-0 mt-1.5"/>

@@ -1,4 +1,4 @@
-import verragioLogo from "../../assets/mock/verragio/logo.jpg";
+import logo_verragio from "../../assets/mock/verragio/logo.jpg";
 
 const DOMAIN = "verragio.com";
 
@@ -10,7 +10,7 @@ export const memberStore = {
       email: `admin@${DOMAIN}`,
       role: "Brand Admin",
       avatarType: "image",
-      avatarUrl: verragioLogo,
+      avatarUrl: logo_verragio,
       canEdit: true,
     },
     {

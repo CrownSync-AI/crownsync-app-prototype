@@ -18,13 +18,13 @@ import coverImage_17 from "@/assets/mock/verragio/brand/campaigns/17/cover.png";
 
 // External Covers for Other Brands
 const ROLEX_COVER =
-  "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=800";
+  "https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?auto=format&fit=crop&q=80&w=800";
 const CARTIER_COVER =
   "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&q=80&w=800";
 const PATEK_COVER =
   "https://images.unsplash.com/photo-1596568359553-a56de6970068?auto=format&fit=crop&q=80&w=800";
 const OMEGA_COVER =
-  "https://images.unsplash.com/photo-1622434641406-a158105c9fc7?auto=format&fit=crop&q=80&w=800"; // Fixed URL
+  "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=800"; // Fixed URL
 
 import mediaImage_1 from "@/assets/mock/verragio/brand/campaigns/1/product.jpg";
 import mediaImage_2 from "@/assets/mock/verragio/brand/campaigns/2/product.jpg";
@@ -109,7 +109,7 @@ Together, they embody elegance, commitment, and individuality.
       endDate: "2026-1-15",
       brandId: "b-verragio",
       retailerUsage: { social: true, email: false, sms: false, download: true },
-      templates: ["t-1", "t-2"],
+      templates: ["t-all-social", "t-2", "t-3"],
       assets: ["f-full-1"],
       createdBy: {
         name: getMember("u-guest").name,
@@ -134,8 +134,8 @@ Together, they embody elegance, commitment, and individuality.
       contentId: "social-heavy",
       insightsId: "avg-perf", // Mocked below
       adoptionId: "avg",
-      createdAt: "2025-12-04",
-      startDate: "2025-12-10",
+      createdAt: "2025-11-25",
+      startDate: "2025-11-25",
       endDate: "2026-02-28",
       brandId: "b-verragio",
       retailerUsage: {
@@ -358,7 +358,7 @@ This is more than an engagement ring—it’s a statement of your journey.
       id: "camp-ext-004",
       title: "Speedmaster '57",
       description: "Celebrating the 65th anniversary.",
-      status: "Ended", // Should be in Past tab
+      status: "Active", // Should be in Past tab
       coverImage: OMEGA_COVER,
       cover: "bg-gray-800",
       audience: "All Retailers",
@@ -374,7 +374,7 @@ This is more than an engagement ring—it’s a statement of your journey.
       retailerUsage: { social: true, email: true, sms: true, download: true },
       createdAt: "2025-10-01",
       startDate: "2025-10-01",
-      endDate: "2025-11-20", // Expired
+      endDate: "2026-2-20",
       createdBy: { name: "Omega Admin", avatar: "O" },
       templates: ["t-1", "t-2", "t-3"],
       assets: ["f-full-3"],
@@ -488,8 +488,8 @@ This is more than an engagement ring—it’s a statement of your journey.
       contentId: "social-heavy",
       insightsId: "empty",
       adoptionId: "empty",
-      createdAt: "2025-11-28",
-      startDate: "2026-04-01",
+      createdAt: "2025-11-25",
+      startDate: "2025-11-25",
       endDate: "2026-05-10",
       brandId: "b-verragio",
       retailerUsage: {

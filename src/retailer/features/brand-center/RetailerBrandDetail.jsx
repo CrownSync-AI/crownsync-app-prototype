@@ -14,9 +14,13 @@ const RetailerBrandDetail = ({ brand, onBack }) => {
          Back to Brands
        </button>
 
-       <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm text-center py-20">
-          <div className={`w-24 h-24 rounded-full ${brand.logo} mx-auto flex items-center justify-center text-3xl font-bold text-white mb-6 shadow-lg`}>
-             {brand.name.substring(0,1)}
+       <div className="bg-white rounded-xl border-gray-200 p-8 shadow-sm text-center py-20">
+          <div className={`w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white mb-6 shadow-lg overflow-hidden ${brand.logo?.startsWith('bg-') ? brand.logo : 'bg-white'}`}>
+              {brand.logo?.startsWith('bg-') ? (
+                 brand.name.substring(0,1)
+              ) : (
+                 <img src={brand.logo} alt={brand.name} className="w-full h-full object-cover" />
+              )}
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{brand.name}</h1>
           <p className="text-gray-500 max-w-md mx-auto">

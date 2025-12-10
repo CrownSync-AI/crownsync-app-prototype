@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Search, Grid, List as ListIcon, ChevronDown, Check, MoreHorizontal, Edit, Copy, Trash2, BarChart3, Clock, Download, Eye, Users, FileText, Image as ImageIcon, Video, Mail, Smartphone, Instagram, Pin, Flame, Archive, XCircle, Pencil, ArrowRight, MessageSquare, Facebook, Twitter, MapPin, Calendar, Infinity as InfinityIcon, Upload } from 'lucide-react';
 import PerformanceOverview from './PerformanceOverview';
 import EmptyState from '../../components/EmptyState';
-import Tooltip from '../../components/Tooltip';
+import Tooltip from '../../../components/Tooltip';
 import { campaignData } from '../../../data/mockStore/campaignStore';
 
 const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, onDuplicate, onPin, onArchive, onEnd, onPublish }) => {
@@ -396,10 +396,12 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
 
                       {/* Info Area */}
                       <div className="p-5 flex-1 flex flex-col">
-                          <div className="flex items-start justify-between gap-2 mb-1">
-                              <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-brand-gold transition">{campaign.title}</h3>
-                              {campaign.isPinned && <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>}
-                          </div>
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                  <Tooltip content={campaign.title}>
+                                    <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-brand-gold transition">{campaign.title}</h3>
+                                  </Tooltip>
+                                  {campaign.isPinned && <Pin size={14} className="fill-black flex-shrink-0 mt-1"/>}
+                              </div>
                           
                           <div className="mb-4">
                               {campaign.endDate === 'Permanent' ? (
@@ -444,7 +446,7 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
               <table className="w-full text-left table-fixed">
                   <thead className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
                       <tr>
-                          <th className="px-6 py-4 w-[25%]">Campaign Name</th>
+                          <th className="px-6 py-4 w-[25%]">Campaign Info</th>
                           <th className="px-6 py-4 w-[12%]">Status</th>
                           <th className="px-6 py-4 w-[15%]">Duration</th>
                           <th className="px-6 py-4 w-[12%]">Audience</th>
@@ -480,9 +482,13 @@ const BrandCampaignList = ({ campaigns, onCreate, onSelect, onEdit, onDelete, on
                                           <div className={`w-full h-full ${campaign.cover} absolute inset-0 ${campaign.coverImage ? 'hidden' : ''}`}></div>
                                       </div>
                                       <div>
-                                          <div className="font-bold text-gray-900 group-hover:text-brand-gold transition flex items-center gap-2">
-                                              {campaign.title}
-                                              {campaign.isPinned && <Pin size={12} className="fill-black"/>}
+                                          <div className="flex items-start gap-2">
+                                              <Tooltip content={campaign.title}>
+                                                <div className="font-bold text-gray-900 group-hover:text-brand-gold transition line-clamp-2 text-ellipsis">
+                                                    {campaign.title}
+                                                </div>
+                                              </Tooltip>
+                                              {campaign.isPinned && <Pin size={12} className="fill-black flex-shrink-0 mt-1"/>}
                                           </div>
                                           <div className="text-xs text-gray-500 line-clamp-2 mt-0.5 max-w-[200px]">{campaign.description || 'No description provided for this campaign.'}</div>
                                       </div>
