@@ -154,7 +154,7 @@ const BrandCenter = ({ view = 'overview', campaigns, catalogs, templates, files 
                    <div className="flex-shrink-0">
                        <PageHeader 
                             title="Download History" 
-                            subtitle="A complete log of your asset acquisitions and file versions."
+                            subtitle="Log of all assets downloaded from campaigns and resources."
                        />
                    </div>
                    <div className="flex-1 overflow-hidden">
