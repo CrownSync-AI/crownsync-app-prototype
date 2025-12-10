@@ -68,8 +68,15 @@ const AllCampaigns = ({ campaigns, brands, templates, files, initialBrandId = 'a
   
   // --- Filtering Logic for Main Grid ---
   const filteredCampaigns = campaigns.filter(c => {
-      // 1. Status Filter (Active vs Past)
+      // 0. StartDate Filter (Hide Scheduled Campaigns)
+      // Only show campaigns that have started (startDate <= now)
       const now = new Date('2025-11-26'); // Simulated Now
+      if (c.startDate) {
+          const start = new Date(c.startDate);
+          if (start > now) return false; // Hide scheduled campaigns
+      }
+
+      // 1. Status Filter (Active vs Past)
       let isExpired = false;
       
       if (c.endDate !== 'Permanent') {

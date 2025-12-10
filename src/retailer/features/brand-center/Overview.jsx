@@ -1,12 +1,20 @@
 import React from 'react';
-import { Clock, Sparkles, Bell, Activity, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Sparkles, Bell, Activity, ChevronRight, AlertTriangle } from 'lucide-react'; // Remove Clock
 import CampaignCard from './components/CampaignCard';
+import Carousel from '../../../components/Carousel';
 
 const Overview = ({ campaigns, brands, templates, files }) => {
   // --- Logic for Sections ---
   
   // Expiring Soon: EndDate < Now + 3 Days (72h)
   const expiringCampaigns = campaigns.filter(c => {
+      // Only show campaigns that have started
+      const now = new Date('2025-11-26'); // Simulated "Now"
+      if (c.startDate) {
+          const start = new Date(c.startDate);
+          if (start > now) return false; // Hide scheduled campaigns
+      }
+
       if (c.endDate === 'Permanent') return false;
       
       // Exclude Used Campaigns
@@ -14,7 +22,6 @@ const Overview = ({ campaigns, brands, templates, files }) => {
       if (isUsed) return false;
 
       const end = new Date(c.endDate);
-      const now = new Date('2025-11-26'); // Simulated "Now"
       const diffTime = end - now;
       const diffHours = diffTime / (1000 * 60 * 60);
       return diffHours > 0 && diffHours <= 72; 
@@ -25,6 +32,10 @@ const Overview = ({ campaigns, brands, templates, files }) => {
       if (!c.startDate) return false;
       const start = new Date(c.startDate);
       const now = new Date('2025-11-26');
+      
+      // Only show if startDate has passed
+      if (start > now) return false;
+      
       const diffTime = now - start;
       const diffHours = diffTime / (1000 * 60 * 60);
       return diffHours >= 0 && diffHours <= 48;
@@ -45,17 +56,20 @@ const Overview = ({ campaigns, brands, templates, files }) => {
   ];
 
   return (
-    <div className="p-8 space-y-10 pb-20">
+    <div className="p-8 space-y-4 pb-20">
       {/* 1. High Priority: Expiring Soon */}
       {expiringCampaigns.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-amber-600 uppercase tracking-wider flex items-center gap-2">
-              <AlertTriangle size={18} className="fill-amber-100" />
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <span className="text-amber-600"><AlertTriangle size={20} className="fill-amber-100" /></span>
               Expiring Soon
             </h2>
+            <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full border border-amber-100">
+              {expiringCampaigns.length}
+            </span>
           </div>
-          <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 no-scrollbar snap-x items-stretch">
+          <Carousel>
              {expiringCampaigns.map(campaign => (
                 <div key={campaign.id} className="min-w-[300px] w-[300px] snap-center flex flex-col">
                    <CampaignCard 
@@ -66,20 +80,23 @@ const Overview = ({ campaigns, brands, templates, files }) => {
                    />
                 </div>
              ))}
-          </div>
+          </Carousel>
         </section>
       )}
 
       {/* 2. New Arrivals */}
       {newArrivals.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3 mb-6">
             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles size={18} className="text-blue-600 fill-blue-100" />
+              <span className="text-blue-600"><Sparkles size={20} className="fill-blue-100" /></span>
               New Arrivals
             </h2>
+            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded-full border border-blue-100">
+              {newArrivals.length}
+            </span>
           </div>
-          <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 no-scrollbar snap-x items-stretch">
+          <Carousel>
              {newArrivals.map(campaign => (
                 <div key={campaign.id} className="min-w-[300px] w-[300px] snap-center flex flex-col">
                    <CampaignCard 
@@ -91,7 +108,7 @@ const Overview = ({ campaigns, brands, templates, files }) => {
                    />
                 </div>
              ))}
-          </div>
+          </Carousel>
         </section>
       )}
 
