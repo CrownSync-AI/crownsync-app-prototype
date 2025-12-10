@@ -3,12 +3,19 @@ import { Filter, Clock, Download, Pin, FolderOpen } from 'lucide-react';
 import AllCampaigns from './AllCampaigns';
 import Overview from './Overview';
 import PartnerBrands from './PartnerBrands';
-
+import DownloadHistory from './DownloadHistory';
+import RetailerBrandDetail from './RetailerBrandDetail';
 import { brands } from '../../../data/mockStore/brandStore';
 
-// --- Mock Data for Retailer View ---
-// MOCK_BRANDS removed, using imported brands
+// --- Reusable Page Header ---
+const PageHeader = ({ title, subtitle }) => (
+    <div className="px-8 pt-8 pb-4">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">{title}</h1>
+        <p className="text-gray-500 text-sm">{subtitle}</p>
+    </div>
+);
 
+// --- Mock Data for Retailer View ---
 
 const AllCatalogs = ({ catalogs, brands }) => {
   const [filterBrand, setFilterBrand] = useState('all');
@@ -50,93 +57,111 @@ const AllCatalogs = ({ catalogs, brands }) => {
   );
 };
 
-import RetailerBrandDetail from './RetailerBrandDetail';
-
-// ... (imports)
-
-const BrandCenter = ({ campaigns, catalogs, templates, files }) => {
-  const [view, setView] = useState('overview'); // Default to overview
-  const [selectedBrandId] = useState('all');
+const BrandCenter = ({ view = 'overview', campaigns, catalogs, templates, files }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
+  
+  // Local state for internal navigation (like Brand Detail)
+  const [internalView, setInternalView] = useState(null); 
 
-  const handleNavigate = (targetView) => {
-    setView(targetView);
-  };
+  // Reset internal view when main view changes
+  React.useEffect(() => {
+     setInternalView(null);
+  }, [view]);
 
   const handleSelectBrand = (brand) => {
     setSelectedBrand(brand);
-    setView('brand-detail');
+    setInternalView('brand-detail');
   };
 
-  return (
-    <div className="h-full flex flex-col">
-       {/* Brand Center Header Tabs */}
-       <div className="flex items-center gap-6 border-b border-gray-200 px-6 bg-white sticky top-0 z-10 flex-shrink-0">
-          <button 
-            onClick={() => setView('overview')}
-            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'overview' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
-          >
-            Overview
-          </button>
-          <button 
-            onClick={() => setView('brands')}
-            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'brands' || view === 'brand-detail' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
-          >
-            Partner Brands
-          </button>
-          <button 
-            onClick={() => setView('campaigns')}
-            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'campaigns' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
-          >
-            All Campaigns
-          </button>
-          <button 
-            onClick={() => setView('catalogs')}
-            className={`py-4 text-sm font-medium border-b-2 transition ${view === 'catalogs' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'}`}
-          >
-            Resources
-          </button>
-       </div>
+  const currentView = internalView || view;
 
+  return (
+    <div className="h-full flex flex-col bg-gray-50">
+       
        <div className="flex-1 overflow-hidden">
-          {view === 'overview' && (
+          {currentView === 'overview' && (
              <div className="h-full overflow-auto">
+               <PageHeader 
+                  title="Brand Center Overview" 
+                  subtitle="Your daily snapshot of new releases and brand updates."
+               />
                <Overview 
                  campaigns={campaigns} 
                  brands={brands} 
                  templates={templates} 
                  files={files} 
-                 onNavigate={handleNavigate} 
                />
              </div>
            )}
-           {view === 'brands' && (
+           
+           {currentView === 'brands' && (
              <div className="h-full overflow-auto">
-               <PartnerBrands 
-                 brands={brands} 
-                 onSelectBrand={handleSelectBrand} 
+               <PageHeader 
+                  title="Partner Brands" 
+                  subtitle="Access dedicated portals for each of your partners."
                />
+               <div className="px-8 pb-8">
+                   <PartnerBrands 
+                     brands={brands} 
+                     onSelectBrand={handleSelectBrand} 
+                   />
+               </div>
              </div>
            )}
-           {view === 'brand-detail' && selectedBrand && (
+
+           {currentView === 'brand-detail' && selectedBrand && (
               <div className="h-full overflow-auto">
                  <RetailerBrandDetail 
                     brand={selectedBrand}
-                    onBack={() => setView('brands')}
+                    onBack={() => setInternalView(null)}
                  />
               </div>
            )}
-           {view === 'campaigns' && (
-              <AllCampaigns 
-                key={selectedBrandId} // Force re-render when brand changes
-                campaigns={campaigns} 
-                brands={brands} 
-                templates={templates}
-                files={files}
-                initialBrandId={selectedBrandId}
-              />
+
+           {currentView === 'campaigns' && (
+              <div className="h-full overflow-y-auto flex flex-col">
+                  <div className="flex-shrink-0">
+                    <PageHeader 
+                        title="Campaign Marketplace" 
+                        subtitle="Discover and activate new marketing campaigns."
+                    />
+                  </div>
+                  <div className="flex-1">
+                      <AllCampaigns 
+                        campaigns={campaigns} 
+                        brands={brands} 
+                        templates={templates}
+                        files={files}
+                      />
+                  </div>
+              </div>
            )}
-           {view === 'catalogs' && <div className="p-6 overflow-auto h-full"><AllCatalogs catalogs={catalogs} brands={brands} /></div>}
+
+           {currentView === 'resources' && (
+               <div className="h-full overflow-auto">
+                   <PageHeader 
+                        title="Brand Resources" 
+                        subtitle="Access official documentation and brand essentials."
+                   />
+                   <div className="px-8 pb-8">
+                       <AllCatalogs catalogs={catalogs} brands={brands} />
+                   </div>
+               </div>
+           )}
+           
+           {currentView === 'downloads' && (
+               <div className="h-full overflow-hidden flex flex-col">
+                   <div className="flex-shrink-0">
+                       <PageHeader 
+                            title="Download History" 
+                            subtitle="A complete log of your asset acquisitions and file versions."
+                       />
+                   </div>
+                   <div className="flex-1 overflow-hidden">
+                       <DownloadHistory files={files} brands={brands} />
+                   </div>
+               </div>
+           )}
        </div>
     </div>
   );

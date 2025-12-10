@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LayoutDashboard, Layout, Users, Mail, FolderOpen, BarChart3, Settings, MoreHorizontal, LogOut, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Layout, Users, Mail, FolderOpen, BarChart3, Settings, MoreHorizontal, LogOut, ChevronDown, Download, Grid, Megaphone, FileBox } from 'lucide-react';
 import BrandLogo from '@/assets/crownsync_logo-with-text.svg';
 
 const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 const RetailerSidebar = ({ activePage, setActivePage, user }) => {
+  const [openMenu, setOpenMenu] = useState('brand-center'); // Default open for Brand Center
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
 
@@ -23,7 +24,19 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
   
   const MENU_ITEMS = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'brand-center', icon: Layout, label: 'Brand Center' },
+    { 
+      id: 'brand-center', 
+      icon: Layout, 
+      label: 'Brand Center',
+      hasSubmenu: true,
+      subItems: [
+        { id: 'brand-center-overview', label: 'Overview', icon: Grid },
+        { id: 'brand-center-brands', label: 'Brands', icon: Users },
+        { id: 'brand-center-campaigns', label: 'Campaigns', icon: Megaphone },
+        { id: 'brand-center-resources', label: 'Resources', icon: FileBox },
+        { id: 'brand-center-downloads', label: 'Download History', icon: Download },
+      ]
+    },
     { id: 'crm', icon: Users, label: 'CRM' },
     { id: 'inbox', icon: Mail, label: 'Unify Inbox' },
     { id: 'analytics', icon: BarChart3, label: 'Analytics' },
@@ -33,13 +46,25 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
 
-  const NavItem = ({ item }) => {
-    const isActive = activePage === item.id;
+  const toggleMenu = (menuId) => {
+    setOpenMenu(openMenu === menuId ? null : menuId);
+  };
+
+  const NavItem = ({ item, isFooter = false }) => {
+    // Active state logic
+    const isActive = activePage === item.id || (item.hasSubmenu && activePage.startsWith(item.id));
+    const isSubActive = (subId) => activePage === subId;
 
     return (
-       <div className="mb-2">
+       <div className={cn("mb-2", isFooter && "mb-0")}>
            <button 
-               onClick={() => setActivePage(item.id)} 
+               onClick={() => {
+                   if (item.hasSubmenu) {
+                       toggleMenu(item.id);
+                   } else {
+                       setActivePage(item.id);
+                   }
+               }} 
                className={cn(
                    "w-full flex items-center justify-between px-3 py-3 text-sm transition-all duration-300 group relative rounded-xl overflow-hidden", 
                    isActive 
@@ -52,11 +77,40 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
                    <span className={cn("tracking-wide", isActive ? "text-gray-900" : "font-medium")}>{item.label}</span>
                </div>
                
-               {/* Right Side Active Indicator (Luxury Touch) */}
-               {isActive && (
+               {/* Right Side Active Indicator (Luxury Touch) for Top Level if Active and NOT Submenu (unless collapsed?) */}
+               {isActive && !item.hasSubmenu && (
                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-[#C5A065] rounded-l-full shadow-[0_0_10px_rgba(197,160,101,0.3)]"></div>
                )}
+
+               {item.hasSubmenu && (
+                    <ChevronDown size={14} className={cn("transition-transform duration-300 text-gray-300 group-hover:text-gray-500", openMenu === item.id ? "rotate-180" : "")} />
+               )}
            </button>
+
+            {/* Submenu Render */}
+            {item.hasSubmenu && openMenu === item.id && (
+                <div className="mt-2 ml-4 pl-4 border-l border-gray-100/80 space-y-1 animate-in slide-in-from-left-1 duration-300 ease-out">
+                    {item.subItems.map((sub) => (
+                        <button
+                            key={sub.id}
+                            onClick={() => setActivePage(sub.id)}
+                            className={cn(
+                                "w-full flex items-center justify-between px-3 py-2 text-sm transition-all relative rounded-lg group/sub",
+                                isSubActive(sub.id) 
+                                    ? "text-gray-900 font-medium" 
+                                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+                            )}
+                        >
+                            <span className={cn("tracking-normal", isSubActive(sub.id) ? "" : "")}>{sub.label}</span>
+                            
+                            {/* Submenu Right Indicator */}
+                            {isSubActive(sub.id) && (
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#C5A065] shadow-sm"></div>
+                            )}
+                        </button>
+                    ))}
+                </div>
+            )}
        </div>
     );
   };
