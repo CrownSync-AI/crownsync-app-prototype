@@ -26,7 +26,6 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
     { id: 'brand-center', icon: Layout, label: 'Brand Center' },
     { id: 'crm', icon: Users, label: 'CRM' },
     { id: 'inbox', icon: Mail, label: 'Unify Inbox' },
-    { id: 'resources', icon: FolderOpen, label: 'Resource Hub' },
     { id: 'analytics', icon: BarChart3, label: 'Analytics' },
   ];
 
@@ -63,7 +62,7 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
   };
 
   return (
-    <aside className="w-20 md:w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
+    <aside className="w-20 md:w-56 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transition-all duration-300 z-20 h-screen font-sans">
       {/* 1. Logo */}
       <div className="h-20 flex items-center justify-center md:justify-start md:px-8">
         <img src={BrandLogo} alt="CrownSync" className="h-10 max-w-[160px] hidden md:block" />
@@ -96,7 +95,7 @@ const RetailerSidebar = ({ activePage, setActivePage, user }) => {
                 </div>
                 <div className="hidden md:block flex-1 min-w-0">
                    <div className="text-sm font-bold text-gray-900 truncate tracking-tight">{user.name}</div>
-                   <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Retailer Support</div>
+                   <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Admin</div>
                 </div>
                 <MoreHorizontal size={16} className={`text-gray-400 hidden md:block transition-transform ${isUserMenuOpen ? 'rotate-90 text-gray-600' : ''}`}/>
              </div>
