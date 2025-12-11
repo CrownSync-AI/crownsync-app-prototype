@@ -57,7 +57,7 @@ const AllCatalogs = ({ catalogs, brands }) => {
   );
 };
 
-const BrandCenter = ({ view = 'overview', campaigns, catalogs, templates, files }) => {
+const BrandCenter = ({ view = 'overview', campaigns, catalogs, templates, files, onNavigate }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
   
   // Local state for internal navigation (like Brand Detail)
@@ -158,7 +158,7 @@ const BrandCenter = ({ view = 'overview', campaigns, catalogs, templates, files 
                        />
                    </div>
                    <div className="flex-1 overflow-hidden">
-                       <DownloadHistory files={files} brands={brands} />
+                       <DownloadHistory files={files} brands={brands} onNavigate={onNavigate} />
                    </div>
                </div>
            )}

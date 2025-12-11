@@ -23,6 +23,7 @@ const RetailerApp = ({ campaigns, catalogs, templates, files, showEmptyState }) 
               catalogs={catalogs} 
               templates={templates} 
               files={files} 
+              onNavigate={(pageId) => setActivePage(pageId)}
            />
         ) : (
            <div className="p-12 flex items-center justify-center h-full text-gray-400">
