@@ -73,7 +73,7 @@ const getCampaignAssets = () => {
       // We will assume imports work or are handled.
       // url: "/src/assets/mock/files/m127334-0001.pdf"
       // NOTE: In Vite, src assets usually need import. We'll use string path for now as per user instruction "file address is...".
-      url: "/src/assets/mock/files/m127334-0001.pdf",
+      url: "/mock/files/m127334-0001.pdf",
     },
     {
       id: "f-webp-test",
@@ -84,7 +84,7 @@ const getCampaignAssets = () => {
       version: "v1.0",
       lastUpdated: "2025-12-11",
       status: "active",
-      url: "/src/assets/mock/files/banner-1.webp",
+      url: "/mock/files/banner-1.webp",
     },
     {
       id: "f-jpg-test",
@@ -95,7 +95,7 @@ const getCampaignAssets = () => {
       version: "v1.0",
       lastUpdated: "2025-12-11",
       status: "active",
-      url: "/src/assets/mock/files/img-001.jpg",
+      url: "/mock/files/img-001.jpg",
     },
   ];
 };
